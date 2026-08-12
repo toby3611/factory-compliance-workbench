@@ -3,85 +3,233 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>工厂合规工作台 · 云端版</title>
+<title>综合工作台 · 云端版</title>
 <style>
-:root{--primary:#2563eb;--primary-soft:#e8f0ff;--bg:#f3f6fb;--card:#fff;--text:#1f2a44;--muted:#7c89a4;--line:#e6ebf4;--red:#e5484d;--green:#16a34a;--amber:#f59e0b}
+:root{
+  --primary:#1e6fff;--primary-2:#3b8aff;--primary-soft:#eaf2ff;
+  --bg:#f4f7fb;--card:#fff;--text:#1a2238;--muted:#7c89a4;--line:#e6ebf4;
+  --red:#e5484d;--green:#16a34a;--amber:#f59e0b;--purple:#7c3aed;--teal:#0891b2;
+  --shadow:0 4px 14px rgba(15,30,80,.06);
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.55;padding-bottom:env(safe-area-inset-bottom)}
-.wrap{max-width:960px;margin:0 auto;padding:14px 14px 40px}
-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.brand{display:flex;align-items:center;gap:10px}
-.logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#2563eb,#4f8bff);display:flex;align-items:center;justify-content:center;flex:none}
-.brand h1{font-size:18px;font-weight:700;line-height:1.1}
-.brand p{font-size:12px;color:var(--muted)}
-.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.btn{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:40px}
-.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
-.btn.sm{padding:6px 10px;font-size:12px;min-height:34px}
-.btn:active{transform:scale(.97)}
-.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 11px;border-radius:20px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:600}
-.badge.cloud{color:#0a7d3b;border-color:#bfe9cd;background:#effaf2}
-.badge.sync{color:#b4690e;border-color:#fde2b3;background:#fff7e8}
-.badge.local{color:var(--muted)}
-.badge.err{color:var(--red);border-color:#ffd0d2;background:#fff5f5}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;font-size:14px;line-height:1.55;padding-bottom:env(safe-area-inset-bottom)}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text)}
+
+/* ============ 顶蓝条 ============ */
+.topbar{
+  position:sticky;top:0;z-index:50;height:56px;
+  background:linear-gradient(90deg,#1e6fff 0%,#3b8aff 50%,#5fa1ff 100%);
+  color:#fff;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;box-shadow:0 2px 10px rgba(30,111,255,.18);
+}
+.topbar .brand{display:flex;align-items:center;gap:10px;min-width:0}
+.topbar .brand .logo{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;flex:none}
+.topbar .brand h1{font-size:16px;font-weight:600;letter-spacing:.5px;white-space:nowrap}
+.topbar .brand .tagline{font-size:11px;opacity:.75;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:340px}
+.topbar .actions{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+.topbar .actions .icon-btn{width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.14);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.topbar .actions .icon-btn:hover{background:rgba(255,255,255,.24)}
+.topbar .actions .avatar{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex:none;border:2px solid rgba(255,255,255,.6)}
+.topbar .actions .sync-badge{display:none}
+
+/* ============ 布局：左侧栏 + 主区 ============ */
+.layout{display:flex;min-height:calc(100vh - 56px)}
+.sidebar{
+  width:200px;flex:none;background:#fff;
+  border-right:1px solid var(--line);padding:12px 8px;overflow-y:auto;
+}
+.sidebar-section{font-size:11px;color:var(--muted);padding:10px 12px 6px;font-weight:600;letter-spacing:.5px}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 12px;border-radius:9px;
+  cursor:pointer;font-size:14px;color:var(--text);
+  margin-bottom:2px;user-select:none;transition:background .12s;
+}
+.nav-item:hover{background:#f1f6ff}
+.nav-item.active{background:var(--primary);color:#fff;font-weight:600}
+.nav-item .ni{width:18px;height:18px;flex:none}
+.nav-item .arrow{margin-left:auto;font-size:10px;opacity:.6;transition:transform .2s}
+.nav-item.expand .arrow{transform:rotate(90deg)}
+.sub-content {
+  max-height:0;overflow:hidden;transition:max-height .2s;
+  padding-left:14px;
+}
+.nav-item.expand + .sub-content{max-height:500px}
+.sub-link{
+  display:block;padding:6px 12px;font-size:12px;color:var(--muted);
+  border-radius:6px;cursor:pointer;margin:2px 0;
+}
+.sub-link:hover{background:#f1f6ff;color:var(--text)}
+
+/* ============ 主区 ============ */
+.main{flex:1;padding:20px 24px 80px;max-width:1180px;margin:0 auto;width:100%}
+.greeting-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:6px 0 18px;
+}
+.greeting-bar h2{font-size:20px;font-weight:700;line-height:1.2}
+.greeting-bar h2 .name{color:var(--primary)}
+.greeting-bar .greet-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.today-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 16px;background:#fff;border:1px solid var(--line);
+  border-radius:22px;cursor:pointer;font-size:13px;font-weight:600;
+  transition:all .15s;
+}
+.today-btn:hover{border-color:var(--primary);color:var(--primary);box-shadow:var(--shadow)}
+.today-btn .num{
+  background:var(--red);color:#fff;border-radius:11px;
+  padding:1px 8px;font-size:11px;font-weight:700;min-width:20px;text-align:center;
+}
+.today-btn .num.zero{background:var(--muted)}
+
+/* ============ 6 卡片网格 ============ */
+.cards-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:14px;margin-bottom:22px;
+}
+.mod-card{
+  position:relative;border-radius:16px;padding:20px;
+  min-height:160px;cursor:pointer;overflow:hidden;
+  transition:transform .18s,box-shadow .18s;
+  background:#fff;border:1px solid var(--line);
+  display:flex;flex-direction:column;
+}
+.mod-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(15,30,80,.12)}
+.mod-card .ic{
+  width:42px;height:42px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:12px;flex:none;
+}
+.mod-card.c-blue{background:linear-gradient(135deg,#3b8aff 0%,#5fa1ff 100%);color:#fff;border:none}
+.mod-card.c-blue .ic{background:rgba(255,255,255,.22)}
+.mod-card.c-green{background:linear-gradient(135deg,#10b981 0%,#34d399 100%);color:#fff;border:none}
+.mod-card.c-green .ic{background:rgba(255,255,255,.22)}
+.mod-card.c-teal{background:linear-gradient(135deg,#0891b2 0%,#22d3ee 100%);color:#fff;border:none}
+.mod-card.c-teal .ic{background:rgba(255,255,255,.22)}
+.mod-card.c-amber{background:linear-gradient(135deg,#f59e0b 0%,#fbbf24 100%);color:#fff;border:none}
+.mod-card.c-amber .ic{background:rgba(255,255,255,.22)}
+.mod-card.c-white{background:#fff;color:var(--text)}
+.mod-card.c-white .ic{background:var(--primary-soft);color:var(--primary)}
+.mod-card.c-purple{background:#fff;color:var(--text)}
+.mod-card.c-purple .ic{background:#f3eaff;color:var(--purple)}
+.mod-card-title{font-size:15px;font-weight:700;margin-bottom:14px;line-height:1.3;display:flex;align-items:center;gap:8px}
+.mod-card-title .pc{font-size:11px;opacity:.7;font-weight:500}
+.mod-card-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.chip{
+  font-size:11px;padding:5px 11px;border-radius:14px;
+  background:rgba(255,255,255,.22);color:#fff;
+  cursor:pointer;font-weight:500;white-space:nowrap;
+  transition:background .15s,transform .1s;
+  border:1px solid rgba(255,255,255,.15);
+}
+.chip:hover{background:rgba(255,255,255,.38)}
+.mod-card.c-white .chip,.mod-card.c-purple .chip{background:#f1f5fb;color:var(--text);border-color:#e6ebf4}
+.mod-card.c-white .chip:hover,.mod-card.c-purple .chip:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.mod-card-bg{
+  position:absolute;right:-30px;bottom:-30px;opacity:.18;pointer-events:none;
+}
+.mod-card-stat{
+  position:absolute;top:14px;right:18px;
+  font-size:11px;padding:3px 9px;border-radius:11px;
+  background:rgba(255,255,255,.25);color:#fff;font-weight:600;
+}
+.mod-card.c-white .mod-card-stat,.mod-card.c-purple .mod-card-stat{background:#fff7e8;color:#b4690e}
+
+/* ============ 今日待办卡 ============ */
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
-.card h2{font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h2{font-size:15px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .card h2 .ic{width:20px;height:20px;color:var(--primary);flex:none}
-.today{background:linear-gradient(135deg,#e8f0ff,#f3f6fb);border-color:#cfe0ff}
-.today-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+.today-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;background:#fafbfd}
 .today-item.overdue{border-color:#ffd0d2;background:#fff5f5}
-.tag{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap}
+.tag{font-size:11px;padding:2px 8px;border-radius:11px;font-weight:600;white-space:nowrap}
 .tag.P0{background:#ffe3e3;color:#e5484d}
 .tag.P1{background:#fff1d6;color:#d97706}
 .tag.P2{background:#e6f0ff;color:#2563eb}
-.tag.st-d{background:#d7f3ef;color:#0d9488}
-.tag.st-q{background:#fff1d6;color:#d97706}
-.tag.st-z{background:#e6f0ff;color:#2563eb}
-.tag.st-w{background:#e3eeec;color:#14302c}
 .due{font-size:12px;color:var(--muted);white-space:nowrap}
 .due.over{color:var(--red);font-weight:600}
-.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;min-height:34px}
+.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;min-height:30px}
 .mini.done{background:var(--green);color:#fff;border-color:var(--green)}
+.empty{color:var(--muted);font-size:13px;text-align:center;padding:18px}
 
-/* tabs */
-.tabs{position:sticky;top:0;z-index:20;display:flex;gap:6px;background:var(--bg);padding:6px 0 10px;overflow-x:auto;margin-bottom:6px;-webkit-overflow-scrolling:touch}
-.tabs::-webkit-scrollbar{display:none}
-.tab{flex:none;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:20px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
-.tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
-.panel{display:none}
-.panel.active{display:block}
+/* ============ 子模块（全屏覆盖） ============ */
+.sub-view{position:fixed;inset:0;background:var(--bg);z-index:99;overflow-y:auto;animation:slideIn .25s ease}
+.sub-view.hidden{display:none}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+.sub-hd{
+  position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;
+  padding:14px 16px;background:var(--card);border-bottom:1px solid var(--line);
+  backdrop-filter:saturate(180%) blur(8px);
+}
+.sub-back{background:none;border:none;color:var(--primary);font-size:22px;cursor:pointer;padding:4px 10px;line-height:1;font-weight:700}
+.sub-hd h2{font-size:17px;font-weight:700;flex:1;min-width:0}
+.sub-stats{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:4px}
+.sub-stats b{color:var(--text);font-size:14px}
+.sub-body{padding:14px 16px;max-width:900px;margin:0 auto}
+.sub-section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.sub-section h3{font-size:13px;margin-bottom:10px;display:flex;align-items:center;gap:6px;color:var(--muted);font-weight:600}
+.sub-section h3 .ic{width:16px;height:16px;color:var(--primary)}
+.sub-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.sub-filter .fchip{font-size:12px;padding:5px 12px;border-radius:14px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--text);font-weight:500}
+.sub-filter .fchip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.add-task-bar{display:flex;gap:6px;flex-wrap:wrap}
+.add-task-bar input[type=text]{flex:1;min-width:160px}
+.add-task-bar select,.add-task-bar input[type=date]{flex:none;min-width:90px}
+.progress-bar{height:12px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:6px}
+.progress-bar div{height:100%;background:linear-gradient(90deg,var(--primary),#5fa1ff);border-radius:6px;transition:width .4s}
+.progress-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.progress-row .pct{font-size:30px;font-weight:700;color:var(--primary);line-height:1}
+.progress-row .sub{font-size:12px;color:var(--muted)}
+.sub-task{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;background:#fff}
+.sub-task.done{background:#fafdfa;opacity:.85}
+.sub-task .chk{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center}
+.sub-task.done .chk{background:var(--green);border-color:var(--green)}
+.sub-task.done .tt{text-decoration:line-through;color:var(--muted)}
+.sub-task .tt{flex:1;font-size:14px;min-width:0}
+.sub-task select,.sub-task input[type=date]{font-size:12px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--text)}
+.sub-task select{width:62px}
+.sub-task input[type=date]{width:130px}
+.sub-task .due{font-size:11px;color:var(--muted)}
+.sub-task .due.over{color:var(--red);font-weight:600}
+.del{cursor:pointer;color:var(--muted);border:none;background:none;padding:4px;display:flex;align-items:center}
+.done-list{max-height:220px;overflow-y:auto}
+.done-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.done-item:last-child{border:none}
+.done-item .ck{color:var(--green);font-weight:700}
+.empty-mini{padding:14px;text-align:center;color:var(--muted);font-size:13px}
 
-.cat{margin-bottom:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
-.cat-hd{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#eef3fb;font-weight:600;font-size:14px;cursor:pointer;user-select:none}
-.cat-hd .fold-zone{flex:1;display:flex;align-items:center;justify-content:space-between;min-width:0;gap:8px}
-.cat-hd .nm{display:flex;align-items:center;gap:8px}
-.cat-hd .nm::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--primary)}
-.cat-hd .st{font-size:12px;color:var(--muted);font-weight:500}
-.enter-btn{flex:none;font-size:12px;padding:5px 11px;border:1px solid var(--primary);background:#fff;color:var(--primary);border-radius:18px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:4px}
-.enter-btn:hover{background:var(--primary);color:#fff}
-.task{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line);background:#fff}
-.task .chk{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center}
-.task.done .chk{background:var(--green);border-color:var(--green)}
-.task.done .tt{text-decoration:line-through;color:var(--muted)}
-.task .tt{flex:1;font-size:14px;min-width:0}
-.del{cursor:pointer;color:var(--muted);border:none;background:none;padding:4px;display:flex}
+/* ============ AI 助手悬浮按钮 ============ */
+.ai-fab{
+  position:fixed;bottom:24px;right:24px;z-index:80;
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(135deg,#3b8aff,#5fa1ff);
+  color:#fff;border:none;cursor:pointer;
+  box-shadow:0 8px 22px rgba(59,138,255,.4);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  font-size:11px;font-weight:700;
+  transition:transform .15s;
+}
+.ai-fab:hover{transform:scale(1.05)}
+.ai-fab svg{margin-bottom:1px}
 
-.proj{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff;cursor:pointer;transition:background .15s}
-.proj:hover{background:#f5f9ff}
-.proj .ring{flex:none}
-.proj .meta{flex:1;min-width:0}
-.proj .nm{font-size:14px;font-weight:700}
-.proj .st{font-size:12px;color:var(--muted);margin-top:2px}
-.proj .pc{font-size:13px;font-weight:700;color:var(--primary)}
-.proj .enter-btn{flex:none}
+/* ============ 报告中心 / 知识库 / 备忘录视图 ============ */
+.view{display:none}
+.view.active{display:block}
+.report-textarea{width:100%;min-height:340px;font-size:13px;line-height:1.7;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 
-.meet{display:flex;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff}
-.meet .bar{width:4px;border-radius:4px;background:var(--primary);flex:none}
-.meet .body{flex:1;min-width:0}
-.meet .top{font-size:13px;font-weight:600}
-.meet .sub{font-size:12px;color:var(--muted);margin:3px 0}
-.meet .line{font-size:13px;margin-top:4px}
-.meet .k{color:var(--primary);font-weight:600}
+.kb{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff;cursor:pointer}
+.kb .ic{width:34px;height:34px;border-radius:9px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;flex:none}
+.kb .body{flex:1;min-width:0}
+.kb .nm{font-size:14px;font-weight:600}
+.kb .ct{font-size:13px;color:var(--muted);margin-top:4px;white-space:pre-wrap}
+.kb .url{font-size:12px;color:var(--primary);margin-top:4px;word-break:break-all}
+
+.memo{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff}
+.memo.pin{background:#fffbe8;border-color:#fde68a}
+.memo .body{flex:1;min-width:0;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.memo .meta{font-size:11px;color:var(--muted);margin-top:4px}
 
 .client{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff}
 .client .av{width:36px;height:36px;border-radius:10px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex:none}
@@ -102,70 +250,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px;fl
 .pie-legend .row{display:flex;align-items:center;gap:6px}
 .pie-legend .dot{width:9px;height:9px;border-radius:50%;flex:none}
 
-.kb{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff;cursor:pointer}
-.kb .ic{width:34px;height:34px;border-radius:9px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;flex:none}
-.kb .body{flex:1;min-width:0}
-.kb .nm{font-size:14px;font-weight:600}
-.kb .ct{font-size:13px;color:var(--muted);margin-top:4px;white-space:pre-wrap}
-.kb .url{font-size:12px;color:var(--primary);margin-top:4px;word-break:break-all}
-
-.memo{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff}
-.memo.pin{background:#fffbe8;border-color:#fde68a}
-.memo .body{flex:1;min-width:0;font-size:14px;white-space:pre-wrap;word-break:break-word}
-.memo .meta{font-size:11px;color:var(--muted);margin-top:4px}
-
-.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-.metric{background:#f7faff;border:1px solid var(--line);border-radius:10px;padding:10px 6px;text-align:center}
-.metric .v{font-size:17px;font-weight:700;color:var(--primary)}
-.metric .l{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.3}
-.empty{color:var(--muted);font-size:13px;text-align:center;padding:18px}
-.center{text-align:center}
-form .row{display:flex;gap:8px;flex-wrap:wrap}
-input,select,textarea{font-size:16px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);font-family:inherit}
-textarea{width:100%;min-height:90px;resize:vertical}
-.note{font-size:12px;color:var(--muted);margin-top:8px}
-.hint{background:#eef4ff;border:1px solid #cfe0ff;border-radius:10px;padding:10px 12px;font-size:12px;color:#1e4f9c;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px}
-.hint b{color:#1e4f9c}
-
-/* sub module */
-.sub-view{position:fixed;inset:0;background:var(--bg);z-index:99;overflow-y:auto;padding:0 0 60px;animation:slideIn .25s ease}
-.sub-view.hidden{display:none}
-@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
-.sub-hd{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:14px;background:var(--card);border-bottom:1px solid var(--line);backdrop-filter:saturate(180%) blur(8px)}
-.sub-back{background:none;border:none;color:var(--primary);font-size:22px;cursor:pointer;padding:4px 10px;line-height:1;font-weight:700}
-.sub-hd h2{font-size:18px;font-weight:700;flex:1;min-width:0}
-.sub-stats{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:4px}
-.sub-stats b{color:var(--text);font-size:14px}
-.sub-body{padding:14px}
-.sub-section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
-.sub-section h3{font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--muted);font-weight:600}
-.sub-section h3 .ic{width:18px;height:18px;color:var(--primary)}
-.add-task-bar{display:flex;gap:8px;flex-wrap:wrap}
-.add-task-bar input[type=text]{flex:1;min-width:160px}
-.add-task-bar select,.add-task-bar input[type=date]{flex:none;min-width:90px}
-.progress-bar{height:14px;background:var(--line);border-radius:7px;overflow:hidden;margin-top:8px}
-.progress-bar div{height:100%;background:linear-gradient(90deg,var(--primary),#5b9cff);border-radius:7px;transition:width .4s}
-.progress-row{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
-.progress-row .pct{font-size:32px;font-weight:700;color:var(--primary);line-height:1}
-.progress-row .sub{font-size:13px;color:var(--muted)}
-.sub-task{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;background:#fff}
-.sub-task.done{background:#fafdfa;opacity:.85}
-.sub-task .chk{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center}
-.sub-task.done .chk{background:var(--green);border-color:var(--green)}
-.sub-task.done .tt{text-decoration:line-through;color:var(--muted)}
-.sub-task .tt{flex:1;font-size:14px;min-width:0}
-.sub-task select,.sub-task input[type=date]{font-size:12px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--text);font-family:inherit}
-.sub-task select{width:62px}
-.sub-task input[type=date]{width:140px}
-.sub-task .due{font-size:11px;color:var(--muted)}
-.sub-task .due.over{color:var(--red);font-weight:600}
-.done-list{max-height:240px;overflow-y:auto}
-.done-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13px}
-.done-item:last-child{border:none}
-.done-item .ck{color:var(--green);font-weight:700}
-.empty-mini{padding:14px;text-align:center;color:var(--muted);font-size:13px}
-
-/* modal */
+/* ============ 模态框 / Toast ============ */
 .mask{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:120;display:flex;align-items:center;justify-content:center;padding:16px}
 .mask.hidden{display:none}
 .modal{background:#fff;border-radius:18px;padding:20px;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
@@ -177,154 +262,211 @@ textarea{width:100%;min-height:90px;resize:vertical}
 .modal .err{color:var(--red);font-size:12px;margin-top:8px;white-space:pre-wrap}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f2a44;color:#fff;padding:10px 18px;border-radius:22px;font-size:13px;z-index:200;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1}
-@media(max-width:680px){.metrics{grid-template-columns:repeat(3,1fr)}.sub-task input[type=date]{width:120px}.brand p{display:none}}
+
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.sm{padding:6px 10px;font-size:12px;min-height:34px}
+
+/* 备忘录提醒中心 - 4 个聚合视图 */
+.f-agg-section{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.f-agg-section h3{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px;color:var(--text)}
+.f-agg-section h3 .ic{width:18px;height:18px;color:var(--primary);flex:none}
+.f-agg-section .desc{font-size:12px;color:var(--muted);margin-bottom:10px;margin-left:24px}
+.f-agg-list{display:flex;flex-direction:column;gap:6px}
+
+/* 响应式 */
+@media(max-width:980px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){
+  .layout{flex-direction:column}
+  .sidebar{display:flex;flex-direction:row;overflow-x:auto;width:100%;border-right:none;border-bottom:1px solid var(--line);padding:8px;flex:none}
+  .sidebar-section{display:none}
+  .nav-item{flex:none;padding:7px 11px;font-size:12px;white-space:nowrap}
+  .nav-item .arrow{display:none}
+  .nav-item.expand + .sub-content{display:none}
+  .cards-grid{grid-template-columns:1fr}
+  .main{padding:14px 14px 90px}
+  .topbar .brand .tagline{display:none}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="brand">
-      <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></div>
-      <div><h1>工厂合规工作台</h1><p>云端版 · 电脑手机通用 · 换设备零迁移</p></div>
+
+<!-- ============ 顶蓝条 ============ -->
+<header class="topbar">
+  <div class="brand">
+    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></div>
+    <div>
+      <h1>综合工作台</h1>
+      <div class="tagline">纺织工厂合规管理 · 云端版 · 电脑手机通用 · 换设备零迁移</div>
     </div>
-    <div class="tools">
-      <span class="badge local" id="syncBadge" onclick="openSync()" title="点击配置云端同步">💾 本地模式</span>
-      <button class="btn sm" id="expBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>导出</button>
-      <button class="btn sm" id="impBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9m0 0l-4 4m4-4l4 4M5 3h14"/></svg>导入</button>
-      <input type="file" id="impFile" accept="application/json" hidden>
+  </div>
+  <div class="actions">
+    <span id="syncBadge" onclick="openSync()" style="font-size:12px;padding:5px 11px;border-radius:14px;background:rgba(255,255,255,.16);cursor:pointer;font-weight:600">☁ 本地模式</span>
+    <button class="icon-btn" id="expBtn" title="导出备份"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></button>
+    <button class="icon-btn" id="impBtn" title="导入备份"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9m0 0l-4 4m4-4l4 4M5 3h14"/></svg></button>
+    <input type="file" id="impFile" accept="application/json" hidden>
+    <button class="icon-btn" onclick="loadFromCloud(true)" title="刷新云端"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5"/></svg></button>
+    <div class="avatar">黄</div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- ============ 左侧栏 ============ -->
+  <aside class="sidebar">
+    <div class="sidebar-section">主导航</div>
+    <div class="nav-item active" data-view="home" onclick="showView('home')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+      <span>工作台首页</span>
     </div>
-  </header>
 
-  <div class="hint">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
-    <div><b>这是云端版：</b>点右上角「💾 本地模式」开启云端同步后，所有任务/知识库/备忘录会自动存在云端。换电脑或手机只需打开同一个链接（建议存书签+桌面快捷方式），数据原样回来，不用拷贝任何文件。</div>
-  </div>
+    <div class="sidebar-section">业务模块</div>
+    <div class="nav-item" data-cat="A" onclick="openSubModule('A')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>
+      <span>认证管理</span><span class="arrow">▼</span>
+    </div>
+    <div class="nav-item" data-cat="B" onclick="openSubModule('B')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      <span>验厂管理</span><span class="arrow">▼</span>
+    </div>
+    <div class="nav-item" data-cat="C" onclick="openSubModule('C')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-7 8-13a8 8 0 10-16 0c0 6 8 13 8 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      <span>环境能源</span><span class="arrow">▼</span>
+    </div>
+    <div class="nav-item" data-cat="D" onclick="openSubModule('D')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/></svg>
+      <span>EHS安全</span><span class="arrow">▼</span>
+    </div>
+    <div class="nav-item" data-cat="E" onclick="openSubModule('E')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16v13H4zM8 7V3h8v4"/></svg>
+      <span>综合内勤</span><span class="arrow">▼</span>
+    </div>
+    <div class="nav-item" data-cat="F" onclick="openSubModule('F')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1112 0v5l1.5 3h-15L6 13V8z"/></svg>
+      <span>备忘录提醒</span><span class="arrow">▼</span>
+    </div>
 
-  <!-- 常驻：今天要处理 -->
-  <section class="card today">
-    <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今天要处理</h2>
-    <div id="todayList"></div>
-  </section>
+    <div class="sidebar-section">工具</div>
+    <div class="nav-item" data-view="report" onclick="showView('report')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V10zM14 3v6h6M8 13h8M8 17h5"/></svg>
+      <span>报告中心</span>
+    </div>
+    <div class="nav-item" data-view="kb" onclick="showView('kb')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h12a4 4 0 014 4v10H8a4 4 0 01-4-4V5zM4 5v10a4 4 0 004 4"/></svg>
+      <span>知识库</span>
+    </div>
+    <div class="nav-item" data-view="memo" onclick="showView('memo')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>
+      <span>备忘录</span>
+    </div>
+  </aside>
 
-  <!-- 标签页 -->
-  <div class="tabs" id="tabs">
-    <div class="tab active" data-t="effi" onclick="showTab('effi')">效率</div>
-    <div class="tab" data-t="proj" onclick="showTab('proj')">项目</div>
-    <div class="tab" data-t="ops" onclick="showTab('ops')">事务</div>
-    <div class="tab" data-t="kb" onclick="showTab('kb')">知识库</div>
-    <div class="tab" data-t="memo" onclick="showTab('memo')">备忘录</div>
-  </div>
+  <!-- ============ 主区 ============ -->
+  <main class="main">
 
-  <!-- 效率 -->
-  <div class="panel active" id="panel-effi">
-    <section class="card">
-      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h18v4H3zM3 10h18v10H3z"/></svg>任务清单 · 按大类（点「进入 →」进子模块）</h2>
-      <div id="taskList"></div>
-    </section>
-    <section class="card">
-      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/></svg>分类周报</h2>
-      <button class="btn primary" id="genWeek" style="width:100%">一键生成按 6 大类汇总的周报</button>
-      <textarea id="weekOut" style="margin-top:10px;display:none"></textarea>
-    </section>
-    <section class="card">
-      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>六大类完成率</h2>
-      <div class="metrics" id="metrics"></div>
-    </section>
-  </div>
-
-  <!-- 项目 -->
-  <div class="panel" id="panel-proj">
-    <section class="card">
-      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7"/></svg>项目看板 · 6 大类（点卡片进入子模块）</h2>
-      <div id="projList"></div>
-    </section>
-    <section class="card">
-      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h18v4H3zM3 10h18v10H3z"/></svg>任务清单 · 按大类</h2>
-      <div id="projTaskList"></div>
-    </section>
-    <section class="card">
-      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4zM8 10h8M8 14h5"/></svg>会议纪要</h2>
-      <form id="meetForm" style="display:grid;gap:8px;margin-bottom:12px">
-        <div class="row"><input id="mDate" type="date"><input id="mWho" placeholder="参会人…"></div>
-        <input id="mTopic" placeholder="议题…">
-        <textarea id="mResult" placeholder="结论…" style="min-height:48px"></textarea>
-        <input id="mFollow" placeholder="跟进事项…">
-        <button class="btn primary" type="submit">保存纪要</button>
-      </form>
-      <div id="meetList"></div>
-    </section>
-  </div>
-
-  <!-- 事务 -->
-  <div class="panel" id="panel-ops">
-    <section class="card">
-      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h18v4H3zM3 10h18v10H3z"/></svg>任务清单 · 按大类</h2>
-      <div id="opsTaskList"></div>
-    </section>
-    <section class="card">
-      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 11a4 4 0 10-8 0 4 4 0 008 0zM3 21a7 7 0 0114 0"/></svg>客户跟进</h2>
-      <form id="cliForm" class="row" style="margin-bottom:10px">
-        <input id="cliName" placeholder="客户名称…" required style="flex:1;min-width:120px">
-        <select id="cliStatus"><option value="对接中">对接中</option><option value="报价中">报价中</option><option value="验厂中">验厂中</option><option value="已完成">已完成</option></select>
-        <input id="cliNext" placeholder="下一步" style="flex:1;min-width:120px">
-        <button class="btn primary" type="submit">添加</button>
-      </form>
-      <div id="cliList"></div>
-    </section>
-    <section class="card">
-      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>工作费用（按类别）</h2>
-      <form id="expForm" class="row" style="margin-bottom:12px">
-        <input id="expDate" type="date" style="flex:none;min-width:130px">
-        <select id="expType" style="flex:none"></select>
-        <input id="expAmt" type="number" placeholder="金额" style="flex:1;min-width:90px">
-        <input id="expNote" placeholder="说明" style="flex:2;min-width:120px">
-        <button class="btn primary" type="submit">记一笔</button>
-      </form>
-      <div class="pie-wrap">
-        <div class="pie" id="expPie"></div>
-        <div class="pie-legend" id="expLegend"></div>
-      </div>
-      <div id="expList" style="margin-top:12px"></div>
-      <p class="note" id="expTotal"></p>
-    </section>
-  </div>
-
-  <!-- 知识库 -->
-  <div class="panel" id="panel-kb">
-    <section class="card">
-      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11H4zM15 4v5h5"/></svg>知识库</h2>
-      <input id="kbSearch" placeholder="搜索标题 / 内容…" style="width:100%;margin-bottom:10px">
-      <form id="kbForm" style="display:grid;gap:8px;margin-bottom:12px">
-        <div class="row">
-          <input id="kbTitle" placeholder="标题…" style="flex:2;min-width:140px">
-          <select id="kbCat" style="flex:1;min-width:110px">
-            <option>认证资料</option><option>客户信息</option><option>流程SOP</option><option>联系人</option><option>模板文档</option><option>其他</option>
-          </select>
+    <!-- 工作台首页 -->
+    <div class="view active" id="view-home">
+      <div class="greeting-bar">
+        <div>
+          <h2>欢迎回来，<span class="name">黄总</span> 👋</h2>
+          <div class="greet-meta" id="greetMeta">今天 <span id="todayDate"></span> · 6 个业务模块待您处理</div>
         </div>
-        <textarea id="kbContent" placeholder="内容 / 要点…"></textarea>
-        <input id="kbUrl" placeholder="相关链接（可选）…">
-        <button class="btn primary" type="submit">添加条目</button>
-      </form>
-      <div id="kbList"></div>
-    </section>
-  </div>
+        <button class="today-btn" onclick="scrollToToday()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>
+          今日待办 <span class="num" id="todayCount">0</span> →
+        </button>
+      </div>
 
-  <!-- 备忘录 -->
-  <div class="panel" id="panel-memo">
-    <section class="card">
-      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>备忘录</h2>
-      <textarea id="memoInput" placeholder="随手记一条…（Ctrl/⌘+Enter 保存）"></textarea>
-      <div style="margin-top:8px"><button class="btn primary" onclick="addMemo()">+ 添加备忘录</button></div>
-      <div id="memoList" style="margin-top:12px"></div>
-    </section>
-  </div>
+      <div class="cards-grid" id="cardsGrid"></div>
 
-  <div class="center" style="margin-top:8px">
-    <button class="btn" id="clearBtn" style="color:var(--red);border-color:#ffd0d2">重置为示例数据</button>
-  </div>
+      <div class="card" id="todayCard">
+        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今日要处理</h2>
+        <div id="todayList"></div>
+      </div>
+
+      <div class="center" style="margin-top:14px;text-align:center">
+        <button class="btn" id="clearBtn" style="color:var(--red);border-color:#ffd0d2">重置为示例数据</button>
+      </div>
+    </div>
+
+    <!-- 报告中心 -->
+    <div class="view" id="view-report">
+      <div class="greeting-bar">
+        <div>
+          <h2>报告中心</h2>
+          <div class="greet-meta">按 6 大业务模块自动汇总本周工作</div>
+        </div>
+        <button class="today-btn" onclick="genWeekReport()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          一键生成本周报告
+        </button>
+      </div>
+      <div class="card">
+        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/></svg>本周工作报告（可编辑复制）</h2>
+        <textarea id="weekOut" class="report-textarea" placeholder="点击右上角「一键生成本周报告」自动汇总…"></textarea>
+      </div>
+      <div class="card">
+        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>六大模块完成率</h2>
+        <div id="metrics" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+      </div>
+    </div>
+
+    <!-- 知识库 -->
+    <div class="view" id="view-kb">
+      <div class="greeting-bar">
+        <div>
+          <h2>知识库</h2>
+          <div class="greet-meta">认证资料 / 客户信息 / 流程 SOP / 联系人 / 模板</div>
+        </div>
+      </div>
+      <div class="card">
+        <input id="kbSearch" placeholder="搜索标题 / 内容…" style="width:100%;margin-bottom:10px">
+        <form id="kbForm" style="display:grid;gap:8px;margin-bottom:12px">
+          <div class="row">
+            <input id="kbTitle" placeholder="标题…" style="flex:2;min-width:140px">
+            <select id="kbCat" style="flex:1;min-width:110px">
+              <option>认证资料</option><option>客户信息</option><option>流程SOP</option>
+              <option>联系人</option><option>模板文档</option><option>其他</option>
+            </select>
+          </div>
+          <textarea id="kbContent" placeholder="内容 / 要点…" style="min-height:90px"></textarea>
+          <input id="kbUrl" placeholder="相关链接（可选）…">
+          <button class="btn primary" type="submit">添加条目</button>
+        </form>
+        <div id="kbList"></div>
+      </div>
+    </div>
+
+    <!-- 备忘录 -->
+    <div class="view" id="view-memo">
+      <div class="greeting-bar">
+        <div>
+          <h2>备忘录</h2>
+          <div class="greet-meta">随手记 · 置顶 · 跨设备同步</div>
+        </div>
+      </div>
+      <div class="card">
+        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>添加新备忘</h2>
+        <textarea id="memoInput" placeholder="随手记一条…（Ctrl/⌘+Enter 保存）" style="min-height:80px"></textarea>
+        <div style="margin-top:8px"><button class="btn primary" onclick="addMemo()">+ 添加备忘录</button></div>
+      </div>
+      <div class="card">
+        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 7"/></svg>我的备忘</h2>
+        <div id="memoList"></div>
+      </div>
+    </div>
+
+  </main>
 </div>
 
-<!-- 子模块 -->
+<!-- ============ AI 助手悬浮按钮 ============ -->
+<button class="ai-fab" onclick="aiHelp()" title="AI 助手">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+  AI助手
+</button>
+
+<!-- ============ 子模块覆盖层 ============ -->
 <div id="subView" class="sub-view hidden">
   <div class="sub-hd">
     <button class="sub-back" onclick="closeSubModule()">←</button>
@@ -333,48 +475,14 @@ textarea{width:100%;min-height:90px;resize:vertical}
       <div class="sub-stats" id="subStats"></div>
     </div>
   </div>
-  <div class="sub-body">
-    <div class="sub-section">
-      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>添加新任务到本类</h3>
-      <div class="add-task-bar">
-        <input type="text" id="newTaskTitle" placeholder="输入任务标题...">
-        <select id="newTaskPrio"><option value="P2">P2 普通</option><option value="P1">P1 重要</option><option value="P0">P0 紧急</option></select>
-        <input type="date" id="newTaskDate">
-        <button class="btn primary" onclick="addSubTask()">+ 添加</button>
-      </div>
-    </div>
-    <div class="sub-section">
-      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h18v4H3zM3 10h18v10H3z"/></svg>本类全部任务</h3>
-      <div id="subTaskList"></div>
-    </div>
-    <div class="sub-section">
-      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/></svg>分类备注（自动保存到云端）</h3>
-      <textarea id="subNotes" placeholder="记录这个大类的关键节点、联系人、要跟进的细节…，关闭子模块时即自动保存"></textarea>
-      <p class="note" id="subNoteStatus">备注自动保存</p>
-    </div>
-    <div class="sub-section">
-      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>完成进度</h3>
-      <div class="progress-row">
-        <div class="pct" id="subPct">0%</div>
-        <div class="sub" id="subPctDetail"></div>
-      </div>
-      <div class="progress-bar"><div id="subPctBar" style="width:0%"></div></div>
-    </div>
-    <div class="sub-section">
-      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 7"/></svg>近期已完成（最近 10 条）</h3>
-      <div class="done-list" id="subCompleted"></div>
-    </div>
-    <div class="center" style="margin-top:20px">
-      <button class="btn" onclick="closeSubModule()">← 返回主工作台</button>
-    </div>
-  </div>
+  <div class="sub-body" id="subBody"></div>
 </div>
 
-<!-- 云端同步弹窗 -->
+<!-- ============ 云端同步弹窗 ============ -->
 <div class="mask hidden" id="syncMask">
   <div class="modal">
     <h3>云端同步设置</h3>
-    <p>数据将保存在你的私有云端（GitHub Gist），换电脑 / 手机打开同一链接即可同步，无需拷贝文件。<br>① 在 github.com → Settings → Developer settings → Personal access tokens 生成一个带 <b>gist</b> 权限的 Token；<br>② 粘贴到下方。留空 Gist ID 会自动新建一个私有 Gist。</p>
+    <p>数据保存在你的私有云端（GitHub Gist），换电脑 / 手机打开同一链接即可同步，无需拷贝文件。<br>① 在 github.com → Settings → Developer settings → Personal access tokens 生成一个带 <b>gist</b> 权限的 Token；<br>② 粘贴到下方。留空 Gist ID 会自动新建私有 Gist。</p>
     <div class="field">
       <label>GitHub Token（必填，仅存你本地/链接里）</label>
       <input id="syncToken" type="password" placeholder="ghp_..." style="width:100%">
@@ -389,7 +497,7 @@ textarea{width:100%;min-height:90px;resize:vertical}
     </div>
     <div id="syncErr" class="err"></div>
     <div id="syncActions" style="margin-top:14px;display:none;border-top:1px solid var(--line);padding-top:12px">
-      <p style="margin-bottom:8px">已连接云端。换设备时，复制下面的同步链接（含令牌），在新电脑/手机浏览器打开即自动配置：</p>
+      <p style="margin-bottom:8px;font-size:12px;color:var(--muted)">已连接云端。换设备时复制下面的同步链接（含令牌），在新电脑/手机浏览器打开即自动配置：</p>
       <div class="row">
         <input id="syncLink" readonly style="flex:1;font-size:12px">
         <button class="btn sm" onclick="copySyncLink()">复制</button>
@@ -401,81 +509,104 @@ textarea{width:100%;min-height:90px;resize:vertical}
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div id="toast" class="toast"></div>
 
 <script>
-/* ============ 基础数据 ============ */
-const todayStr=()=>new Date().toISOString().slice(0,10);
+/* ============ 6 大类（按图 1）+ 子功能 ============ */
 const CATS=[
-  {id:'A',name:'体系/客户认证'},
-  {id:'B',name:'客户验厂与ZDHC'},
-  {id:'C',name:'TC证书与平衡'},
-  {id:'D',name:'数据上传与统计'},
-  {id:'E',name:'应急安全与检查'},
-  {id:'F',name:'工时费用与跟进'}
+  {id:'A',name:'体系与可持续认证管理',color:'c-blue',short:'认证管理',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>',
+   subs:['ISO体系','GRS/GOTS认证','范围证书','TC申请','原料平衡统计']},
+  {id:'B',name:'客户验厂 & 平台上报',color:'c-green',short:'验厂管理',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
+   subs:['各客户验厂预审','H&M PD系统','化学品平台上传','客户专项报表']},
+  {id:'C',name:'环境能源化学品管理',color:'c-teal',short:'环境能源',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-7 8-13a8 8 0 10-16 0c0 6 8 13 8 13z"/></svg>',
+   subs:['ZDHC废水检测','化学品台账','水电气产量统计']},
+  {id:'D',name:'EHS 现场安全合规',color:'c-amber',short:'EHS安全',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/></svg>',
+   subs:['应急演练','安全检查','设备点检','劳工台账','职业健康']},
+  {id:'E',name:'综合内勤商务事务',color:'c-white',short:'综合内勤',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16v13H4zM8 7V3h8v4"/></svg>',
+   subs:['费用统计','客户对接','客人行程','内部协同','休假报销']},
+  {id:'F',name:'备忘录提醒中心',color:'c-purple',short:'备忘录提醒',isAggregator:true,
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1112 0v5l1.5 3h-15L6 13V8z"/></svg>',
+   subs:['证书到期提醒','验厂排期','检测 / 演练计划','待办清单']}
 ];
 const CATNAME=Object.fromEntries(CATS.map(c=>[c.id,c.name]));
+const CATSHORT=Object.fromEntries(CATS.map(c=>[c.id,c.short]));
+
+/* ============ 53 条任务（按新 6 大类重分类，含 sub 子功能）============ */
 const TS=[
-["ISO 9001质量管理体系认证","A","P1","2026-08-10",false],
-["ISO 14001环境管理体系认证","A","P1","2026-08-25",false],
-["ISO 50001能源管理体系认证","A","P1","2026-09-05",false],
-["有机棉GOTS&OCS认证","A","P0","2026-08-30",true],
-["再生棉GRS&RCS认证","A","P0","2026-08-30",false],
-["再生农场认证（regenagri）","A","P1","2026-09-10",false],
-["Higg FEM环境模块验证","A","P1","2026-08-25",false],
-["SLCP劳工聚合项目验证（Higg FSLM）","A","P1","2026-08-28",false],
-["Oeko-tex100国际标准认证","A","P1","2026-09-15",false],
-["良好棉花 BCI认证","A","P2","2026-09-20",false],
-["客户社会责任/环境/质量验厂","B","P0","2026-08-08",false],
-["Target CMA验厂-再生棉","B","P1","2026-08-28",false],
-["Target GFA质量验厂","B","P1","2026-09-10",false],
-["ZDHC废水检测-上半年8月-10月","B","P0","2026-10-31",false],
-["ZDHC废水检测-上半年2月-4月","B","P0","2026-04-30",true],
-["再生棉（GRS/RCS）添加范围证书","C","P1","2026-08-20",false],
-["有机棉（GOTS/OCS）添加范围证书","C","P1","2026-08-22",true],
-["再生农场添加范围证书","C","P2","2026-08-25",false],
-["再生棉面料TC证书申请（GRS/RCS）","C","P0","2026-08-10",false],
-["有机棉面料TC证书申请（GOTS/OCS）","C","P0","2026-08-12",false],
-["再生农场TC证书申请","C","P1","2026-08-30",false],
-["有机棉原料TC证书申请（GRS/RCS）","C","P1","2026-08-25",false],
-["有机棉原料TC证书申请（GOTS/OCS）","C","P1","2026-08-28",false],
-["再生农场原料TC证书申请","C","P1","2026-09-05",false],
-["再生棉原料TC使用量平衡统计","C","P1","2026-08-30",false],
-["有机棉原料TC使用量平衡统计","C","P1","2026-08-30",false],
-["H&M PD环保能源数据上传","D","P0","2026-08-05",false],
-["H&M PD社会责任数据上传","D","P0","2026-08-12",false],
-["每月检查填报统计工人数量和工作时间","D","P1","2026-08-15",false],
-["Clean Chain清洁链 化学品上传","D","P1","2026-08-20",false],
-["BHIVE系统 化学品上传","D","P1","2026-08-20",false],
-["BVe3系统 化学品上传","D","P1","2026-08-20",false],
-["化学品清单更新月度审查/库存统计","D","P1","2026-08-25",false],
-["能源、水、产量、碳排放统计","D","P1","2026-08-30",false],
-["车间消防演习（2次/班组/2次/台班）","E","P0","2026-08-10",false],
-["综合消防演习（2次/半年）","E","P0","2026-09-30",false],
-["污水处理应急演习","E","P0","2026-10-15",false],
-["浆池/纺塑/仓库应急演习","E","P0","2026-09-15",false],
-["危色岗位人员检测色盲检测","E","P1","2026-08-20",false],
-["特种设备及检查记录","E","P1","2026-08-25",false],
-["化学品仓库检查","E","P0","2026-08-12",false],
-["消防重点安全检查","E","P0","2026-08-30",false],
-["认证体系维护检查","E","P1","2026-09-10",false],
-["季度安全检查","E","P0","2026-09-30",false],
-["特种设备登记报表","E","P1","2026-08-30",false],
-["工时统计记录","F","P2","2026-08-30",false],
-["部门费用统计","F","P2","2026-08-30",false],
-["选绢（QU/QU）客户","F","P1","2026-08-08",false],
-["POLO客户","F","P1","2026-08-15",false],
-["OTTO客户","F","P1","2026-08-18",false],
-["客人行程跟进","F","P2","2026-08-20",false],
-["业务/销售/国内同事","F","P2","2026-08-25",false],
-["中方人员休假请/休假出席报销","F","P2","2026-08-30",false]
+  // A 体系与可持续认证管理 (21) - 合并原 A + 原 C
+  ["ISO 9001质量管理体系认证","A","P1","2026-08-10",false,"ISO体系"],
+  ["ISO 14001环境管理体系认证","A","P1","2026-08-25",false,"ISO体系"],
+  ["ISO 50001能源管理体系认证","A","P1","2026-09-05",false,"ISO体系"],
+  ["有机棉GOTS&OCS认证","A","P0","2026-08-30",true,"GRS/GOTS认证"],
+  ["再生棉GRS&RCS认证","A","P0","2026-08-30",false,"GRS/GOTS认证"],
+  ["再生农场认证（regenagri）","A","P1","2026-09-10",false,"GRS/GOTS认证"],
+  ["良好棉花 BCI认证","A","P2","2026-09-20",false,"GRS/GOTS认证"],
+  ["Higg FEM环境模块验证","A","P1","2026-08-25",false,"GRS/GOTS认证"],
+  ["SLCP劳工聚合项目验证（Higg FSLM）","A","P1","2026-08-28",false,"GRS/GOTS认证"],
+  ["Oeko-tex100国际标准认证","A","P1","2026-09-15",false,"范围证书"],
+  ["再生棉（GRS/RCS）添加范围证书","A","P1","2026-08-20",false,"范围证书"],
+  ["有机棉（GOTS/OCS）添加范围证书","A","P1","2026-08-22",true,"范围证书"],
+  ["再生农场添加范围证书","A","P2","2026-08-25",false,"范围证书"],
+  ["再生棉面料TC证书申请（GRS/RCS）","A","P0","2026-08-10",false,"TC申请"],
+  ["有机棉面料TC证书申请（GOTS/OCS）","A","P0","2026-08-12",false,"TC申请"],
+  ["再生农场TC证书申请","A","P1","2026-08-30",false,"TC申请"],
+  ["有机棉原料TC证书申请（GRS/RCS）","A","P1","2026-08-25",false,"TC申请"],
+  ["有机棉原料TC证书申请（GOTS/OCS）","A","P1","2026-08-28",false,"TC申请"],
+  ["再生农场原料TC证书申请","A","P1","2026-09-05",false,"TC申请"],
+  ["再生棉原料TC使用量平衡统计","A","P1","2026-08-30",false,"原料平衡统计"],
+  ["有机棉原料TC使用量平衡统计","A","P1","2026-08-30",false,"原料平衡统计"],
+
+  // B 客户验厂 & 平台上报 (8)
+  ["客户社会责任/环境/质量验厂","B","P0","2026-08-08",false,"各客户验厂预审"],
+  ["Target CMA验厂-再生棉","B","P1","2026-08-28",false,"各客户验厂预审"],
+  ["Target GFA质量验厂","B","P1","2026-09-10",false,"各客户验厂预审"],
+  ["H&M PD环保能源数据上传","B","P0","2026-08-05",false,"H&M PD系统"],
+  ["H&M PD社会责任数据上传","B","P0","2026-08-12",false,"H&M PD系统"],
+  ["Clean Chain清洁链 化学品上传","B","P1","2026-08-20",false,"化学品平台上传"],
+  ["BHIVE系统 化学品上传","B","P1","2026-08-20",false,"化学品平台上传"],
+  ["BVe3系统 化学品上传","B","P1","2026-08-20",false,"化学品平台上传"],
+
+  // C 环境能源化学品管理 (4)
+  ["ZDHC废水检测-上半年8月-10月","C","P0","2026-10-31",false,"ZDHC废水检测"],
+  ["ZDHC废水检测-上半年2月-4月","C","P0","2026-04-30",true,"ZDHC废水检测"],
+  ["化学品清单更新月度审查/库存统计","C","P1","2026-08-25",false,"化学品台账"],
+  ["能源、水、产量、碳排放统计","C","P1","2026-08-30",false,"水电气产量统计"],
+
+  // D EHS 现场安全合规 (12)
+  ["车间消防演习（2次/班组/2次/台班）","D","P0","2026-08-10",false,"应急演练"],
+  ["综合消防演习（2次/半年）","D","P0","2026-09-30",false,"应急演练"],
+  ["污水处理应急演习","D","P0","2026-10-15",false,"应急演练"],
+  ["浆池/纺塑/仓库应急演习","D","P0","2026-09-15",false,"应急演练"],
+  ["危色岗位人员检测色盲检测","D","P1","2026-08-20",false,"职业健康"],
+  ["特种设备及检查记录","D","P1","2026-08-25",false,"设备点检"],
+  ["化学品仓库检查","D","P0","2026-08-12",false,"安全检查"],
+  ["消防重点安全检查","D","P0","2026-08-30",false,"安全检查"],
+  ["认证体系维护检查","D","P1","2026-09-10",false,"安全检查"],
+  ["季度安全检查","D","P0","2026-09-30",false,"安全检查"],
+  ["特种设备登记报表","D","P1","2026-08-30",false,"设备点检"],
+  ["每月检查填报统计工人数量和工作时间","D","P1","2026-08-15",false,"劳工台账"],
+
+  // E 综合内勤商务事务 (8)
+  ["工时统计记录","E","P2","2026-08-30",false,"内部协同"],
+  ["部门费用统计","E","P2","2026-08-30",false,"费用统计"],
+  ["选绢（QU/QU）客户","E","P1","2026-08-08",false,"客户对接"],
+  ["POLO客户","E","P1","2026-08-15",false,"客户对接"],
+  ["OTTO客户","E","P1","2026-08-18",false,"客户对接"],
+  ["客人行程跟进","E","P2","2026-08-20",false,"客人行程"],
+  ["业务/销售/国内同事","E","P2","2026-08-25",false,"内部协同"],
+  ["中方人员休假请/休假出席报销","E","P2","2026-08-30",false,"休假报销"]
 ];
 const EXP_TYPES=["招待费","差旅费","样品费","认证费","办公费","其他"];
 const EXP_COLORS=["#2563eb","#16a34a","#f59e0b","#e5484d","#7c3aed","#0891b2"];
 
 function seed(){
   return {
-    tasks:TS.map((t,i)=>({id:i+1,title:t[0],cat:t[1],prio:t[2],due:t[3],done:t[4]})),
+    tasks:TS.map((t,i)=>({id:i+1,title:t[0],cat:t[1],prio:t[2],due:t[3],done:t[4],sub:t[5]})),
     meets:[
       {id:1,date:'2026-08-11',who:'张总、认证部',topic:'TC 证书与平衡统计推进',result:'优先 GOTS/GRS 范围证书',follow:'本周提交再生棉TC'},
       {id:2,date:'2026-08-12',who:'EHS、车间',topic:'8 月应急演练计划',result:'车间消防演习下周启动',follow:'跟踪车间/仓库演习'}
@@ -505,23 +636,23 @@ function seed(){
 }
 
 /* ============ 存储 / 云端同步 ============ */
-const KEY="wb_factory_v1";
+const KEY="wb_factory_v2";
 const SYNC_KEY="wb_factory_sync_v1";
 const GIST_FILE="workbench.json";
 let data;
 let sync={enabled:false,gistId:null,token:null};
 
 function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function todayStr(){return new Date().toISOString().slice(0,10)}
 function setStatus(kind){
   const b=document.getElementById('syncBadge');
-  if(kind==='cloud'||kind==='synced'){b.className='badge cloud';b.textContent='☁ 云端已同步';}
-  else if(kind==='syncing'){b.className='badge sync';b.textContent='🔄 同步中…';}
-  else if(kind==='error'){b.className='badge err';b.textContent='⚠️ 同步失败(本地)';}
-  else {b.className='badge local';b.textContent='💾 本地模式';}
+  if(kind==='cloud'||kind==='synced'){b.textContent='☁ 已同步';b.style.background='rgba(255,255,255,.22)';}
+  else if(kind==='syncing'){b.textContent='🔄 同步中…';b.style.background='rgba(255,255,255,.28)';}
+  else if(kind==='error'){b.textContent='⚠️ 同步失败';b.style.background='rgba(229,72,77,.7)';}
+  else{b.textContent='☁ 本地模式';b.style.background='rgba(255,255,255,.16)';}
 }
 function loadSyncCfg(){
   try{const s=JSON.parse(localStorage.getItem(SYNC_KEY));if(s&&s.token){sync=s;return}}catch(e){}
-  // 从 URL hash 导入（零迁移）
   const h=location.hash.match(/gist=([^&]+)&t=([^&]+)/);
   if(h){
     sync={enabled:true,gistId:h[1],token:decodeURIComponent(h[2])};
@@ -549,9 +680,7 @@ async function pushGist(){
   }catch(e){setStatus('error');console.warn('push failed',e)}
 }
 async function gistRead(){
-  const res=await fetch('https://api.github.com/gists/'+sync.gistId,{
-    headers:{'Authorization':'token '+sync.token}
-  });
+  const res=await fetch('https://api.github.com/gists/'+sync.gistId,{headers:{'Authorization':'token '+sync.token}});
   if(!res.ok)throw new Error('HTTP '+res.status);
   const j=await res.json();
   const c=j.files&&j.files[GIST_FILE]&&j.files[GIST_FILE].content;
@@ -562,162 +691,90 @@ async function gistCreate(){
   const res=await fetch('https://api.github.com/gists',{
     method:'POST',
     headers:{'Authorization':'token '+sync.token,'Content-Type':'application/json'},
-    body:JSON.stringify({description:'工厂合规工作台 云端数据',public:false,files:{[GIST_FILE]:{content:JSON.stringify(data,null,1)}}})
+    body:JSON.stringify({description:'综合工作台 云端数据',public:false,files:{[GIST_FILE]:{content:JSON.stringify(data,null,1)}}})
   });
   if(!res.ok)throw new Error('HTTP '+res.status);
   const j=await res.json();
   sync.gistId=j.id;sync.enabled=true;
   localStorage.setItem(SYNC_KEY,JSON.stringify(sync));
 }
+async function loadFromCloud(manual){
+  if(!sync.enabled){if(manual)openSync();return}
+  setStatus('syncing');
+  try{
+    const d=await gistRead();
+    if(d){data=d;localSave();renderAll();setStatus('synced');if(manual)toast('已从云端刷新')}
+    else{setStatus('local')}
+  }catch(e){setStatus('error');if(manual)toast('刷新失败：'+e.message)}
+}
 
-/* ============ 渲染 ============ */
+/* ============ 渲染：6 模块卡片网格 ============ */
+function renderCards(){
+  document.getElementById('cardsGrid').innerHTML=CATS.map(c=>{
+    let total=0,done=0,overdue=0;
+    if(c.isAggregator){
+      // F 不计数，徽章显示"提醒"
+    }else{
+      const it=data.tasks.filter(x=>x.cat===c.id);
+      total=it.length;done=it.filter(x=>x.done).length;
+      const t=todayStr();
+      overdue=it.filter(x=>!x.done && x.due && x.due<t).length;
+    }
+    const statText=c.isAggregator?'聚合视图':(total?`${done}/${total}${overdue ?` · <span style="color:#ffd0d2">逾期 ${overdue}</span>`:''}`:'暂无');
+    const bgIcon=c.color==='c-blue'||c.color==='c-green'||c.color==='c-teal'||c.color==='c-amber'?
+      `<div class="mod-card-bg">${c.icon}</div>`:'';
+    return `<div class="mod-card ${c.color}" onclick="openSubModule('${c.id}')">
+      ${bgIcon}
+      ${c.isAggregator?'':`<div class="mod-card-stat">${done}/${total}${overdue?` 逾期 ${overdue}`:''}</div>`}
+      <div class="ic">${c.icon}</div>
+      <div class="mod-card-title">${esc(c.name)}</div>
+      <div class="mod-card-chips">
+        ${c.subs.map(s=>`<span class="chip" onclick="event.stopPropagation();openSubModule('${c.id}','${s.replace(/'/g,"\\'")}')">${esc(s)}</span>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ============ 渲染：今日待办 ============ */
 function renderToday(){
   const t=todayStr();
   const items=data.tasks.filter(x=>!x.done && x.due && x.due<=t).sort((a,b)=>a.due.localeCompare(b.due));
-  const box=document.getElementById("todayList");
+  const box=document.getElementById('todayList');
+  const cnt=document.getElementById('todayCount');
+  cnt.textContent=items.length;
+  cnt.className='num'+(items.length?'':' zero');
   if(!items.length){box.innerHTML='<p class="empty">今天没有待处理事项，状态很好！</p>';return}
   box.innerHTML=items.map(x=>{
     const over=x.due<t;
     return `<div class="today-item ${over?'overdue':''}">
       <span class="tag ${x.prio}">${x.prio}</span>
       <div style="flex:1;min-width:0"><div style="font-size:14px">${esc(x.title)}</div>
-      <div class="due ${over?'over':''}">${esc(CATNAME[x.cat]||'')} · ${over?'已逾期 ':'到期 '}${x.due}</div></div>
+      <div class="due ${over?'over':''}">${esc(CATSHORT[x.cat]||'')} · ${esc(x.sub||'')} · ${over?'已逾期 ':'到期 '}${x.due}</div></div>
       <button class="mini done" onclick="finish(${x.id})">完成</button>
     </div>`}).join("");
 }
 function finish(id){const x=data.tasks.find(t=>t.id==id);if(x){x.done=true;saveData();renderAll();if(currentSubCat)renderSubModule()}}
 
-function taskListHTML(items){
-  const today=todayStr();
-  let html='';
-  CATS.forEach(c=>{
-    const it=items.filter(x=>x.cat===c.id);
-    if(!it.length)return;
-    const done=it.filter(x=>x.done).length;
-    const total=it.length;
-    const overdue=it.filter(x=>!x.done && x.due && x.due<today).length;
-    const overTag=overdue?' · <span style="color:var(--red)">逾期 '+overdue+'</span>':'';
-    html+=`<div class="cat"><div class="cat-hd">
-      <div class="fold-zone" onclick="this.parentElement.parentElement.classList.toggle('fold')">
-        <span class="nm">${esc(c.name)}</span>
-        <span class="st">${done}/${total}${overTag}</span>
-      </div>
-      <button class="enter-btn" onclick="event.stopPropagation();openSubModule('${c.id}')">进入 →</button>
-    </div><div class="cat-body">`;
-    it.slice().sort((a,b)=>a.done-b.done||(a.due||"").localeCompare(b.due||"")).forEach(x=>{
-      const over=x.due && x.due<today && !x.done;
-      html+=`<div class="task ${x.done?'done':''}">
-        <div class="chk" onclick="toggle(${x.id})">${x.done?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg>':''}</div>
-        <span class="tt">${esc(x.title)}</span>
-        <span class="tag ${x.prio}">${x.prio}</span>
-        <span class="due ${over?'over':''}">${x.due||'—'}</span>
-        <button class="del" onclick="del(${x.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
-      </div>`;
-    });
-    html+='</div></div>';
-  });
-  return html || '<p class="empty">暂无任务</p>';
-}
-function renderTasksAll(){
-  const html=taskListHTML(data.tasks);
-  document.getElementById("taskList").innerHTML=html;
-  document.getElementById("projTaskList").innerHTML=html;
-  document.getElementById("opsTaskList").innerHTML=html;
-}
 function toggle(id){const x=data.tasks.find(t=>t.id==id);if(x){x.done=!x.done;saveData();renderAll();if(currentSubCat)renderSubModule()}}
 function del(id){if(!confirm('删除该任务？'))return;data.tasks=data.tasks.filter(t=>t.id!=id);saveData();renderAll();if(currentSubCat)renderSubModule()}
 
-function ring(p){
-  const r=22,c=2*Math.PI*r,off=c*(1-p/100);
-  return `<svg class="ring" width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="${r}" fill="none" stroke="#e8f0ff" stroke-width="6"/><circle cx="28" cy="28" r="${r}" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 28 28)"/><text x="28" y="32" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2a44">${p}%</text></svg>`;
-}
-function renderProjects(){
-  document.getElementById("projList").innerHTML=CATS.map(c=>{
-    const it=data.tasks.filter(x=>x.cat===c.id);
-    const total=it.length,done=it.filter(x=>x.done).length;
-    const pct=total?Math.round(done/total*100):0;
-    return `<div class="proj" onclick="openSubModule('${c.id}')">
-      ${ring(pct)}
-      <div class="meta"><div class="nm">${esc(c.name)}</div><div class="st">已完成 ${done} / ${total} 项</div></div>
-      <div class="pc">${pct}%</div>
-      <div class="enter-btn">进入 →</div>
-    </div>`;
-  }).join("");
-}
+/* ============ 渲染：报告中心完成率 ============ */
 function renderMetrics(){
-  document.getElementById("metrics").innerHTML=CATS.map(c=>{
+  document.getElementById('metrics').innerHTML=CATS.filter(c=>!c.isAggregator).map(c=>{
     const it=data.tasks.filter(x=>x.cat===c.id);
     const total=it.length,done=it.filter(x=>x.done).length;
     const pct=total?Math.round(done/total*100):0;
-    return `<div class="metric"><div class="v">${pct}%</div><div class="l">${esc(c.name)}<br>${done}/${total}</div></div>`;
-  }).join("");
-}
-
-function renderMeets(){
-  const box=document.getElementById("meetList");
-  if(!data.meets.length){box.innerHTML='<p class="empty">还没有会议纪要</p>';return}
-  box.innerHTML=data.meets.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(m=>`
-    <div class="meet">
-      <div class="bar"></div>
-      <div class="body">
-        <div class="top">${esc(m.topic)}</div>
-        <div class="sub">${esc(m.date||'')} · ${esc(m.who||'')}</div>
-        <div class="line"><span class="k">结论：</span>${esc(m.result||'—')}</div>
-        <div class="line"><span class="k">跟进：</span>${esc(m.follow||'—')}</div>
-      </div>
-    </div>`).join("");
-}
-
-const ST_MAP={对接中:'st-d',报价中:'st-q',验厂中:'st-z',已完成:'st-w'};
-function renderClients(){
-  const box=document.getElementById("cliList");
-  if(!data.clients.length){box.innerHTML='<p class="empty">还没有客户跟进</p>';return}
-  box.innerHTML=data.clients.map(c=>{
-    const cls=ST_MAP[c.status]||'st-d';
-    return `<div class="client">
-      <div class="av">${esc(c.name.slice(0,1))}</div>
-      <div class="body"><div class="nm">${esc(c.name)}</div><div class="nx">下一步：${esc(c.next||'—')}</div></div>
-      <span class="tag ${cls}">${esc(c.status)}</span>
-      <button class="del" onclick="delCli(${c.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+    return `<div style="background:#f7faff;border:1px solid var(--line);border-radius:10px;padding:12px 8px;text-align:center">
+      <div style="font-size:18px;font-weight:700;color:var(--primary)">${pct}%</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px">${esc(c.short)}<br>${done}/${total}</div>
     </div>`;
-  }).join("");
+  }).join('');
 }
-function delCli(id){data.clients=data.clients.filter(c=>c.id!=id);saveData();renderClients()}
 
-function renderExpenses(){
-  // 类别下拉
-  const sel=document.getElementById("expType");
-  if(!sel.options.length){EXP_TYPES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;sel.appendChild(o)})}
-  const box=document.getElementById("expList");
-  if(!data.expenses.length){box.innerHTML='<p class="empty">还没有费用记录</p>';}
-  else{
-    box.innerHTML=data.expenses.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(e=>`
-      <div class="exp">
-        <span class="catdot" style="background:${EXP_COLORS[EXP_TYPES.indexOf(e.type)]||'#999'}"></span>
-        <div class="body"><div class="nm">${esc(e.type)} · ${esc(e.note||'—')}</div><div class="nx">${esc(e.date||'')}</div></div>
-        <span class="amt">¥${Number(e.amount||0).toLocaleString()}</span>
-        <button class="del" onclick="delExp(${e.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
-      </div>`).join("");
-  }
-  // 饼图
-  const sum={};let total=0;
-  data.expenses.forEach(e=>{sum[e.type]=(sum[e.type]||0)+Number(e.amount||0);total+=Number(e.amount||0)});
-  const keys=Object.keys(sum);
-  if(!keys.length){
-    document.getElementById("expPie").style.background='#e6ebf4';
-    document.getElementById("expLegend").innerHTML='<span style="color:var(--muted)">暂无数据</span>';
-  }else{
-    let acc=0;const segs=keys.map(k=>{const p=sum[k]/total*360;const from=acc;acc+=p;const col=EXP_COLORS[EXP_TYPES.indexOf(k)]||'#999';return `${col} ${from.toFixed(1)}deg ${(from+p).toFixed(1)}deg`;}).join(',');
-    document.getElementById("expPie").style.background=`conic-gradient(${segs})`;
-    document.getElementById("expLegend").innerHTML=keys.map(k=>`<div class="row"><span class="dot" style="background:${EXP_COLORS[EXP_TYPES.indexOf(k)]||'#999'}"></span><span>${esc(k)}</span><b style="margin-left:auto">¥${sum[k].toLocaleString()}</b></div>`).join("");
-  }
-  document.getElementById("expTotal").textContent=total?`累计支出 ¥${total.toLocaleString()}（共 ${data.expenses.length} 笔）`:'';
-}
-function delExp(id){data.expenses=data.expenses.filter(e=>e.id!=id);saveData();renderExpenses()}
-
+/* ============ 渲染：知识库 / 备忘录 ============ */
 function renderKB(){
-  const q=(document.getElementById("kbSearch").value||'').toLowerCase();
-  const box=document.getElementById("kbList");
+  const q=(document.getElementById('kbSearch').value||'').toLowerCase();
+  const box=document.getElementById('kbList');
   const list=data.kb.slice().sort((a,b)=>b.ts-a.ts).filter(k=>{
     if(!q)return true;
     return (k.title+k.content+k.url+k.cat).toLowerCase().includes(q);
@@ -738,8 +795,8 @@ function toggleKB(id){const c=document.getElementById('kbct-'+id);if(c)c.style.d
 function delKB(id){if(!confirm('删除该知识条目？'))return;data.kb=data.kb.filter(k=>k.id!=id);saveData();renderKB()}
 
 function renderMemos(){
-  const box=document.getElementById("memoList");
-  const list=data.memos.slice().sort((a,b)=>(b.pinned-a.pinned)|| b.ts-a.ts);
+  const box=document.getElementById('memoList');
+  const list=data.memos.slice().sort((a,b)=>(b.pinned-a.pinned)||b.ts-a.ts);
   if(!list.length){box.innerHTML='<p class="empty">还没有备忘录</p>';return}
   box.innerHTML=list.map(m=>`
     <div class="memo ${m.pinned?'pin':''}">
@@ -749,18 +806,34 @@ function renderMemos(){
     </div>`).join("");
 }
 function addMemo(){
-  const v=document.getElementById("memoInput").value.trim();
+  const v=document.getElementById('memoInput').value.trim();
   if(!v){toast('请输入内容');return}
   data.memos.push({id:Date.now(),text:v,ts:Date.now(),pinned:false});
-  saveData();renderMemos();document.getElementById("memoInput").value='';
+  saveData();renderMemos();document.getElementById('memoInput').value='';
 }
 function pinMemo(id){const m=data.memos.find(x=>x.id==id);if(m){m.pinned=!m.pinned;saveData();renderMemos()}}
 function delMemo(id){data.memos=data.memos.filter(m=>m.id!=id);saveData();renderMemos()}
 
+/* ============ 视图切换 ============ */
+function showView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+v));
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    if(el.dataset.view)el.classList.toggle('active',el.dataset.view===v);
+    else if(el.dataset.cat&&v==='cat-'+el.dataset.cat)el.classList.add('active');
+    else el.classList.remove('active');
+  });
+  if(v==='report')genWeekReport();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
 /* ============ 子模块 ============ */
 let currentSubCat=null;
-function openSubModule(catId){
+let currentSubFilter=null;
+
+function openSubModule(catId,subName){
   currentSubCat=catId;
+  currentSubFilter=subName||null;
+  const c=CATS.find(x=>x.id===catId);
   document.getElementById('subView').classList.remove('hidden');
   document.body.style.overflow='hidden';
   renderSubModule();
@@ -768,45 +841,115 @@ function openSubModule(catId){
 function closeSubModule(){
   document.getElementById('subView').classList.add('hidden');
   document.body.style.overflow='';
-  currentSubCat=null;
+  currentSubCat=null;currentSubFilter=null;
 }
+
 function renderSubModule(){
   if(!currentSubCat)return;
   const c=CATS.find(x=>x.id===currentSubCat);
   document.getElementById('subName').textContent=c.name+' · '+c.id+' 类';
+  const body=document.getElementById('subBody');
+
+  // F 聚合视图
+  if(c.isAggregator){
+    body.innerHTML=renderFAggregator();
+    return;
+  }
+
+  // A-E 子模块
   const items=data.tasks.filter(x=>x.cat===currentSubCat);
+  const today=todayStr();
   const total=items.length;
   const done=items.filter(x=>x.done);
   const todo=items.filter(x=>!x.done);
-  const today=todayStr();
   const over=todo.filter(x=>x.due && x.due<today).length;
   document.getElementById('subStats').innerHTML=
     `<span>共 <b>${total}</b> 条</span>`+
     `<span>已完成 <b style="color:var(--green)">${done.length}</b></span>`+
     `<span>待办 <b>${todo.length}</b></span>`+
     (over?`<span style="color:var(--red)">逾期 <b>${over}</b></span>`:'');
-  const order=[...todo.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')), ...done];
-  document.getElementById('subTaskList').innerHTML=order.map(x=>{
-    const isOver=x.due && x.due<today && !x.done;
-    return `<div class="sub-task ${x.done?'done':''}">
-      <div class="chk" onclick="subToggle(${x.id})">${x.done?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg>':''}</div>
-      <span class="tt">${esc(x.title)}</span>
-      <select onchange="subChangePrio(${x.id}, this.value)"><option value="P0" ${x.prio==='P0'?'selected':''}>P0</option><option value="P1" ${x.prio==='P1'?'selected':''}>P1</option><option value="P2" ${x.prio==='P2'?'selected':''}>P2</option></select>
-      <input type="date" value="${x.due||''}" onchange="subChangeDate(${x.id}, this.value)">
-      ${isOver?'<span class="due over">逾期</span>':''}
-      <button class="del" onclick="del(${x.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
-    </div>`;
-  }).join('') || '<p class="empty-mini">该类暂无任务，可在上方添加</p>';
-  const notesEl=document.getElementById('subNotes');
-  notesEl.value=data.subNotes[currentSubCat]||'';
-  notesEl.oninput=()=>{data.subNotes[currentSubCat]=notesEl.value;saveData();document.getElementById('subNoteStatus').textContent='已自动保存于 '+new Date().toLocaleTimeString();};
+
+  // 按 sub 分组展示
+  const filterItems=currentSubFilter?items.filter(x=>x.sub===currentSubFilter):items;
+
+  // 子功能筛选 chips
+  const filterChips=`<div class="sub-filter">
+    <span class="fchip ${!currentSubFilter?'active':''}" onclick="filterSub(null)">全部 (${items.length})</span>
+    ${c.subs.map(s=>{
+      const ct=items.filter(x=>x.sub===s).length;
+      return `<span class="fchip ${currentSubFilter===s?'active':''}" onclick="filterSub('${s.replace(/'/g,"\\'")}')">${esc(s)} (${ct})</span>`;
+    }).join('')}
+  </div>`;
+
+  // 添加任务栏（含 sub 下拉）
+  const addBar=`<div class="sub-section">
+    <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>添加新任务到本类</h3>
+    <div class="add-task-bar">
+      <input type="text" id="newTaskTitle" placeholder="输入任务标题...">
+      <select id="newTaskSub">${c.subs.map(s=>`<option ${currentSubFilter===s?'selected':''}>${esc(s)}</option>`).join('')}</select>
+      <select id="newTaskPrio"><option value="P2">P2 普通</option><option value="P1">P1 重要</option><option value="P0">P0 紧急</option></select>
+      <input type="date" id="newTaskDate">
+      <button class="btn primary" onclick="addSubTask()">+ 添加</button>
+    </div>
+  </div>`;
+
+  // 任务列表
+  const order=[...filterItems.filter(x=>!x.done).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')),
+               ...filterItems.filter(x=>x.done)];
+  const taskList=`<div class="sub-section">
+    <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h18v4H3zM3 10h18v10H3z"/></svg>${currentSubFilter?'【'+currentSubFilter+'】':''} 全部任务 (${filterItems.length})</h3>
+    <div id="subTaskList">${order.map(x=>{
+      const isOver=x.due && x.due<today && !x.done;
+      return `<div class="sub-task ${x.done?'done':''}">
+        <div class="chk" onclick="subToggle(${x.id})">${x.done?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg>':''}</div>
+        <span class="tt">${esc(x.title)}</span>
+        <select onchange="subChangePrio(${x.id}, this.value)">
+          <option value="P0" ${x.prio==='P0'?'selected':''}>P0</option>
+          <option value="P1" ${x.prio==='P1'?'selected':''}>P1</option>
+          <option value="P2" ${x.prio==='P2'?'selected':''}>P2</option>
+        </select>
+        <input type="date" value="${x.due||''}" onchange="subChangeDate(${x.id}, this.value)">
+        ${isOver?'<span class="due over">逾期</span>':''}
+        <button class="del" onclick="del(${x.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+      </div>`;
+    }).join('') || '<p class="empty-mini">该子功能暂无任务，可在上方添加</p>'}</div>
+  </div>`;
+
+  // 备注
+  const notes=`<div class="sub-section">
+    <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/></svg>${c.short} 备注（自动保存到云端）</h3>
+    <textarea id="subNotes" placeholder="记录这个模块的关键节点、联系人、要跟进的细节…，关闭子模块时即自动保存">${esc(data.subNotes[currentSubCat]||'')}</textarea>
+    <p class="note" id="subNoteStatus" style="font-size:12px;color:var(--muted);margin-top:6px">备注自动保存</p>
+  </div>`;
+
+  // 完成进度
   const pct=total?Math.round(done.length/total*100):0;
-  document.getElementById('subPct').textContent=pct+'%';
-  document.getElementById('subPctBar').style.width=pct+'%';
-  document.getElementById('subPctDetail').textContent=total?`已完成 ${done.length} / 共 ${total} 条${over?' · 逾期 '+over+' 条':''}`:'该类暂无任务';
-  const recentDone=done.slice().reverse().slice(0,10);
-  document.getElementById('subCompleted').innerHTML=recentDone.length?recentDone.map(x=>`<div class="done-item"><span class="ck">✓</span><span>${esc(x.title)}</span><span class="due" style="margin-left:auto">截止 ${x.due||'—'}</span></div>`).join(''):'<p class="empty-mini">尚无完成任务</p>';
+  const prog=`<div class="sub-section">
+    <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>完成进度</h3>
+    <div class="progress-row">
+      <div class="pct">${pct}%</div>
+      <div class="sub">${total?`已完成 ${done.length} / 共 ${total} 条${over?' · 逾期 '+over+' 条':''}`:'该模块暂无任务'}</div>
+    </div>
+    <div class="progress-bar"><div style="width:${pct}%"></div></div>
+  </div>`;
+
+  // 近期已完成
+  const recent=done.slice().reverse().slice(0,10);
+  const compList=`<div class="sub-section">
+    <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 7"/></svg>近期已完成（最近 10 条）</h3>
+    <div class="done-list">${recent.length?recent.map(x=>`<div class="done-item"><span class="ck">✓</span><span>${esc(x.title)}</span><span class="due" style="margin-left:auto">截止 ${x.due||'—'}</span></div>`).join(''):'<p class="empty-mini">尚无完成任务</p>'}</div>
+  </div>`;
+
+  body.innerHTML=filterChips+addBar+taskList+notes+prog+compList+
+    `<div class="center" style="margin-top:14px;text-align:center"><button class="btn" onclick="closeSubModule()">← 返回主工作台</button></div>`;
+
+  // 备注自动保存
+  const notesEl=document.getElementById('subNotes');
+  notesEl.oninput=()=>{data.subNotes[currentSubCat]=notesEl.value;saveData();document.getElementById('subNoteStatus').textContent='已自动保存于 '+new Date().toLocaleTimeString();};
 }
+
+function filterSub(s){currentSubFilter=s;renderSubModule()}
+
 function subToggle(id){const x=data.tasks.find(t=>t.id==id);if(x){x.done=!x.done;saveData();renderAll();renderSubModule()}}
 function subChangePrio(id,v){const x=data.tasks.find(t=>t.id==id);if(x){x.prio=v;saveData();renderAll();renderSubModule()}}
 function subChangeDate(id,v){const x=data.tasks.find(t=>t.id==id);if(x){x.due=v;saveData();renderAll();renderSubModule()}}
@@ -815,18 +958,101 @@ function addSubTask(){
   if(!t){toast('请填写任务标题');return}
   const p=document.getElementById('newTaskPrio').value;
   const d=document.getElementById('newTaskDate').value;
+  const s=document.getElementById('newTaskSub').value;
   const maxId=data.tasks.reduce((m,t)=>Math.max(m,t.id),0);
-  data.tasks.push({id:maxId+1,title:t,cat:currentSubCat,prio:p,due:d,done:false});
+  data.tasks.push({id:maxId+1,title:t,cat:currentSubCat,prio:p,due:d,done:false,sub:s});
   saveData();
   document.getElementById('newTaskTitle').value='';
   document.getElementById('newTaskDate').value='';
   renderAll();renderSubModule();
 }
 
-/* ============ Tab ============ */
-function showTab(t){
-  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.t===t));
-  document.querySelectorAll('.panel').forEach(el=>el.classList.toggle('active',el.id==='panel-'+t));
+/* ============ F 聚合视图 ============ */
+function renderFAggregator(){
+  const today=todayStr();
+  // 1. 证书到期提醒：取 A 类 + sub 范围证书/TC申请/GRS-GOTS认证/Oeko-tex 的未来 60 天到期项
+  const certSubs=['范围证书','TC申请','GRS/GOTS认证','原料平衡统计'];
+  const certs=data.tasks.filter(x=>x.cat==='A' && certSubs.includes(x.sub) && !x.done)
+    .sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,12);
+
+  // 2. 验厂排期：B 各客户验厂预审 + D 安全检查 + D 特种设备
+  const auditSubs=['各客户验厂预审','安全检查','设备点检'];
+  const audits=data.tasks.filter(x=>auditSubs.includes(x.sub) && !x.done)
+    .sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,12);
+
+  // 3. 检测/演练计划：C ZDHC废水检测 + D 应急演练
+  const detSubs=['ZDHC废水检测','应急演练'];
+  const detects=data.tasks.filter(x=>detSubs.includes(x.sub) && !x.done)
+    .sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,12);
+
+  // 4. 待办清单：全部逾期 + 今天到期
+  const todos=data.tasks.filter(x=>!x.done && x.due && x.due<=today)
+    .sort((a,b)=>a.due.localeCompare(b.due)).slice(0,20);
+
+  const renderList=(items,emptyText)=>items.length?
+    `<div class="f-agg-list">${items.map(x=>{
+      const over=x.due<today;
+      return `<div class="today-item ${over?'overdue':''}" onclick="openSubModule('${x.cat}')">
+        <span class="tag ${x.prio}">${x.prio}</span>
+        <div style="flex:1;min-width:0"><div style="font-size:13px">${esc(x.title)}</div>
+        <div class="due ${over?'over':''}">${esc(CATSHORT[x.cat]||'')} · ${esc(x.sub||'')} · ${over?'已逾期':'到期'} ${x.due}</div></div>
+        <button class="mini done" onclick="event.stopPropagation();finish(${x.id})">完成</button>
+      </div>`;
+    }).join('')}</div>`
+    :`<p class="empty">${emptyText}</p>`;
+
+  document.getElementById('subStats').innerHTML=
+    `<span>证书提醒 <b>${certs.length}</b></span>`+
+    `<span>验厂排期 <b>${audits.length}</b></span>`+
+    `<span>检测演练 <b>${detects.length}</b></span>`+
+    `<span>待办清单 <b>${todos.length}</b></span>`;
+
+  return `
+    <div class="f-agg-section">
+      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>📜 证书到期提醒</h3>
+      <div class="desc">来自 认证管理（A类）· 含范围证书 / TC 申请 / GRS-GOTS 认证 / 原料平衡统计</div>
+      ${renderList(certs,'暂无证书相关任务')}
+    </div>
+    <div class="f-agg-section">
+      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/></svg>🏭 验厂排期</h3>
+      <div class="desc">来自 验厂管理（B类）· 各客户验厂预审 / 安全检查 / 设备点检</div>
+      ${renderList(audits,'暂无验厂排期')}
+    </div>
+    <div class="f-agg-section">
+      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M12 3v18"/></svg>🔬 检测 / 演练计划</h3>
+      <div class="desc">来自 环境能源（C类）+ EHS安全（D类）· ZDHC 废水检测 / 应急演练</div>
+      ${renderList(detects,'暂无检测/演练安排')}
+    </div>
+    <div class="f-agg-section">
+      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>⚠️ 待办清单（已逾期 + 今日到期）</h3>
+      <div class="desc">跨模块聚合 · 优先级最高 · 点击「完成」快速标记</div>
+      ${renderList(todos,'当前无待办事项')}
+    </div>
+    <div class="center" style="margin-top:14px;text-align:center"><button class="btn" onclick="closeSubModule()">← 返回主工作台</button></div>
+  `;
+}
+
+/* ============ 一键生成周报 ============ */
+function genWeekReport(){
+  const lines=[];
+  CATS.filter(c=>!c.isAggregator).forEach(c=>{
+    const it=data.tasks.filter(x=>x.cat===c.id);
+    if(!it.length)return;
+    const done=it.filter(x=>x.done);
+    const todo=it.filter(x=>!x.done).sort((a,b)=>(a.due||"").localeCompare(b.due||""));
+    lines.push('【'+c.short+' · '+c.name+'】');
+    if(done.length)lines.push('已完成：'+done.map(d=>'• '+d.title).join('\n'));
+    if(todo.length)lines.push('待跟进：'+todo.map(d=>'• '+d.title+(d.due?'（到期 '+d.due+'）':'')).join('\n'));
+    lines.push('');
+  });
+  // 费用汇总
+  const total=data.expenses.reduce((s,e)=>s+Number(e.amount||0),0);
+  if(total){
+    lines.push('【费用汇总】本月累计支出 ¥'+total.toLocaleString()+'，共 '+data.expenses.length+' 笔');
+  }
+  const out='【综合工作台 周报 '+todayStr()+'】\n\n'+lines.join('\n');
+  const ta=document.getElementById('weekOut');
+  ta.value=out;ta.focus();ta.select();
 }
 
 /* ============ 同步弹窗 ============ */
@@ -859,7 +1085,6 @@ async function saveSync(){
     }
     localStorage.setItem(SYNC_KEY,JSON.stringify(sync));
     setStatus('synced');
-    // 重新渲染
     renderAll();
     document.getElementById('syncActions').style.display='block';
     document.getElementById('syncLink').value=location.origin+location.pathname+'#gist='+sync.gistId+'&t='+encodeURIComponent(sync.token);
@@ -887,64 +1112,38 @@ function disconnectSync(){
 
 /* ============ 工具 ============ */
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
-function renderAll(){renderToday();renderTasksAll();renderProjects();renderMetrics();renderMeets();renderClients();renderExpenses();renderKB();renderMemos()}
+function scrollToToday(){const el=document.getElementById('todayCard');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
+function aiHelp(){toast('AI 助手已就绪 · 在 WorkBuddy 对话中让我帮你')}
+function renderAll(){renderCards();renderToday();renderMetrics();renderKB();renderMemos()}
 
-document.getElementById("genWeek").addEventListener("click",()=>{
-  const lines=[];
-  CATS.forEach(c=>{
-    const it=data.tasks.filter(x=>x.cat===c.id);
-    if(!it.length)return;
-    const done=it.filter(x=>x.done);
-    const todo=it.filter(x=>!x.done).sort((a,b)=>(a.due||"").localeCompare(b.due||""));
-    lines.push('【'+c.name+'】');
-    if(done.length)lines.push('已完成：'+done.map(d=>'• '+d.title).join('\n'));
-    if(todo.length)lines.push('待跟进：'+todo.map(d=>'• '+d.title+(d.due?'（到期 '+d.due+'）':'')).join('\n'));
-    lines.push('');
-  });
-  const out='【本周工作分类汇总 '+todayStr()+'】\n\n'+lines.join('\n');
-  const ta=document.getElementById("weekOut");ta.style.display='block';ta.value=out;ta.select();
-});
-document.getElementById("meetForm").addEventListener("submit",e=>{
+/* ============ 事件绑定 ============ */
+document.getElementById('genWeekBtn')?.addEventListener?.('click',genWeekReport);
+document.getElementById('kbForm').addEventListener('submit',e=>{
   e.preventDefault();
-  data.meets.push({id:Date.now(),date:document.getElementById("mDate").value,topic:document.getElementById("mTopic").value,who:document.getElementById("mWho").value,result:document.getElementById("mResult").value,follow:document.getElementById("mFollow").value});
-  saveData();renderMeets();e.target.reset();
-});
-document.getElementById("cliForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  data.clients.push({id:Date.now(),name:document.getElementById("cliName").value,status:document.getElementById("cliStatus").value,next:document.getElementById("cliNext").value});
-  saveData();renderClients();e.target.reset();
-});
-document.getElementById("expForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  const amt=parseFloat(document.getElementById("expAmt").value);
-  if(!amt||amt<=0){toast('请输入有效金额');return}
-  data.expenses.push({id:Date.now(),date:document.getElementById("expDate").value||todayStr(),type:document.getElementById("expType").value,amount:amt,note:document.getElementById("expNote").value});
-  saveData();renderExpenses();e.target.reset();
-});
-document.getElementById("kbForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  const title=document.getElementById("kbTitle").value.trim();
+  const title=document.getElementById('kbTitle').value.trim();
   if(!title){toast('请输入标题');return}
-  data.kb.push({id:Date.now(),cat:document.getElementById("kbCat").value,title,content:document.getElementById("kbContent").value,url:document.getElementById("kbUrl").value,ts:Date.now()});
+  data.kb.push({id:Date.now(),cat:document.getElementById('kbCat').value,title,content:document.getElementById('kbContent').value,url:document.getElementById('kbUrl').value,ts:Date.now()});
   saveData();renderKB();e.target.reset();
 });
-document.getElementById("kbSearch").addEventListener("input",renderKB);
-document.getElementById("memoInput").addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')addMemo()});
-document.getElementById("expBtn").addEventListener("click",()=>{
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
-  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="工厂合规工作台备份.json";a.click();
+document.getElementById('kbSearch').addEventListener('input',renderKB);
+document.getElementById('memoInput').addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')addMemo()});
+document.getElementById('expBtn').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='综合工作台备份.json';a.click();
 });
-document.getElementById("impBtn").addEventListener("click",()=>document.getElementById("impFile").click());
-document.getElementById("impFile").addEventListener("change",e=>{
+document.getElementById('impBtn').addEventListener('click',()=>document.getElementById('impFile').click());
+document.getElementById('impFile').addEventListener('change',e=>{
   const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);saveData();renderAll();toast("导入成功")}catch(err){toast("文件格式错误")}};r.readAsText(f);
+  const r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);saveData();renderAll();toast('导入成功')}catch(err){toast('文件格式错误')}};r.readAsText(f);
 });
-document.getElementById("clearBtn").addEventListener("click",()=>{
-  if(confirm("确定重置为示例数据吗？（会覆盖当前数据）")){data=seed();saveData();renderAll();toast("已重置为示例数据")}
+document.getElementById('clearBtn').addEventListener('click',()=>{
+  if(confirm('确定重置为示例数据吗？（会覆盖当前数据）')){data=seed();saveData();renderAll();toast('已重置为示例数据')}
 });
 
 /* ============ 启动 ============ */
-(async function init(){
+document.getElementById('todayDate').textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
+
+(async function(){
   loadSyncCfg();
   if(sync.enabled){
     setStatus('syncing');
