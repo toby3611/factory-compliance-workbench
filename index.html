@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>工厂合规工作台 · 云端版</title>
+<style>
+:root{--primary:#2563eb;--primary-soft:#e8f0ff;--bg:#f3f6fb;--card:#fff;--text:#1f2a44;--muted:#7c89a4;--line:#e6ebf4;--red:#e5484d;--green:#16a34a;--amber:#f59e0b}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;font-size:15px;line-height:1.55;padding-bottom:env(safe-area-inset-bottom)}
+.wrap{max-width:960px;margin:0 auto;padding:14px 14px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#2563eb,#4f8bff);display:flex;align-items:center;justify-content:center;flex:none}
+.brand h1{font-size:18px;font-weight:700;line-height:1.1}
+.brand p{font-size:12px;color:var(--muted)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--text);border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;min-height:40px}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.sm{padding:6px 10px;font-size:12px;min-height:34px}
+.btn:active{transform:scale(.97)}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:6px 11px;border-radius:20px;border:1px solid var(--line);background:#fff;cursor:pointer;font-weight:600}
+.badge.cloud{color:#0a7d3b;border-color:#bfe9cd;background:#effaf2}
+.badge.sync{color:#b4690e;border-color:#fde2b3;background:#fff7e8}
+.badge.local{color:var(--muted)}
+.badge.err{color:var(--red);border-color:#ffd0d2;background:#fff5f5}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.card h2{font-size:15px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h2 .ic{width:20px;height:20px;color:var(--primary);flex:none}
+.today{background:linear-gradient(135deg,#e8f0ff,#f3f6fb);border-color:#cfe0ff}
+.today-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:8px}
+.today-item.overdue{border-color:#ffd0d2;background:#fff5f5}
+.tag{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap}
+.tag.P0{background:#ffe3e3;color:#e5484d}
+.tag.P1{background:#fff1d6;color:#d97706}
+.tag.P2{background:#e6f0ff;color:#2563eb}
+.tag.st-d{background:#d7f3ef;color:#0d9488}
+.tag.st-q{background:#fff1d6;color:#d97706}
+.tag.st-z{background:#e6f0ff;color:#2563eb}
+.tag.st-w{background:#e3eeec;color:#14302c}
+.due{font-size:12px;color:var(--muted);white-space:nowrap}
+.due.over{color:var(--red);font-weight:600}
+.mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;min-height:34px}
+.mini.done{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* tabs */
+.tabs{position:sticky;top:0;z-index:20;display:flex;gap:6px;background:var(--bg);padding:6px 0 10px;overflow-x:auto;margin-bottom:6px;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:20px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+.tab.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.panel{display:none}
+.panel.active{display:block}
+
+.cat{margin-bottom:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.cat-hd{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#eef3fb;font-weight:600;font-size:14px;cursor:pointer;user-select:none}
+.cat-hd .fold-zone{flex:1;display:flex;align-items:center;justify-content:space-between;min-width:0;gap:8px}
+.cat-hd .nm{display:flex;align-items:center;gap:8px}
+.cat-hd .nm::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--primary)}
+.cat-hd .st{font-size:12px;color:var(--muted);font-weight:500}
+.enter-btn{flex:none;font-size:12px;padding:5px 11px;border:1px solid var(--primary);background:#fff;color:var(--primary);border-radius:18px;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.enter-btn:hover{background:var(--primary);color:#fff}
+.task{display:flex;align-items:center;gap:10px;padding:10px 14px;border-top:1px solid var(--line);background:#fff}
+.task .chk{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center}
+.task.done .chk{background:var(--green);border-color:var(--green)}
+.task.done .tt{text-decoration:line-through;color:var(--muted)}
+.task .tt{flex:1;font-size:14px;min-width:0}
+.del{cursor:pointer;color:var(--muted);border:none;background:none;padding:4px;display:flex}
+
+.proj{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff;cursor:pointer;transition:background .15s}
+.proj:hover{background:#f5f9ff}
+.proj .ring{flex:none}
+.proj .meta{flex:1;min-width:0}
+.proj .nm{font-size:14px;font-weight:700}
+.proj .st{font-size:12px;color:var(--muted);margin-top:2px}
+.proj .pc{font-size:13px;font-weight:700;color:var(--primary)}
+.proj .enter-btn{flex:none}
+
+.meet{display:flex;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff}
+.meet .bar{width:4px;border-radius:4px;background:var(--primary);flex:none}
+.meet .body{flex:1;min-width:0}
+.meet .top{font-size:13px;font-weight:600}
+.meet .sub{font-size:12px;color:var(--muted);margin:3px 0}
+.meet .line{font-size:13px;margin-top:4px}
+.meet .k{color:var(--primary);font-weight:600}
+
+.client{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff}
+.client .av{width:36px;height:36px;border-radius:10px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex:none}
+.client .body{flex:1;min-width:0}
+.client .nm{font-size:14px;font-weight:600}
+.client .nx{font-size:12px;color:var(--muted);margin-top:2px}
+
+.exp{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff}
+.exp .catdot{width:10px;height:10px;border-radius:50%;flex:none}
+.exp .body{flex:1;min-width:0}
+.exp .nm{font-size:14px;font-weight:600}
+.exp .nx{font-size:12px;color:var(--muted);margin-top:2px}
+.exp .amt{font-weight:700;color:var(--text);white-space:nowrap}
+.pie-wrap{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.pie{width:120px;height:120px;border-radius:50%;flex:none;position:relative}
+.pie::after{content:'';position:absolute;inset:26px;background:#fff;border-radius:50%}
+.pie-legend{flex:1;min-width:160px;display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:12px}
+.pie-legend .row{display:flex;align-items:center;gap:6px}
+.pie-legend .dot{width:9px;height:9px;border-radius:50%;flex:none}
+
+.kb{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff;cursor:pointer}
+.kb .ic{width:34px;height:34px;border-radius:9px;background:var(--primary-soft);color:var(--primary);display:flex;align-items:center;justify-content:center;flex:none}
+.kb .body{flex:1;min-width:0}
+.kb .nm{font-size:14px;font-weight:600}
+.kb .ct{font-size:13px;color:var(--muted);margin-top:4px;white-space:pre-wrap}
+.kb .url{font-size:12px;color:var(--primary);margin-top:4px;word-break:break-all}
+
+.memo{display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff}
+.memo.pin{background:#fffbe8;border-color:#fde68a}
+.memo .body{flex:1;min-width:0;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.memo .meta{font-size:11px;color:var(--muted);margin-top:4px}
+
+.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.metric{background:#f7faff;border:1px solid var(--line);border-radius:10px;padding:10px 6px;text-align:center}
+.metric .v{font-size:17px;font-weight:700;color:var(--primary)}
+.metric .l{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.3}
+.empty{color:var(--muted);font-size:13px;text-align:center;padding:18px}
+.center{text-align:center}
+form .row{display:flex;gap:8px;flex-wrap:wrap}
+input,select,textarea{font-size:16px;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--text);font-family:inherit}
+textarea{width:100%;min-height:90px;resize:vertical}
+.note{font-size:12px;color:var(--muted);margin-top:8px}
+.hint{background:#eef4ff;border:1px solid #cfe0ff;border-radius:10px;padding:10px 12px;font-size:12px;color:#1e4f9c;margin-bottom:12px;display:flex;align-items:flex-start;gap:8px}
+.hint b{color:#1e4f9c}
+
+/* sub module */
+.sub-view{position:fixed;inset:0;background:var(--bg);z-index:99;overflow-y:auto;padding:0 0 60px;animation:slideIn .25s ease}
+.sub-view.hidden{display:none}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+.sub-hd{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:14px;background:var(--card);border-bottom:1px solid var(--line);backdrop-filter:saturate(180%) blur(8px)}
+.sub-back{background:none;border:none;color:var(--primary);font-size:22px;cursor:pointer;padding:4px 10px;line-height:1;font-weight:700}
+.sub-hd h2{font-size:18px;font-weight:700;flex:1;min-width:0}
+.sub-stats{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:4px}
+.sub-stats b{color:var(--text);font-size:14px}
+.sub-body{padding:14px}
+.sub-section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.sub-section h3{font-size:14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--muted);font-weight:600}
+.sub-section h3 .ic{width:18px;height:18px;color:var(--primary)}
+.add-task-bar{display:flex;gap:8px;flex-wrap:wrap}
+.add-task-bar input[type=text]{flex:1;min-width:160px}
+.add-task-bar select,.add-task-bar input[type=date]{flex:none;min-width:90px}
+.progress-bar{height:14px;background:var(--line);border-radius:7px;overflow:hidden;margin-top:8px}
+.progress-bar div{height:100%;background:linear-gradient(90deg,var(--primary),#5b9cff);border-radius:7px;transition:width .4s}
+.progress-row{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+.progress-row .pct{font-size:32px;font-weight:700;color:var(--primary);line-height:1}
+.progress-row .sub{font-size:13px;color:var(--muted)}
+.sub-task{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;background:#fff}
+.sub-task.done{background:#fafdfa;opacity:.85}
+.sub-task .chk{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center}
+.sub-task.done .chk{background:var(--green);border-color:var(--green)}
+.sub-task.done .tt{text-decoration:line-through;color:var(--muted)}
+.sub-task .tt{flex:1;font-size:14px;min-width:0}
+.sub-task select,.sub-task input[type=date]{font-size:12px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--text);font-family:inherit}
+.sub-task select{width:62px}
+.sub-task input[type=date]{width:140px}
+.sub-task .due{font-size:11px;color:var(--muted)}
+.sub-task .due.over{color:var(--red);font-weight:600}
+.done-list{max-height:240px;overflow-y:auto}
+.done-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.done-item:last-child{border:none}
+.done-item .ck{color:var(--green);font-weight:700}
+.empty-mini{padding:14px;text-align:center;color:var(--muted);font-size:13px}
+
+/* modal */
+.mask{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:120;display:flex;align-items:center;justify-content:center;padding:16px}
+.mask.hidden{display:none}
+.modal{background:#fff;border-radius:18px;padding:20px;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.modal h3{font-size:17px;margin-bottom:6px}
+.modal p{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6}
+.modal .field{margin-bottom:12px}
+.modal label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600}
+.modal .row{display:flex;gap:8px;margin-top:6px}
+.modal .err{color:var(--red);font-size:12px;margin-top:8px;white-space:pre-wrap}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1f2a44;color:#fff;padding:10px 18px;border-radius:22px;font-size:13px;z-index:200;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.show{opacity:1}
+@media(max-width:680px){.metrics{grid-template-columns:repeat(3,1fr)}.sub-task input[type=date]{width:120px}.brand p{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></div>
+      <div><h1>工厂合规工作台</h1><p>云端版 · 电脑手机通用 · 换设备零迁移</p></div>
+    </div>
+    <div class="tools">
+      <span class="badge local" id="syncBadge" onclick="openSync()" title="点击配置云端同步">💾 本地模式</span>
+      <button class="btn sm" id="expBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>导出</button>
+      <button class="btn sm" id="impBtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9m0 0l-4 4m4-4l4 4M5 3h14"/></svg>导入</button>
+      <input type="file" id="impFile" accept="application/json" hidden>
+    </div>
+  </header>
+
+  <div class="hint">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+    <div><b>这是云端版：</b>点右上角「💾 本地模式」开启云端同步后，所有任务/知识库/备忘录会自动存在云端。换电脑或手机只需打开同一个链接（建议存书签+桌面快捷方式），数据原样回来，不用拷贝任何文件。</div>
+  </div>
+
+  <!-- 常驻：今天要处理 -->
+  <section class="card today">
+    <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今天要处理</h2>
+    <div id="todayList"></div>
+  </section>
+
+  <!-- 标签页 -->
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-t="effi" onclick="showTab('effi')">效率</div>
+    <div class="tab" data-t="proj" onclick="showTab('proj')">项目</div>
+    <div class="tab" data-t="ops" onclick="showTab('ops')">事务</div>
+    <div class="tab" data-t="kb" onclick="showTab('kb')">知识库</div>
+    <div class="tab" data-t="memo" onclick="showTab('memo')">备忘录</div>
+  </div>
+
+  <!-- 效率 -->
+  <div class="panel active" id="panel-effi">
+    <section class="card">
+      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h18v4H3zM3 10h18v10H3z"/></svg>任务清单 · 按大类（点「进入 →」进子模块）</h2>
+      <div id="taskList"></div>
+    </section>
+    <section class="card">
+      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/></svg>分类周报</h2>
+      <button class="btn primary" id="genWeek" style="width:100%">一键生成按 6 大类汇总的周报</button>
+      <textarea id="weekOut" style="margin-top:10px;display:none"></textarea>
+    </section>
+    <section class="card">
+      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>六大类完成率</h2>
+      <div class="metrics" id="metrics"></div>
+    </section>
+  </div>
+
+  <!-- 项目 -->
+  <div class="panel" id="panel-proj">
+    <section class="card">
+      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7"/></svg>项目看板 · 6 大类（点卡片进入子模块）</h2>
+      <div id="projList"></div>
+    </section>
+    <section class="card">
+      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h18v4H3zM3 10h18v10H3z"/></svg>任务清单 · 按大类</h2>
+      <div id="projTaskList"></div>
+    </section>
+    <section class="card">
+      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4zM8 10h8M8 14h5"/></svg>会议纪要</h2>
+      <form id="meetForm" style="display:grid;gap:8px;margin-bottom:12px">
+        <div class="row"><input id="mDate" type="date"><input id="mWho" placeholder="参会人…"></div>
+        <input id="mTopic" placeholder="议题…">
+        <textarea id="mResult" placeholder="结论…" style="min-height:48px"></textarea>
+        <input id="mFollow" placeholder="跟进事项…">
+        <button class="btn primary" type="submit">保存纪要</button>
+      </form>
+      <div id="meetList"></div>
+    </section>
+  </div>
+
+  <!-- 事务 -->
+  <div class="panel" id="panel-ops">
+    <section class="card">
+      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h18v4H3zM3 10h18v10H3z"/></svg>任务清单 · 按大类</h2>
+      <div id="opsTaskList"></div>
+    </section>
+    <section class="card">
+      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 11a4 4 0 10-8 0 4 4 0 008 0zM3 21a7 7 0 0114 0"/></svg>客户跟进</h2>
+      <form id="cliForm" class="row" style="margin-bottom:10px">
+        <input id="cliName" placeholder="客户名称…" required style="flex:1;min-width:120px">
+        <select id="cliStatus"><option value="对接中">对接中</option><option value="报价中">报价中</option><option value="验厂中">验厂中</option><option value="已完成">已完成</option></select>
+        <input id="cliNext" placeholder="下一步" style="flex:1;min-width:120px">
+        <button class="btn primary" type="submit">添加</button>
+      </form>
+      <div id="cliList"></div>
+    </section>
+    <section class="card">
+      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>工作费用（按类别）</h2>
+      <form id="expForm" class="row" style="margin-bottom:12px">
+        <input id="expDate" type="date" style="flex:none;min-width:130px">
+        <select id="expType" style="flex:none"></select>
+        <input id="expAmt" type="number" placeholder="金额" style="flex:1;min-width:90px">
+        <input id="expNote" placeholder="说明" style="flex:2;min-width:120px">
+        <button class="btn primary" type="submit">记一笔</button>
+      </form>
+      <div class="pie-wrap">
+        <div class="pie" id="expPie"></div>
+        <div class="pie-legend" id="expLegend"></div>
+      </div>
+      <div id="expList" style="margin-top:12px"></div>
+      <p class="note" id="expTotal"></p>
+    </section>
+  </div>
+
+  <!-- 知识库 -->
+  <div class="panel" id="panel-kb">
+    <section class="card">
+      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11H4zM15 4v5h5"/></svg>知识库</h2>
+      <input id="kbSearch" placeholder="搜索标题 / 内容…" style="width:100%;margin-bottom:10px">
+      <form id="kbForm" style="display:grid;gap:8px;margin-bottom:12px">
+        <div class="row">
+          <input id="kbTitle" placeholder="标题…" style="flex:2;min-width:140px">
+          <select id="kbCat" style="flex:1;min-width:110px">
+            <option>认证资料</option><option>客户信息</option><option>流程SOP</option><option>联系人</option><option>模板文档</option><option>其他</option>
+          </select>
+        </div>
+        <textarea id="kbContent" placeholder="内容 / 要点…"></textarea>
+        <input id="kbUrl" placeholder="相关链接（可选）…">
+        <button class="btn primary" type="submit">添加条目</button>
+      </form>
+      <div id="kbList"></div>
+    </section>
+  </div>
+
+  <!-- 备忘录 -->
+  <div class="panel" id="panel-memo">
+    <section class="card">
+      <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>备忘录</h2>
+      <textarea id="memoInput" placeholder="随手记一条…（Ctrl/⌘+Enter 保存）"></textarea>
+      <div style="margin-top:8px"><button class="btn primary" onclick="addMemo()">+ 添加备忘录</button></div>
+      <div id="memoList" style="margin-top:12px"></div>
+    </section>
+  </div>
+
+  <div class="center" style="margin-top:8px">
+    <button class="btn" id="clearBtn" style="color:var(--red);border-color:#ffd0d2">重置为示例数据</button>
+  </div>
+</div>
+
+<!-- 子模块 -->
+<div id="subView" class="sub-view hidden">
+  <div class="sub-hd">
+    <button class="sub-back" onclick="closeSubModule()">←</button>
+    <div style="flex:1;min-width:0">
+      <h2 id="subName">—</h2>
+      <div class="sub-stats" id="subStats"></div>
+    </div>
+  </div>
+  <div class="sub-body">
+    <div class="sub-section">
+      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>添加新任务到本类</h3>
+      <div class="add-task-bar">
+        <input type="text" id="newTaskTitle" placeholder="输入任务标题...">
+        <select id="newTaskPrio"><option value="P2">P2 普通</option><option value="P1">P1 重要</option><option value="P0">P0 紧急</option></select>
+        <input type="date" id="newTaskDate">
+        <button class="btn primary" onclick="addSubTask()">+ 添加</button>
+      </div>
+    </div>
+    <div class="sub-section">
+      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h18v4H3zM3 10h18v10H3z"/></svg>本类全部任务</h3>
+      <div id="subTaskList"></div>
+    </div>
+    <div class="sub-section">
+      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/></svg>分类备注（自动保存到云端）</h3>
+      <textarea id="subNotes" placeholder="记录这个大类的关键节点、联系人、要跟进的细节…，关闭子模块时即自动保存"></textarea>
+      <p class="note" id="subNoteStatus">备注自动保存</p>
+    </div>
+    <div class="sub-section">
+      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>完成进度</h3>
+      <div class="progress-row">
+        <div class="pct" id="subPct">0%</div>
+        <div class="sub" id="subPctDetail"></div>
+      </div>
+      <div class="progress-bar"><div id="subPctBar" style="width:0%"></div></div>
+    </div>
+    <div class="sub-section">
+      <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 7"/></svg>近期已完成（最近 10 条）</h3>
+      <div class="done-list" id="subCompleted"></div>
+    </div>
+    <div class="center" style="margin-top:20px">
+      <button class="btn" onclick="closeSubModule()">← 返回主工作台</button>
+    </div>
+  </div>
+</div>
+
+<!-- 云端同步弹窗 -->
+<div class="mask hidden" id="syncMask">
+  <div class="modal">
+    <h3>云端同步设置</h3>
+    <p>数据将保存在你的私有云端（GitHub Gist），换电脑 / 手机打开同一链接即可同步，无需拷贝文件。<br>① 在 github.com → Settings → Developer settings → Personal access tokens 生成一个带 <b>gist</b> 权限的 Token；<br>② 粘贴到下方。留空 Gist ID 会自动新建一个私有 Gist。</p>
+    <div class="field">
+      <label>GitHub Token（必填，仅存你本地/链接里）</label>
+      <input id="syncToken" type="password" placeholder="ghp_..." style="width:100%">
+    </div>
+    <div class="field">
+      <label>Gist ID（留空=自动新建私有 Gist）</label>
+      <input id="syncGist" placeholder="如 a1b2c3d4e5f6..." style="width:100%">
+    </div>
+    <div class="row">
+      <button class="btn primary" style="flex:1" onclick="saveSync()">保存并连接</button>
+      <button class="btn" onclick="closeSync()">取消</button>
+    </div>
+    <div id="syncErr" class="err"></div>
+    <div id="syncActions" style="margin-top:14px;display:none;border-top:1px solid var(--line);padding-top:12px">
+      <p style="margin-bottom:8px">已连接云端。换设备时，复制下面的同步链接（含令牌），在新电脑/手机浏览器打开即自动配置：</p>
+      <div class="row">
+        <input id="syncLink" readonly style="flex:1;font-size:12px">
+        <button class="btn sm" onclick="copySyncLink()">复制</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn sm" onclick="disconnectSync()" style="color:var(--red);border-color:#ffd0d2">断开云端（转本地）</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 基础数据 ============ */
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const CATS=[
+  {id:'A',name:'体系/客户认证'},
+  {id:'B',name:'客户验厂与ZDHC'},
+  {id:'C',name:'TC证书与平衡'},
+  {id:'D',name:'数据上传与统计'},
+  {id:'E',name:'应急安全与检查'},
+  {id:'F',name:'工时费用与跟进'}
+];
+const CATNAME=Object.fromEntries(CATS.map(c=>[c.id,c.name]));
+const TS=[
+["ISO 9001质量管理体系认证","A","P1","2026-08-10",false],
+["ISO 14001环境管理体系认证","A","P1","2026-08-25",false],
+["ISO 50001能源管理体系认证","A","P1","2026-09-05",false],
+["有机棉GOTS&OCS认证","A","P0","2026-08-30",true],
+["再生棉GRS&RCS认证","A","P0","2026-08-30",false],
+["再生农场认证（regenagri）","A","P1","2026-09-10",false],
+["Higg FEM环境模块验证","A","P1","2026-08-25",false],
+["SLCP劳工聚合项目验证（Higg FSLM）","A","P1","2026-08-28",false],
+["Oeko-tex100国际标准认证","A","P1","2026-09-15",false],
+["良好棉花 BCI认证","A","P2","2026-09-20",false],
+["客户社会责任/环境/质量验厂","B","P0","2026-08-08",false],
+["Target CMA验厂-再生棉","B","P1","2026-08-28",false],
+["Target GFA质量验厂","B","P1","2026-09-10",false],
+["ZDHC废水检测-上半年8月-10月","B","P0","2026-10-31",false],
+["ZDHC废水检测-上半年2月-4月","B","P0","2026-04-30",true],
+["再生棉（GRS/RCS）添加范围证书","C","P1","2026-08-20",false],
+["有机棉（GOTS/OCS）添加范围证书","C","P1","2026-08-22",true],
+["再生农场添加范围证书","C","P2","2026-08-25",false],
+["再生棉面料TC证书申请（GRS/RCS）","C","P0","2026-08-10",false],
+["有机棉面料TC证书申请（GOTS/OCS）","C","P0","2026-08-12",false],
+["再生农场TC证书申请","C","P1","2026-08-30",false],
+["有机棉原料TC证书申请（GRS/RCS）","C","P1","2026-08-25",false],
+["有机棉原料TC证书申请（GOTS/OCS）","C","P1","2026-08-28",false],
+["再生农场原料TC证书申请","C","P1","2026-09-05",false],
+["再生棉原料TC使用量平衡统计","C","P1","2026-08-30",false],
+["有机棉原料TC使用量平衡统计","C","P1","2026-08-30",false],
+["H&M PD环保能源数据上传","D","P0","2026-08-05",false],
+["H&M PD社会责任数据上传","D","P0","2026-08-12",false],
+["每月检查填报统计工人数量和工作时间","D","P1","2026-08-15",false],
+["Clean Chain清洁链 化学品上传","D","P1","2026-08-20",false],
+["BHIVE系统 化学品上传","D","P1","2026-08-20",false],
+["BVe3系统 化学品上传","D","P1","2026-08-20",false],
+["化学品清单更新月度审查/库存统计","D","P1","2026-08-25",false],
+["能源、水、产量、碳排放统计","D","P1","2026-08-30",false],
+["车间消防演习（2次/班组/2次/台班）","E","P0","2026-08-10",false],
+["综合消防演习（2次/半年）","E","P0","2026-09-30",false],
+["污水处理应急演习","E","P0","2026-10-15",false],
+["浆池/纺塑/仓库应急演习","E","P0","2026-09-15",false],
+["危色岗位人员检测色盲检测","E","P1","2026-08-20",false],
+["特种设备及检查记录","E","P1","2026-08-25",false],
+["化学品仓库检查","E","P0","2026-08-12",false],
+["消防重点安全检查","E","P0","2026-08-30",false],
+["认证体系维护检查","E","P1","2026-09-10",false],
+["季度安全检查","E","P0","2026-09-30",false],
+["特种设备登记报表","E","P1","2026-08-30",false],
+["工时统计记录","F","P2","2026-08-30",false],
+["部门费用统计","F","P2","2026-08-30",false],
+["选绢（QU/QU）客户","F","P1","2026-08-08",false],
+["POLO客户","F","P1","2026-08-15",false],
+["OTTO客户","F","P1","2026-08-18",false],
+["客人行程跟进","F","P2","2026-08-20",false],
+["业务/销售/国内同事","F","P2","2026-08-25",false],
+["中方人员休假请/休假出席报销","F","P2","2026-08-30",false]
+];
+const EXP_TYPES=["招待费","差旅费","样品费","认证费","办公费","其他"];
+const EXP_COLORS=["#2563eb","#16a34a","#f59e0b","#e5484d","#7c3aed","#0891b2"];
+
+function seed(){
+  return {
+    tasks:TS.map((t,i)=>({id:i+1,title:t[0],cat:t[1],prio:t[2],due:t[3],done:t[4]})),
+    meets:[
+      {id:1,date:'2026-08-11',who:'张总、认证部',topic:'TC 证书与平衡统计推进',result:'优先 GOTS/GRS 范围证书',follow:'本周提交再生棉TC'},
+      {id:2,date:'2026-08-12',who:'EHS、车间',topic:'8 月应急演练计划',result:'车间消防演习下周启动',follow:'跟踪车间/仓库演习'}
+    ],
+    clients:[
+      {id:1,name:'选绢（QU/QU）客户',status:'对接中',next:'发报价 8/25'},
+      {id:2,name:'POLO客户',status:'验厂中',next:'准备文件 8/15'},
+      {id:3,name:'OTTO客户',status:'报价中',next:'等回复 8/18'},
+      {id:4,name:'客人行程跟进',status:'已完成',next:'接机安排已确认'}
+    ],
+    expenses:[
+      {id:1,date:'2026-08-05',type:'认证费',amount:1280,note:'GOTS 年费'},
+      {id:2,date:'2026-08-09',type:'招待费',amount:560,note:'选绢客户晚宴'},
+      {id:3,date:'2026-08-14',type:'样品费',amount:320,note:'寄 OTTO 样布'}
+    ],
+    kb:[
+      {id:1,cat:'认证资料',title:'GOTS 认证核心要求',content:'有机含量≥70%；化学品符合 GOTS 列表；污水检测达标；供应链 TC 可追溯。',url:'',ts:Date.now()},
+      {id:2,cat:'联系人',title:'认证机构对接人',content:'GOTS/Slat: 王老师 138xxxx；ZDHC 平台支持邮箱 support@zdhc.org',url:'',ts:Date.now()},
+      {id:3,cat:'流程SOP',title:'TC 证书申请流程',content:'1.客户下 PO → 2.申请范围证书 SC → 3.按批次申请 TC → 4.平台核验原料 TC 用量平衡',url:'',ts:Date.now()}
+    ],
+    memos:[
+      {id:1,text:'8/20 前必须把 H&M PD 社会责任数据上传完，否则影响发货',ts:Date.now(),pinned:true},
+      {id:2,text:'ZDHC 下半年废水检测窗口 8-10 月，提前约实验室',ts:Date.now(),pinned:false}
+    ],
+    subNotes:{}
+  };
+}
+
+/* ============ 存储 / 云端同步 ============ */
+const KEY="wb_factory_v1";
+const SYNC_KEY="wb_factory_sync_v1";
+const GIST_FILE="workbench.json";
+let data;
+let sync={enabled:false,gistId:null,token:null};
+
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function setStatus(kind){
+  const b=document.getElementById('syncBadge');
+  if(kind==='cloud'||kind==='synced'){b.className='badge cloud';b.textContent='☁ 云端已同步';}
+  else if(kind==='syncing'){b.className='badge sync';b.textContent='🔄 同步中…';}
+  else if(kind==='error'){b.className='badge err';b.textContent='⚠️ 同步失败(本地)';}
+  else {b.className='badge local';b.textContent='💾 本地模式';}
+}
+function loadSyncCfg(){
+  try{const s=JSON.parse(localStorage.getItem(SYNC_KEY));if(s&&s.token){sync=s;return}}catch(e){}
+  // 从 URL hash 导入（零迁移）
+  const h=location.hash.match(/gist=([^&]+)&t=([^&]+)/);
+  if(h){
+    sync={enabled:true,gistId:h[1],token:decodeURIComponent(h[2])};
+    localStorage.setItem(SYNC_KEY,JSON.stringify(sync));
+    history.replaceState(null,'',location.pathname+location.search);
+  }
+}
+function localLoad(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
+function localSave(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}}
+
+let pushTimer=null;
+function saveData(){
+  localSave();
+  if(sync.enabled){setStatus('syncing');clearTimeout(pushTimer);pushTimer=setTimeout(pushGist,700);}
+}
+async function pushGist(){
+  try{
+    const res=await fetch('https://api.github.com/gists/'+sync.gistId,{
+      method:'PATCH',
+      headers:{'Authorization':'token '+sync.token,'Content-Type':'application/json'},
+      body:JSON.stringify({files:{[GIST_FILE]:{content:JSON.stringify(data,null,1)}}})
+    });
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    setStatus('synced');
+  }catch(e){setStatus('error');console.warn('push failed',e)}
+}
+async function gistRead(){
+  const res=await fetch('https://api.github.com/gists/'+sync.gistId,{
+    headers:{'Authorization':'token '+sync.token}
+  });
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  const j=await res.json();
+  const c=j.files&&j.files[GIST_FILE]&&j.files[GIST_FILE].content;
+  if(!c)return null;
+  return JSON.parse(c);
+}
+async function gistCreate(){
+  const res=await fetch('https://api.github.com/gists',{
+    method:'POST',
+    headers:{'Authorization':'token '+sync.token,'Content-Type':'application/json'},
+    body:JSON.stringify({description:'工厂合规工作台 云端数据',public:false,files:{[GIST_FILE]:{content:JSON.stringify(data,null,1)}}})
+  });
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  const j=await res.json();
+  sync.gistId=j.id;sync.enabled=true;
+  localStorage.setItem(SYNC_KEY,JSON.stringify(sync));
+}
+
+/* ============ 渲染 ============ */
+function renderToday(){
+  const t=todayStr();
+  const items=data.tasks.filter(x=>!x.done && x.due && x.due<=t).sort((a,b)=>a.due.localeCompare(b.due));
+  const box=document.getElementById("todayList");
+  if(!items.length){box.innerHTML='<p class="empty">今天没有待处理事项，状态很好！</p>';return}
+  box.innerHTML=items.map(x=>{
+    const over=x.due<t;
+    return `<div class="today-item ${over?'overdue':''}">
+      <span class="tag ${x.prio}">${x.prio}</span>
+      <div style="flex:1;min-width:0"><div style="font-size:14px">${esc(x.title)}</div>
+      <div class="due ${over?'over':''}">${esc(CATNAME[x.cat]||'')} · ${over?'已逾期 ':'到期 '}${x.due}</div></div>
+      <button class="mini done" onclick="finish(${x.id})">完成</button>
+    </div>`}).join("");
+}
+function finish(id){const x=data.tasks.find(t=>t.id==id);if(x){x.done=true;saveData();renderAll();if(currentSubCat)renderSubModule()}}
+
+function taskListHTML(items){
+  const today=todayStr();
+  let html='';
+  CATS.forEach(c=>{
+    const it=items.filter(x=>x.cat===c.id);
+    if(!it.length)return;
+    const done=it.filter(x=>x.done).length;
+    const total=it.length;
+    const overdue=it.filter(x=>!x.done && x.due && x.due<today).length;
+    const overTag=overdue?' · <span style="color:var(--red)">逾期 '+overdue+'</span>':'';
+    html+=`<div class="cat"><div class="cat-hd">
+      <div class="fold-zone" onclick="this.parentElement.parentElement.classList.toggle('fold')">
+        <span class="nm">${esc(c.name)}</span>
+        <span class="st">${done}/${total}${overTag}</span>
+      </div>
+      <button class="enter-btn" onclick="event.stopPropagation();openSubModule('${c.id}')">进入 →</button>
+    </div><div class="cat-body">`;
+    it.slice().sort((a,b)=>a.done-b.done||(a.due||"").localeCompare(b.due||"")).forEach(x=>{
+      const over=x.due && x.due<today && !x.done;
+      html+=`<div class="task ${x.done?'done':''}">
+        <div class="chk" onclick="toggle(${x.id})">${x.done?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg>':''}</div>
+        <span class="tt">${esc(x.title)}</span>
+        <span class="tag ${x.prio}">${x.prio}</span>
+        <span class="due ${over?'over':''}">${x.due||'—'}</span>
+        <button class="del" onclick="del(${x.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+      </div>`;
+    });
+    html+='</div></div>';
+  });
+  return html || '<p class="empty">暂无任务</p>';
+}
+function renderTasksAll(){
+  const html=taskListHTML(data.tasks);
+  document.getElementById("taskList").innerHTML=html;
+  document.getElementById("projTaskList").innerHTML=html;
+  document.getElementById("opsTaskList").innerHTML=html;
+}
+function toggle(id){const x=data.tasks.find(t=>t.id==id);if(x){x.done=!x.done;saveData();renderAll();if(currentSubCat)renderSubModule()}}
+function del(id){if(!confirm('删除该任务？'))return;data.tasks=data.tasks.filter(t=>t.id!=id);saveData();renderAll();if(currentSubCat)renderSubModule()}
+
+function ring(p){
+  const r=22,c=2*Math.PI*r,off=c*(1-p/100);
+  return `<svg class="ring" width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="${r}" fill="none" stroke="#e8f0ff" stroke-width="6"/><circle cx="28" cy="28" r="${r}" fill="none" stroke="#2563eb" stroke-width="6" stroke-linecap="round" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" transform="rotate(-90 28 28)"/><text x="28" y="32" text-anchor="middle" font-size="13" font-weight="700" fill="#1f2a44">${p}%</text></svg>`;
+}
+function renderProjects(){
+  document.getElementById("projList").innerHTML=CATS.map(c=>{
+    const it=data.tasks.filter(x=>x.cat===c.id);
+    const total=it.length,done=it.filter(x=>x.done).length;
+    const pct=total?Math.round(done/total*100):0;
+    return `<div class="proj" onclick="openSubModule('${c.id}')">
+      ${ring(pct)}
+      <div class="meta"><div class="nm">${esc(c.name)}</div><div class="st">已完成 ${done} / ${total} 项</div></div>
+      <div class="pc">${pct}%</div>
+      <div class="enter-btn">进入 →</div>
+    </div>`;
+  }).join("");
+}
+function renderMetrics(){
+  document.getElementById("metrics").innerHTML=CATS.map(c=>{
+    const it=data.tasks.filter(x=>x.cat===c.id);
+    const total=it.length,done=it.filter(x=>x.done).length;
+    const pct=total?Math.round(done/total*100):0;
+    return `<div class="metric"><div class="v">${pct}%</div><div class="l">${esc(c.name)}<br>${done}/${total}</div></div>`;
+  }).join("");
+}
+
+function renderMeets(){
+  const box=document.getElementById("meetList");
+  if(!data.meets.length){box.innerHTML='<p class="empty">还没有会议纪要</p>';return}
+  box.innerHTML=data.meets.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(m=>`
+    <div class="meet">
+      <div class="bar"></div>
+      <div class="body">
+        <div class="top">${esc(m.topic)}</div>
+        <div class="sub">${esc(m.date||'')} · ${esc(m.who||'')}</div>
+        <div class="line"><span class="k">结论：</span>${esc(m.result||'—')}</div>
+        <div class="line"><span class="k">跟进：</span>${esc(m.follow||'—')}</div>
+      </div>
+    </div>`).join("");
+}
+
+const ST_MAP={对接中:'st-d',报价中:'st-q',验厂中:'st-z',已完成:'st-w'};
+function renderClients(){
+  const box=document.getElementById("cliList");
+  if(!data.clients.length){box.innerHTML='<p class="empty">还没有客户跟进</p>';return}
+  box.innerHTML=data.clients.map(c=>{
+    const cls=ST_MAP[c.status]||'st-d';
+    return `<div class="client">
+      <div class="av">${esc(c.name.slice(0,1))}</div>
+      <div class="body"><div class="nm">${esc(c.name)}</div><div class="nx">下一步：${esc(c.next||'—')}</div></div>
+      <span class="tag ${cls}">${esc(c.status)}</span>
+      <button class="del" onclick="delCli(${c.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+    </div>`;
+  }).join("");
+}
+function delCli(id){data.clients=data.clients.filter(c=>c.id!=id);saveData();renderClients()}
+
+function renderExpenses(){
+  // 类别下拉
+  const sel=document.getElementById("expType");
+  if(!sel.options.length){EXP_TYPES.forEach(t=>{const o=document.createElement('option');o.value=t;o.textContent=t;sel.appendChild(o)})}
+  const box=document.getElementById("expList");
+  if(!data.expenses.length){box.innerHTML='<p class="empty">还没有费用记录</p>';}
+  else{
+    box.innerHTML=data.expenses.slice().sort((a,b)=>(b.date||"").localeCompare(a.date||"")).map(e=>`
+      <div class="exp">
+        <span class="catdot" style="background:${EXP_COLORS[EXP_TYPES.indexOf(e.type)]||'#999'}"></span>
+        <div class="body"><div class="nm">${esc(e.type)} · ${esc(e.note||'—')}</div><div class="nx">${esc(e.date||'')}</div></div>
+        <span class="amt">¥${Number(e.amount||0).toLocaleString()}</span>
+        <button class="del" onclick="delExp(${e.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+      </div>`).join("");
+  }
+  // 饼图
+  const sum={};let total=0;
+  data.expenses.forEach(e=>{sum[e.type]=(sum[e.type]||0)+Number(e.amount||0);total+=Number(e.amount||0)});
+  const keys=Object.keys(sum);
+  if(!keys.length){
+    document.getElementById("expPie").style.background='#e6ebf4';
+    document.getElementById("expLegend").innerHTML='<span style="color:var(--muted)">暂无数据</span>';
+  }else{
+    let acc=0;const segs=keys.map(k=>{const p=sum[k]/total*360;const from=acc;acc+=p;const col=EXP_COLORS[EXP_TYPES.indexOf(k)]||'#999';return `${col} ${from.toFixed(1)}deg ${(from+p).toFixed(1)}deg`;}).join(',');
+    document.getElementById("expPie").style.background=`conic-gradient(${segs})`;
+    document.getElementById("expLegend").innerHTML=keys.map(k=>`<div class="row"><span class="dot" style="background:${EXP_COLORS[EXP_TYPES.indexOf(k)]||'#999'}"></span><span>${esc(k)}</span><b style="margin-left:auto">¥${sum[k].toLocaleString()}</b></div>`).join("");
+  }
+  document.getElementById("expTotal").textContent=total?`累计支出 ¥${total.toLocaleString()}（共 ${data.expenses.length} 笔）`:'';
+}
+function delExp(id){data.expenses=data.expenses.filter(e=>e.id!=id);saveData();renderExpenses()}
+
+function renderKB(){
+  const q=(document.getElementById("kbSearch").value||'').toLowerCase();
+  const box=document.getElementById("kbList");
+  const list=data.kb.slice().sort((a,b)=>b.ts-a.ts).filter(k=>{
+    if(!q)return true;
+    return (k.title+k.content+k.url+k.cat).toLowerCase().includes(q);
+  });
+  if(!list.length){box.innerHTML='<p class="empty">没有匹配的知识条目</p>';return}
+  box.innerHTML=list.map(k=>`
+    <div class="kb">
+      <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11H4zM15 4v5h5"/></svg></div>
+      <div class="body" onclick="toggleKB(${k.id})">
+        <div class="nm">${esc(k.title)} <span class="tag P2" style="background:#eef3fb;color:var(--muted)">${esc(k.cat)}</span></div>
+        <div class="ct" id="kbct-${k.id}" style="display:none">${esc(k.content)}</div>
+        ${k.url?`<div class="url" id="kburl-${k.id}" style="display:none">🔗 ${esc(k.url)}</div>`:''}
+      </div>
+      <button class="del" onclick="delKB(${k.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+    </div>`).join("");
+}
+function toggleKB(id){const c=document.getElementById('kbct-'+id);if(c)c.style.display=c.style.display==='none'?'block':'none';const u=document.getElementById('kburl-'+id);if(u)u.style.display=u.style.display==='none'?'block':'none';}
+function delKB(id){if(!confirm('删除该知识条目？'))return;data.kb=data.kb.filter(k=>k.id!=id);saveData();renderKB()}
+
+function renderMemos(){
+  const box=document.getElementById("memoList");
+  const list=data.memos.slice().sort((a,b)=>(b.pinned-a.pinned)|| b.ts-a.ts);
+  if(!list.length){box.innerHTML='<p class="empty">还没有备忘录</p>';return}
+  box.innerHTML=list.map(m=>`
+    <div class="memo ${m.pinned?'pin':''}">
+      <div class="body">${esc(m.text)}<div class="meta">${m.pinned?'📌 置顶 · ':''}${new Date(m.ts).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div></div>
+      <button class="del" onclick="pinMemo(${m.id})" title="置顶/取消">${m.pinned?'📌':'📍'}</button>
+      <button class="del" onclick="delMemo(${m.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+    </div>`).join("");
+}
+function addMemo(){
+  const v=document.getElementById("memoInput").value.trim();
+  if(!v){toast('请输入内容');return}
+  data.memos.push({id:Date.now(),text:v,ts:Date.now(),pinned:false});
+  saveData();renderMemos();document.getElementById("memoInput").value='';
+}
+function pinMemo(id){const m=data.memos.find(x=>x.id==id);if(m){m.pinned=!m.pinned;saveData();renderMemos()}}
+function delMemo(id){data.memos=data.memos.filter(m=>m.id!=id);saveData();renderMemos()}
+
+/* ============ 子模块 ============ */
+let currentSubCat=null;
+function openSubModule(catId){
+  currentSubCat=catId;
+  document.getElementById('subView').classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  renderSubModule();
+}
+function closeSubModule(){
+  document.getElementById('subView').classList.add('hidden');
+  document.body.style.overflow='';
+  currentSubCat=null;
+}
+function renderSubModule(){
+  if(!currentSubCat)return;
+  const c=CATS.find(x=>x.id===currentSubCat);
+  document.getElementById('subName').textContent=c.name+' · '+c.id+' 类';
+  const items=data.tasks.filter(x=>x.cat===currentSubCat);
+  const total=items.length;
+  const done=items.filter(x=>x.done);
+  const todo=items.filter(x=>!x.done);
+  const today=todayStr();
+  const over=todo.filter(x=>x.due && x.due<today).length;
+  document.getElementById('subStats').innerHTML=
+    `<span>共 <b>${total}</b> 条</span>`+
+    `<span>已完成 <b style="color:var(--green)">${done.length}</b></span>`+
+    `<span>待办 <b>${todo.length}</b></span>`+
+    (over?`<span style="color:var(--red)">逾期 <b>${over}</b></span>`:'');
+  const order=[...todo.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')), ...done];
+  document.getElementById('subTaskList').innerHTML=order.map(x=>{
+    const isOver=x.due && x.due<today && !x.done;
+    return `<div class="sub-task ${x.done?'done':''}">
+      <div class="chk" onclick="subToggle(${x.id})">${x.done?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg>':''}</div>
+      <span class="tt">${esc(x.title)}</span>
+      <select onchange="subChangePrio(${x.id}, this.value)"><option value="P0" ${x.prio==='P0'?'selected':''}>P0</option><option value="P1" ${x.prio==='P1'?'selected':''}>P1</option><option value="P2" ${x.prio==='P2'?'selected':''}>P2</option></select>
+      <input type="date" value="${x.due||''}" onchange="subChangeDate(${x.id}, this.value)">
+      ${isOver?'<span class="due over">逾期</span>':''}
+      <button class="del" onclick="del(${x.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+    </div>`;
+  }).join('') || '<p class="empty-mini">该类暂无任务，可在上方添加</p>';
+  const notesEl=document.getElementById('subNotes');
+  notesEl.value=data.subNotes[currentSubCat]||'';
+  notesEl.oninput=()=>{data.subNotes[currentSubCat]=notesEl.value;saveData();document.getElementById('subNoteStatus').textContent='已自动保存于 '+new Date().toLocaleTimeString();};
+  const pct=total?Math.round(done.length/total*100):0;
+  document.getElementById('subPct').textContent=pct+'%';
+  document.getElementById('subPctBar').style.width=pct+'%';
+  document.getElementById('subPctDetail').textContent=total?`已完成 ${done.length} / 共 ${total} 条${over?' · 逾期 '+over+' 条':''}`:'该类暂无任务';
+  const recentDone=done.slice().reverse().slice(0,10);
+  document.getElementById('subCompleted').innerHTML=recentDone.length?recentDone.map(x=>`<div class="done-item"><span class="ck">✓</span><span>${esc(x.title)}</span><span class="due" style="margin-left:auto">截止 ${x.due||'—'}</span></div>`).join(''):'<p class="empty-mini">尚无完成任务</p>';
+}
+function subToggle(id){const x=data.tasks.find(t=>t.id==id);if(x){x.done=!x.done;saveData();renderAll();renderSubModule()}}
+function subChangePrio(id,v){const x=data.tasks.find(t=>t.id==id);if(x){x.prio=v;saveData();renderAll();renderSubModule()}}
+function subChangeDate(id,v){const x=data.tasks.find(t=>t.id==id);if(x){x.due=v;saveData();renderAll();renderSubModule()}}
+function addSubTask(){
+  const t=document.getElementById('newTaskTitle').value.trim();
+  if(!t){toast('请填写任务标题');return}
+  const p=document.getElementById('newTaskPrio').value;
+  const d=document.getElementById('newTaskDate').value;
+  const maxId=data.tasks.reduce((m,t)=>Math.max(m,t.id),0);
+  data.tasks.push({id:maxId+1,title:t,cat:currentSubCat,prio:p,due:d,done:false});
+  saveData();
+  document.getElementById('newTaskTitle').value='';
+  document.getElementById('newTaskDate').value='';
+  renderAll();renderSubModule();
+}
+
+/* ============ Tab ============ */
+function showTab(t){
+  document.querySelectorAll('.tab').forEach(el=>el.classList.toggle('active',el.dataset.t===t));
+  document.querySelectorAll('.panel').forEach(el=>el.classList.toggle('active',el.id==='panel-'+t));
+}
+
+/* ============ 同步弹窗 ============ */
+function openSync(){
+  if(sync.enabled){
+    document.getElementById('syncToken').value=sync.token;
+    document.getElementById('syncGist').value=sync.gistId||'';
+    document.getElementById('syncActions').style.display='block';
+    document.getElementById('syncLink').value=location.origin+location.pathname+'#gist='+sync.gistId+'&t='+encodeURIComponent(sync.token);
+  }else{
+    document.getElementById('syncActions').style.display='none';
+  }
+  document.getElementById('syncErr').textContent='';
+  document.getElementById('syncMask').classList.remove('hidden');
+}
+function closeSync(){document.getElementById('syncMask').classList.add('hidden')}
+async function saveSync(){
+  const token=document.getElementById('syncToken').value.trim();
+  const gist=document.getElementById('syncGist').value.trim();
+  const err=document.getElementById('syncErr');
+  err.textContent='';
+  if(!token){err.textContent='请填写 GitHub Token';return}
+  setStatus('syncing');
+  try{
+    sync={enabled:true,gistId:gist||null,token};
+    if(!sync.gistId){await gistCreate();}
+    else{
+      const d=await gistRead();
+      if(d){data=d;localSave();}
+    }
+    localStorage.setItem(SYNC_KEY,JSON.stringify(sync));
+    setStatus('synced');
+    // 重新渲染
+    renderAll();
+    document.getElementById('syncActions').style.display='block';
+    document.getElementById('syncLink').value=location.origin+location.pathname+'#gist='+sync.gistId+'&t='+encodeURIComponent(sync.token);
+    document.getElementById('syncGist').value=sync.gistId;
+    toast('云端同步已开启');
+  }catch(e){
+    sync.enabled=false;
+    setStatus('error');
+    err.textContent='连接失败：'+e.message+'\n请检查 Token 是否带 gist 权限、是否正确。当前已回退本地模式。';
+  }
+}
+function copySyncLink(){
+  const v=document.getElementById('syncLink').value;
+  navigator.clipboard.writeText(v).then(()=>toast('同步链接已复制')).catch(()=>{const i=document.getElementById('syncLink');i.select();document.execCommand('copy');toast('同步链接已复制')});
+}
+function disconnectSync(){
+  if(!confirm('断开云端后数据只存本地浏览器，确认？'))return;
+  sync={enabled:false,gistId:null,token:null};
+  localStorage.removeItem(SYNC_KEY);
+  setStatus('local');
+  document.getElementById('syncActions').style.display='none';
+  closeSync();
+  toast('已断开云端，转本地模式');
+}
+
+/* ============ 工具 ============ */
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
+function renderAll(){renderToday();renderTasksAll();renderProjects();renderMetrics();renderMeets();renderClients();renderExpenses();renderKB();renderMemos()}
+
+document.getElementById("genWeek").addEventListener("click",()=>{
+  const lines=[];
+  CATS.forEach(c=>{
+    const it=data.tasks.filter(x=>x.cat===c.id);
+    if(!it.length)return;
+    const done=it.filter(x=>x.done);
+    const todo=it.filter(x=>!x.done).sort((a,b)=>(a.due||"").localeCompare(b.due||""));
+    lines.push('【'+c.name+'】');
+    if(done.length)lines.push('已完成：'+done.map(d=>'• '+d.title).join('\n'));
+    if(todo.length)lines.push('待跟进：'+todo.map(d=>'• '+d.title+(d.due?'（到期 '+d.due+'）':'')).join('\n'));
+    lines.push('');
+  });
+  const out='【本周工作分类汇总 '+todayStr()+'】\n\n'+lines.join('\n');
+  const ta=document.getElementById("weekOut");ta.style.display='block';ta.value=out;ta.select();
+});
+document.getElementById("meetForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  data.meets.push({id:Date.now(),date:document.getElementById("mDate").value,topic:document.getElementById("mTopic").value,who:document.getElementById("mWho").value,result:document.getElementById("mResult").value,follow:document.getElementById("mFollow").value});
+  saveData();renderMeets();e.target.reset();
+});
+document.getElementById("cliForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  data.clients.push({id:Date.now(),name:document.getElementById("cliName").value,status:document.getElementById("cliStatus").value,next:document.getElementById("cliNext").value});
+  saveData();renderClients();e.target.reset();
+});
+document.getElementById("expForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const amt=parseFloat(document.getElementById("expAmt").value);
+  if(!amt||amt<=0){toast('请输入有效金额');return}
+  data.expenses.push({id:Date.now(),date:document.getElementById("expDate").value||todayStr(),type:document.getElementById("expType").value,amount:amt,note:document.getElementById("expNote").value});
+  saveData();renderExpenses();e.target.reset();
+});
+document.getElementById("kbForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const title=document.getElementById("kbTitle").value.trim();
+  if(!title){toast('请输入标题');return}
+  data.kb.push({id:Date.now(),cat:document.getElementById("kbCat").value,title,content:document.getElementById("kbContent").value,url:document.getElementById("kbUrl").value,ts:Date.now()});
+  saveData();renderKB();e.target.reset();
+});
+document.getElementById("kbSearch").addEventListener("input",renderKB);
+document.getElementById("memoInput").addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')addMemo()});
+document.getElementById("expBtn").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="工厂合规工作台备份.json";a.click();
+});
+document.getElementById("impBtn").addEventListener("click",()=>document.getElementById("impFile").click());
+document.getElementById("impFile").addEventListener("change",e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);saveData();renderAll();toast("导入成功")}catch(err){toast("文件格式错误")}};r.readAsText(f);
+});
+document.getElementById("clearBtn").addEventListener("click",()=>{
+  if(confirm("确定重置为示例数据吗？（会覆盖当前数据）")){data=seed();saveData();renderAll();toast("已重置为示例数据")}
+});
+
+/* ============ 启动 ============ */
+(async function init(){
+  loadSyncCfg();
+  if(sync.enabled){
+    setStatus('syncing');
+    try{
+      const d=await gistRead();
+      if(d){data=d;localSave();setStatus('synced');}
+      else{data=localLoad()||seed();setStatus('local');}
+    }catch(e){data=localLoad()||seed();setStatus('error');}
+  }else{
+    data=localLoad()||seed();
+    setStatus('local');
+  }
+  renderAll();
+})();
+</script>
+</body>
+</html>
