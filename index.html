@@ -155,11 +155,10 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .empty{color:var(--muted);font-size:13px;text-align:center;padding:18px}
 
 /* ============ 子模块（全屏覆盖） ============ */
-.sub-view{position:fixed;inset:0;background:var(--bg);z-index:99;overflow-y:auto;animation:slideIn .25s ease}
-.sub-view.hidden{display:none}
+.sub-view{background:var(--bg);animation:slideIn .25s ease}
 @keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
 .sub-hd{
-  position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;
+  position:sticky;top:56px;z-index:5;display:flex;align-items:center;gap:10px;
   padding:14px 16px;background:var(--card);border-bottom:1px solid var(--line);
   backdrop-filter:saturate(180%) blur(8px);
 }
@@ -470,11 +469,23 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
       </div>
       <div class="card">
         <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 7"/></svg>我的备忘</h2>
-        <div id="memoList"></div>
+<div id="memoList"></div>
+    </div>
+  </div>
+
+  <!-- 子模块视图（左侧栏始终保留，可直接切换其他模块） -->
+  <div class="view" id="view-sub">
+    <div class="sub-hd">
+      <button class="sub-back" onclick="showView('home')">← 返回首页</button>
+      <div style="flex:1;min-width:0">
+        <h2 id="subName">—</h2>
+        <div class="sub-stats" id="subStats"></div>
       </div>
     </div>
+    <div class="sub-body" id="subBody"></div>
+  </div>
 
-  </main>
+</main>
 </div>
 
 <!-- ============ AI 助手悬浮按钮 ============ -->
@@ -482,18 +493,6 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
   AI助手
 </button>
-
-<!-- ============ 子模块覆盖层 ============ -->
-<div id="subView" class="sub-view hidden">
-  <div class="sub-hd">
-    <button class="sub-back" onclick="closeSubModule()">←</button>
-    <div style="flex:1;min-width:0">
-      <h2 id="subName">—</h2>
-      <div class="sub-stats" id="subStats"></div>
-    </div>
-  </div>
-  <div class="sub-body" id="subBody"></div>
-</div>
 
 <!-- ============ 云端同步弹窗 ============ -->
 <div class="mask hidden" id="syncMask">
@@ -835,9 +834,11 @@ function delMemo(id){data.memos=data.memos.filter(m=>m.id!=id);saveData();render
 function showView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+v));
   document.querySelectorAll('.nav-item').forEach(el=>{
-    if(el.dataset.view)el.classList.toggle('active',el.dataset.view===v);
-    else if(el.dataset.cat&&v==='cat-'+el.dataset.cat)el.classList.add('active');
-    else el.classList.remove('active');
+    if(el.dataset.view){
+      el.classList.toggle('active',el.dataset.view===v);
+    } else if(el.dataset.cat){
+      el.classList.toggle('active', v==='sub' && el.dataset.cat===currentSubCat);
+    }
   });
   if(v==='report')genWeekReport();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -850,15 +851,12 @@ let currentSubFilter=null;
 function openSubModule(catId,subName){
   currentSubCat=catId;
   currentSubFilter=subName||null;
-  const c=CATS.find(x=>x.id===catId);
-  document.getElementById('subView').classList.remove('hidden');
-  document.body.style.overflow='hidden';
+  showView('sub');
   renderSubModule();
 }
 function closeSubModule(){
-  document.getElementById('subView').classList.add('hidden');
-  document.body.style.overflow='';
   currentSubCat=null;currentSubFilter=null;
+  showView('home');
 }
 
 function renderSubModule(){
