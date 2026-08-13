@@ -310,6 +310,73 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .auth-btn{width:100%;padding:12px;border:none;border-radius:11px;background:var(--primary);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:background .15s}
 .auth-btn:hover{background:#155fe0}
 .auth-tip{font-size:11px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5}
+
+/* ============ A 类 · 认证管理表格视图 ============ */
+.auth-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.auth-tabs .t{font-size:13px;font-weight:600;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer;transition:.15s}
+.auth-tabs .t:hover{border-color:#c7d6f5}
+.auth-tabs .t.on{background:var(--primary);border-color:var(--primary);color:#fff}
+.auth-hint{background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:9px 13px;font-size:12px;color:#92400e;margin-bottom:12px;display:flex;align-items:center;gap:8px;line-height:1.5}
+.auth-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.auth-stats .s{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.auth-stats .s .d{width:10px;height:10px;border-radius:50%;flex:0 0 10px}
+.auth-stats .s .n{font-size:21px;font-weight:700;line-height:1}
+.auth-stats .s .l{font-size:12px;color:var(--muted)}
+.auth-stats .s.total .d{background:#94a3b8}
+.auth-stats .s.ok .d{background:var(--green)}
+.auth-stats .s.warn .d{background:var(--amber)}
+.auth-stats .s.bad .d{background:var(--red)}
+.auth-toolbar{display:flex;gap:8px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:10px;box-shadow:var(--shadow);flex-wrap:wrap}
+.auth-toolbar .search{flex:1;min-width:180px;display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--bg);border-radius:8px}
+.auth-toolbar .search input{border:0;outline:0;background:transparent;font-size:13px;flex:1;color:var(--text)}
+.auth-toolbar .filter{display:flex;gap:6px;align-items:center}
+.auth-toolbar .filter .chip{padding:5px 11px;border-radius:999px;font-size:12px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer;user-select:none;transition:.15s}
+.auth-toolbar .filter .chip:hover{border-color:#c7d6f5}
+.auth-toolbar .filter .chip.on{background:var(--primary-soft);border-color:var(--primary);color:#1554d1;font-weight:600}
+.auth-card-tbl{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.auth-card-tbl table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.auth-card-tbl thead th{background:#f8fafc;color:#475569;font-weight:600;text-align:left;padding:10px 10px;font-size:12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.auth-card-tbl thead th.num{text-align:center;width:46px}
+.auth-card-tbl thead th.sm{width:78px}
+.auth-card-tbl tbody tr{border-bottom:1px solid #f1f5f9;transition:background .15s;cursor:pointer}
+.auth-card-tbl tbody tr:last-child{border-bottom:0}
+.auth-card-tbl tbody tr:hover{background:#fafbff}
+.auth-card-tbl tbody td{padding:11px 10px;vertical-align:middle;border-bottom:1px solid #f1f5f9}
+.auth-card-tbl tbody td.num{text-align:center;color:var(--muted);font-weight:600}
+.auth-card-tbl .nm{font-weight:600;color:var(--text)}
+.auth-card-tbl .nm .tag{display:inline-block;background:var(--primary-soft);color:#1554d1;padding:1px 6px;border-radius:4px;font-size:11px;margin-right:6px;font-weight:500}
+.auth-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500}
+.auth-badge .bd{width:6px;height:6px;border-radius:50%}
+.auth-badge.ok{background:#dcfce7;color:#15803d}.auth-badge.ok .bd{background:var(--green)}
+.auth-badge.warn{background:#fef3c7;color:#b45309}.auth-badge.warn .bd{background:var(--amber)}
+.auth-badge.bad{background:#fee2e2;color:#b91c1c}.auth-badge.bad .bd{background:var(--red)}
+.auth-plan{display:flex;flex-wrap:wrap;gap:3px}
+.auth-plan .p{background:#ecfdf5;color:#047857;padding:2px 7px;border-radius:4px;font-size:11px;border:1px solid #d1fae5}
+.auth-plan .p b{color:#065f46;margin-right:2px}
+.auth-org{color:var(--purple);font-weight:500}
+.auth-person{display:inline-flex;align-items:center;gap:5px;margin-right:2px;margin-bottom:2px}
+.auth-person .av{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;flex:0 0 22px}
+.auth-person .pn{font-size:12px;color:var(--text)}
+.auth-rownote{opacity:0;transition:.15s;display:flex;gap:4px;justify-content:flex-end}
+.auth-card-tbl tbody tr:hover .auth-rownote{opacity:1}
+.auth-rownote button{background:transparent;border:0;cursor:pointer;padding:4px 6px;border-radius:4px;color:var(--muted);font-size:14px}
+.auth-rownote button:hover{background:var(--bg);color:var(--text)}
+.auth-empty{padding:30px;text-align:center;color:var(--muted);font-size:13px}
+.auth-foot{color:var(--muted);font-size:12px;margin-top:8px;text-align:center}
+/* 抽屉（复用 .mask） */
+.drawer{position:fixed;top:0;right:0;height:100vh;width:520px;max-width:92vw;background:#fff;box-shadow:-8px 0 24px rgba(0,0,0,.08);transform:translateX(100%);transition:.25s;z-index:121;display:flex;flex-direction:column}
+.drawer.on{transform:translateX(0)}
+.drawer .d-hd{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.drawer .d-hd h3{font-size:16px;font-weight:600}
+.drawer .d-hd .x{background:transparent;border:0;font-size:22px;color:var(--muted);cursor:pointer;line-height:1}
+.drawer .d-bd{flex:1;overflow-y:auto;padding:18px 20px}
+.drawer .d-ft{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
+.drawer .field{margin-bottom:14px}
+.drawer .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600}
+.drawer .field input,.drawer .field textarea,.drawer .field select{width:100%;font-family:inherit}
+.drawer .field textarea{resize:vertical;min-height:58px}
+.drawer .field .ro{background:var(--bg);color:var(--text);padding:8px 10px;border-radius:8px;font-size:13px;line-height:1.6}
+@media(max-width:860px){.auth-stats{grid-template-columns:repeat(2,1fr)}.auth-toolbar .filter{display:none}}
 </style>
 </head>
 <body>
@@ -700,8 +767,26 @@ function seed(){
       {id:2,text:'ZDHC 下半年废水检测窗口 8-10 月，提前约实验室',ts:Date.now(),pinned:false}
     ],
     subNotes:{},
-    certs:[]
+    certs:[],
+    auths:defaultAuths()
   };
+}
+
+/* ============ A 类 · 认证管理台账默认数据（9 条，按截图） ============ */
+const PERSON_COLOR={'武氏早原':'#1e6fff','黎氏庄':'#16a34a','陶氏云英':'#f59e0b','熊氏奉':'#e5484d','陈氏奉':'#7c3aed','黄海海':'#0891b2'};
+function personColor(n){return PERSON_COLOR[n]||'#64748b'}
+function defaultAuths(){
+  return [
+    {id:1,name:'ISO 9001 质量管理体系认证',sub:'认证管理',period:'1年',first:'2020-12-18',expire:'2026-12-17',plan:['确认合同付款','准备审核资料','现场审核','不符合整改'],org:'天祥认证机构',lead:'武氏早原',sup:['黎氏庄'],conf:'黄海海',note:''},
+    {id:2,name:'ISO 14001 环境管理体系认证',sub:'认证管理',period:'1年',first:'2020-12-09',expire:'2026-12-08',plan:['确认合同付款','准备审核资料','现场审核','不符合整改'],org:'天祥认证机构',lead:'黎氏庄',sup:['武氏早原'],conf:'黄海海',note:''},
+    {id:3,name:'ISO 50001 能源管理体系认证',sub:'认证管理',period:'1年',first:'2023-12-05',expire:'2026-12-04',plan:['确认合同付款','准备审核资料','现场审核','不符合整改'],org:'TÜV 认证机构',lead:'黎氏庄',sup:['武氏早原'],conf:'黄海海',note:''},
+    {id:4,name:'有机棉 GOTS & OCS 认证',sub:'认证管理',period:'1年',first:'2022-11-30',expire:'2026-10-31',plan:['确认合同付款','准备审核资料','现场审核','不符合整改'],org:'北京 ECOCERT',lead:'武氏早原',sup:['黎氏庄','陶氏云英','熊氏奉'],conf:'黄海海',note:''},
+    {id:5,name:'再生棉 GRS & RCS 认证',sub:'认证管理',period:'1年',first:'2020-02-12',expire:'2025-09-06',plan:['确认合同付款','准备审核资料','现场审核','不符合整改'],org:'北京 ECOCERT',lead:'武氏早原',sup:['黎氏庄','陶氏云英','熊氏奉'],conf:'黄海海',note:'有效期已过，需尽快续证'},
+    {id:6,name:'海关关单认证（Regenagri）',sub:'认证管理',period:'1年',first:'2024-12-17',expire:'2025-12-16',plan:['确认合同付款','准备审核资料','现场审核','不符合整改'],org:'OU 认证机构',lead:'陶氏云英',sup:['武氏早原','陈氏奉'],conf:'黄海海',note:''},
+    {id:7,name:'Higg FEM 环境模块验厂',sub:'认证管理',period:'1年',first:'2022-06-01',expire:'2026-04-15',plan:['自我评估','确认合同付款','第三方审核','发布审核报告'],org:'TNB 审核机构',lead:'黎氏庄',sup:['武氏早原'],conf:'黄海海',note:''},
+    {id:8,name:'Higg SLOP 社会责任验厂',sub:'认证管理',period:'1年',first:'2022-07-07',expire:'2026-04-30',plan:['自我评估','确认合同付款','第三方审核','发布审核报告'],org:'TNB 审核机构',lead:'黎氏庄',sup:['武氏早原'],conf:'黄海海',note:''},
+    {id:9,name:'Oeko-tex 100 国际标准认证',sub:'认证管理',period:'1年',first:'2021-10-15',expire:'2024-10-15',plan:['确认合同付款','准备测试样品','审核机构检测','通过后出证'],org:'TESTEX AG',lead:'武氏早原',sup:['黎氏庄'],conf:'黄海海',note:'有效期已过，需尽快续证'}
+  ];
 }
 
 /* ============ 存储 / 云端同步 ============ */
@@ -901,10 +986,14 @@ function showView(v){
 /* ============ 子模块 ============ */
 let currentSubCat=null;
 let currentSubFilter=null;
+let authTab='table';
+let authFilter='all';
+let authKeyword='';
 
 function openSubModule(catId,subName){
   currentSubCat=catId;
   currentSubFilter=subName||null;
+  if(catId==='A'){authTab='table';authFilter='all';authKeyword='';}
   showView('sub');
   renderSubModule();
 }
@@ -925,23 +1014,33 @@ function renderSubModule(){
     return;
   }
 
-  // A-E 子模块
+  // A 类：未指定子模块时，由 renderAuthView 统一渲染（认证台账表格 / 执行任务 双 tab）
+  if(currentSubCat==='A' && !currentSubFilter){
+    renderAuthView();
+    return;
+  }
+
+  // B-E 子模块（执行任务）—— 通用任务列表
+  body.innerHTML=renderCatTasksHTML();
+  bindSubNotes();
+}
+
+/* ============ A 类执行任务通用列表（从 renderSubModule 抽取，可复用） ============ */
+function renderCatTasksHTML(){
+  const c=CATS.find(x=>x.id===currentSubCat);
   const items=data.tasks.filter(x=>x.cat===currentSubCat);
   const today=todayStr();
   const total=items.length;
   const done=items.filter(x=>x.done);
   const todo=items.filter(x=>!x.done);
   const over=todo.filter(x=>x.due && x.due<today).length;
-  document.getElementById('subStats').innerHTML=
+  const stEl=document.getElementById('subStats');
+  if(stEl)stEl.innerHTML=
     `<span>共 <b>${total}</b> 条</span>`+
     `<span>已完成 <b style="color:var(--green)">${done.length}</b></span>`+
     `<span>待办 <b>${todo.length}</b></span>`+
     (over?`<span style="color:var(--red)">逾期 <b>${over}</b></span>`:'');
-
-  // 按 sub 分组展示
   const filterItems=currentSubFilter?items.filter(x=>x.sub===currentSubFilter):items;
-
-  // 子功能筛选 chips
   const filterChips=`<div class="sub-filter">
     <span class="fchip ${!currentSubFilter?'active':''}" onclick="filterSub(null)">全部 (${items.length})</span>
     ${c.subs.map(s=>{
@@ -949,8 +1048,6 @@ function renderSubModule(){
       return `<span class="fchip ${currentSubFilter===s?'active':''}" onclick="filterSub('${s.replace(/'/g,"\\'")}')">${esc(s)} (${ct})</span>`;
     }).join('')}
   </div>`;
-
-  // 添加任务栏（含 sub 下拉）
   const addBar=`<div class="sub-section">
     <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>添加新任务到本类</h3>
     <div class="add-task-bar">
@@ -961,8 +1058,6 @@ function renderSubModule(){
       <button class="btn primary" onclick="addSubTask()">+ 添加</button>
     </div>
   </div>`;
-
-  // 任务列表
   const order=[...filterItems.filter(x=>!x.done).sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')),
                ...filterItems.filter(x=>x.done)];
   const taskList=`<div class="sub-section">
@@ -983,15 +1078,11 @@ function renderSubModule(){
       </div>`;
     }).join('') || '<p class="empty-mini">该子功能暂无任务，可在上方添加</p>'}</div>
   </div>`;
-
-  // 备注
   const notes=`<div class="sub-section">
     <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/></svg>${c.short} 备注（自动保存到云端）</h3>
     <textarea id="subNotes" placeholder="记录这个模块的关键节点、联系人、要跟进的细节…，关闭子模块时即自动保存">${esc(data.subNotes[currentSubCat]||'')}</textarea>
     <p class="note" id="subNoteStatus" style="font-size:12px;color:var(--muted);margin-top:6px">备注自动保存</p>
   </div>`;
-
-  // 完成进度
   const pct=total?Math.round(done.length/total*100):0;
   const prog=`<div class="sub-section">
     <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>完成进度</h3>
@@ -1001,23 +1092,194 @@ function renderSubModule(){
     </div>
     <div class="progress-bar"><div style="width:${pct}%"></div></div>
   </div>`;
-
-  // 近期已完成
   const recent=done.slice().reverse().slice(0,10);
   const compList=`<div class="sub-section">
     <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 7"/></svg>近期已完成（最近 10 条）</h3>
     <div class="done-list">${recent.length?recent.map(x=>`<div class="done-item"><span class="ck">✓</span><span>${esc(x.title)}</span><span class="due" style="margin-left:auto">截止 ${x.due||'—'}</span></div>`).join(''):'<p class="empty-mini">尚无完成任务</p>'}</div>
   </div>`;
-
-  body.innerHTML=filterChips+addBar+taskList+notes+prog+compList+
+  return filterChips+addBar+taskList+notes+prog+compList+
     `<div class="center" style="margin-top:14px;text-align:center"><button class="btn" onclick="closeSubModule()">← 返回主工作台</button></div>`;
-
-  // 备注自动保存
+}
+function bindSubNotes(){
   const notesEl=document.getElementById('subNotes');
-  notesEl.oninput=()=>{data.subNotes[currentSubCat]=notesEl.value;saveData();document.getElementById('subNoteStatus').textContent='已自动保存于 '+new Date().toLocaleTimeString();};
+  if(!notesEl)return;
+  notesEl.oninput=()=>{data.subNotes[currentSubCat]=notesEl.value;saveData();const s=document.getElementById('subNoteStatus');if(s)s.textContent='已自动保存于 '+new Date().toLocaleTimeString();};
 }
 
 function filterSub(s){currentSubFilter=s;renderSubModule()}
+
+/* ============ A 类 · 认证管理台账视图 ============ */
+function authStatus(a){
+  if(!a.expire)return 'ok';
+  const t=todayStr();
+  if(a.expire<t)return 'bad';
+  const diff=(new Date(a.expire)-new Date(t))/86400000;
+  return diff<=60?'warn':'ok';
+}
+function authSetTab(t){authTab=t;renderAuthView();}
+function authSetFilter(f){authFilter=f;renderAuthView();}
+function authSearch(v){authKeyword=v;const w=document.getElementById('authTblWrap');if(w)w.innerHTML=renderAuthTbodyHTML();}
+
+function renderAuthView(){
+  const body=document.getElementById('subBody');
+  const atCount=data.tasks.filter(x=>x.cat==='A').length;
+  const tabs=`<div class="auth-tabs">
+    <div class="t ${authTab==='table'?'on':''}" onclick="authSetTab('table')">📋 认证台账</div>
+    <div class="t ${authTab==='tasks'?'on':''}" onclick="authSetTab('tasks')">📝 执行任务（${atCount}）</div>
+  </div>`;
+  if(authTab==='tasks'){body.innerHTML=tabs+renderCatTasksHTML();bindSubNotes();return;}
+  const stEl=document.getElementById('subStats');
+  if(stEl)stEl.innerHTML=`<span>认证台账 <b>${(data.auths||[]).length}</b> 项</span>`;
+  body.innerHTML=tabs+renderAuthStatsHTML()+renderAuthToolsHTML()+`<div id="authTblWrap">${renderAuthTbodyHTML()}</div>`+
+    `<div class="auth-foot">💡 单击任意一行可查看详情 / 编辑；数据自动同步至云端 Gist，电脑手机一致。</div>`;
+}
+function renderAuthStatsHTML(){
+  const list=data.auths||[];
+  const total=list.length;
+  const ok=list.filter(a=>authStatus(a)==='ok').length;
+  const warn=list.filter(a=>authStatus(a)==='warn').length;
+  const bad=list.filter(a=>authStatus(a)==='bad').length;
+  const hint=(bad>0||warn>0)?`<div class="auth-hint">⚠️ 有 <b>${bad}</b> 项已过期、<b>${warn}</b> 项 60 天内到期，请尽快安排续证</div>`:'';
+  return `<div class="auth-stats">
+    <div class="s total"><div class="d"></div><div><div class="n">${total}</div><div class="l">认证总数</div></div></div>
+    <div class="s ok"><div class="d"></div><div><div class="n">${ok}</div><div class="l">有效</div></div></div>
+    <div class="s warn"><div class="d"></div><div><div class="n">${warn}</div><div class="l">60 天内到期</div></div></div>
+    <div class="s bad"><div class="d"></div><div><div class="n">${bad}</div><div class="l">已过期</div></div></div>
+  </div>`+hint;
+}
+function renderAuthToolsHTML(){
+  return `<div class="auth-toolbar">
+    <div class="search"><span style="color:#9ca3af">🔍</span><input id="authSearch" placeholder="搜索认证名称 / 机构 / 担当 / 协力…" value="${esc(authKeyword)}" oninput="authSearch(this.value)"></div>
+    <div class="filter">
+      <div class="chip ${authFilter==='all'?'on':''}" onclick="authSetFilter('all')">全部</div>
+      <div class="chip ${authFilter==='ok'?'on':''}" onclick="authSetFilter('ok')">有效</div>
+      <div class="chip ${authFilter==='warn'?'on':''}" onclick="authSetFilter('warn')">60天内</div>
+      <div class="chip ${authFilter==='bad'?'on':''}" onclick="authSetFilter('bad')">已过期</div>
+    </div>
+    <button class="btn" onclick="exportAuths()">📥 导出</button>
+    <button class="btn primary" onclick="addAuth()">＋ 新增认证</button>
+  </div>`;
+}
+function renderAuthTbodyHTML(){
+  let list=data.auths||[];
+  if(authFilter!=='all'){
+    list=list.filter(a=>{const s=authStatus(a);return authFilter==='ok'?s==='ok':authFilter==='warn'?s==='warn':s==='bad';});
+  }
+  const kw=authKeyword.trim().toLowerCase();
+  if(kw){
+    list=list.filter(a=>(a.name+' '+(a.org||'')+' '+(a.lead||'')+' '+((a.sup||[]).join(' '))+' '+(a.conf||'')+' '+(a.note||'')).toLowerCase().indexOf(kw)>=0);
+  }
+  if(!list.length){
+    return `<div class="auth-card-tbl"><div class="auth-empty">没有符合条件的认证，点「＋ 新增认证」添加</div></div>`;
+  }
+  const rows=list.map((a,i)=>{
+    const s=authStatus(a);
+    const badge=s==='ok'?'<span class="auth-badge ok"><span class="bd"></span>有效</span>':s==='warn'?'<span class="auth-badge warn"><span class="bd"></span>60天内</span>':'<span class="auth-badge bad"><span class="bd"></span>已过期</span>';
+    const plan=(a.plan||[]).map((p,j)=>`<span class="p"><b>${'①②③④⑤⑥'.charAt(j)}</b>${esc(p)}</span>`).join('');
+    const sup=(a.sup||[]).map(n=>`<span class="auth-person"><span class="av" style="background:${personColor(n)}">${esc(n.slice(0,1))}</span><span class="pn">${esc(n)}</span></span>`).join('');
+    const lead=`<span class="auth-person"><span class="av" style="background:${personColor(a.lead)}">${esc((a.lead||'').slice(0,1))}</span><span class="pn">${esc(a.lead||'')}</span></span>`;
+    const conf=`<span class="auth-person"><span class="av" style="background:${personColor(a.conf)}">${esc((a.conf||'').slice(0,1))}</span><span class="pn">${esc(a.conf||'')}</span></span>`;
+    return `<tr onclick="openAuthDrawer(${a.id})">
+      <td style="font-weight:600;color:#1554d1;white-space:nowrap">${esc(a.sub||'')}</td>
+      <td class="num">${i+1}</td>
+      <td><div class="nm"><span class="tag">认证</span>${esc(a.name)}</div></td>
+      <td>${esc(a.period||'')}</td>
+      <td>${esc(a.first||'')}</td>
+      <td>${esc(a.expire||'')} ${badge}</td>
+      <td><div class="auth-plan">${plan}</div></td>
+      <td class="auth-org">${esc(a.org||'')}</td>
+      <td>${lead}</td>
+      <td>${sup}</td>
+      <td>${conf}</td>
+      <td><div class="auth-rownote">
+        <button title="编辑" onclick="event.stopPropagation();openAuthDrawer(${a.id})">✎</button>
+        <button title="删除" onclick="event.stopPropagation();delAuth(${a.id})">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  return `<div class="auth-card-tbl"><table>
+    <thead><tr>
+      <th>项目分类</th><th class="num">序号</th><th>工作明细</th><th class="sm">审核周期</th>
+      <th class="sm">首次发证</th><th class="sm">有效期</th><th>实施计划</th>
+      <th>对接机构</th><th>担当</th><th>协力</th><th>确认</th><th style="text-align:right">操作</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+function ensureAuthDrawer(){
+  if(document.getElementById('authMask'))return;
+  const m=document.createElement('div');m.className='mask hidden';m.id='authMask';m.onclick=closeAuthDrawer;
+  const d=document.createElement('div');d.className='drawer';d.id='authDrawer';
+  d.innerHTML=`<div class="d-hd"><h3 id="authDrawerTitle">认证详情</h3><button class="x" onclick="closeAuthDrawer()">×</button></div><div class="d-bd" id="authDrawerBody"></div><div class="d-ft"><button class="btn" onclick="closeAuthDrawer()">关闭</button><button class="btn primary" onclick="saveAuth()">💾 保存</button></div>`;
+  document.body.appendChild(m);document.body.appendChild(d);
+}
+function openAuthDrawer(id){
+  ensureAuthDrawer();
+  window._authEditId=id;
+  const a=id?(data.auths||[]).find(x=>x.id==id):null;
+  document.getElementById('authDrawerTitle').textContent=a?('编辑 · '+a.name):'新增认证';
+  const v=(k,def)=>a?a[k]:(def||'');
+  const planStr=(a&&a.plan)?a.plan.join('\n'):'';
+  const supStr=(a&&a.sup)?a.sup.join('、'):'';
+  document.getElementById('authDrawerBody').innerHTML=`
+    <div class="field"><label>认证名称 *</label><input id="ad_name" value="${esc(v('name'))}"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="field"><label>项目分类</label><input id="ad_sub" value="${esc(v('sub','认证管理'))}"></div>
+      <div class="field"><label>审核周期</label><input id="ad_period" value="${esc(v('period'))}" placeholder="如 1年"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="field"><label>首次发证</label><input id="ad_first" type="date" value="${esc(v('first'))}"></div>
+      <div class="field"><label>有效期</label><input id="ad_expire" type="date" value="${esc(v('expire'))}"></div>
+    </div>
+    <div class="field"><label>对接机构</label><input id="ad_org" value="${esc(v('org'))}"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div class="field"><label>担当</label><input id="ad_lead" value="${esc(v('lead'))}"></div>
+      <div class="field"><label>协力（顿号/逗号分隔）</label><input id="ad_sup" value="${esc(supStr)}"></div>
+      <div class="field"><label>确认</label><input id="ad_conf" value="${esc(v('conf'))}"></div>
+    </div>
+    <div class="field"><label>实施计划（每行一项）</label><textarea id="ad_plan">${esc(planStr)}</textarea></div>
+    <div class="field"><label>备注</label><textarea id="ad_note">${esc(v('note'))}</textarea></div>
+    ${a?'<div class="field" style="margin-top:4px"><button class="btn" style="color:var(--red);border-color:var(--red)" onclick="delAuth('+a.id+')">🗑 删除该认证</button></div>':''}
+  `;
+  document.getElementById('authMask').classList.remove('hidden');
+  document.getElementById('authDrawer').classList.add('on');
+}
+function closeAuthDrawer(){
+  const m=document.getElementById('authMask'),d=document.getElementById('authDrawer');
+  if(m)m.classList.add('hidden');if(d)d.classList.remove('on');
+}
+function saveAuth(){
+  const id=window._authEditId;
+  const get=id2=>document.getElementById(id2).value.trim();
+  const name=get('ad_name');
+  if(!name){toast('请填写认证名称');return;}
+  const plan=(get('ad_plan')||'').split('\n').map(s=>s.trim()).filter(Boolean);
+  const sup=(get('ad_sup')||'').split(/[，,、\n]/).map(s=>s.trim()).filter(Boolean);
+  const obj={name,sub:get('ad_sub')||'认证管理',period:get('ad_period'),first:get('ad_first'),
+    expire:get('ad_expire'),org:get('ad_org'),lead:get('ad_lead'),sup,conf:get('ad_conf'),plan,note:get('ad_note')};
+  if(id){
+    const a=(data.auths||[]).find(x=>x.id==id);
+    if(a)Object.assign(a,obj);
+  }else{
+    const maxId=(data.auths||[]).reduce((m,x)=>Math.max(m,x.id||0),0);
+    obj.id=maxId+1;(data.auths=data.auths||[]).push(obj);
+  }
+  saveData();closeAuthDrawer();renderAuthView();toast(id?'已保存':'已新增认证');
+}
+function addAuth(){window._authEditId=null;openAuthDrawer(null);}
+function delAuth(id){
+  if(!confirm('确定删除该认证？'))return;
+  data.auths=data.auths.filter(x=>x.id!=id);saveData();closeAuthDrawer();renderAuthView();toast('已删除');
+}
+function exportAuths(){
+  const list=data.auths||[];
+  const headers=['项目分类','序号','工作明细','审核周期','首次发证','有效期','实施计划','对接机构','担当','协力','确认','备注'];
+  const rows=list.map((a,i)=>[a.sub||'',i+1,a.name||'',a.period||'',a.first||'',a.expire||'',(a.plan||[]).join(' / '),a.org||'',a.lead||'',(a.sup||[]).join('、'),a.conf||'',a.note||'']);
+  const csv='\ufeff'+headers.join(',')+'\n'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const aEl=document.createElement('a');aEl.href=URL.createObjectURL(blob);aEl.download='认证管理台账.csv';aEl.click();
+  URL.revokeObjectURL(aEl.href);toast('已导出 CSV');
+}
 
 function subToggle(id){const x=data.tasks.find(t=>t.id==id);if(x){x.done=!x.done;saveData();renderAll();renderSubModule()}}
 function subChangePrio(id,v){const x=data.tasks.find(t=>t.id==id);if(x){x.prio=v;saveData();renderAll();renderSubModule()}}
@@ -1055,6 +1317,16 @@ function renderFAggregator(){
       <div class="due ${over?'over':''}">证书库 · ${over?'已过期':'到期'} ${c.expiry}${soon?' · 60天内':''}</div></div>
     </div>`).join('')}</div>`:'';
 
+  // 认证台账里已过期 / 60 天内到期的认证（纳入同一条证书提醒）
+  const authReminds=(data.auths||[]).filter(a=>{const s=authStatus(a);return s==='bad'||s==='warn';})
+    .map(a=>({a,s:authStatus(a)})).sort((x,y)=>(x.a.expire||'9999').localeCompare(y.a.expire||'9999')).slice(0,12);
+  const authHtml=authReminds.length?`<div class="f-agg-list">${authReminds.map(({a,s})=>`
+    <div class="today-item ${s==='bad'?'overdue':''}" onclick="openSubModule('A')">
+      <span class="tag ${s==='bad'?'P0':'P1'}">${s==='bad'?'逾期':'临期'}</span>
+      <div style="flex:1;min-width:0"><div style="font-size:13px">${esc(a.name)}</div>
+      <div class="due ${s==='bad'?'over':''}">认证台账 · ${s==='bad'?'已过期':'60天内到期'} ${esc(a.expire||'')}</div></div>
+    </div>`).join('')}</div>`:'';
+
   // 2. 验厂排期：B 各客户验厂预审 + D 安全检查 + D 特种设备
   const auditSubs=['各客户验厂预审','安全检查','设备点检'];
   const audits=data.tasks.filter(x=>auditSubs.includes(x.sub) && !x.done)
@@ -1082,7 +1354,7 @@ function renderFAggregator(){
     :`<p class="empty">${emptyText}</p>`;
 
   document.getElementById('subStats').innerHTML=
-    `<span>证书提醒 <b>${certs.length+heldCerts.length}</b></span>`+
+    `<span>证书提醒 <b>${certs.length+heldCerts.length+authReminds.length}</b></span>`+
     `<span>验厂排期 <b>${audits.length}</b></span>`+
     `<span>检测演练 <b>${detects.length}</b></span>`+
     `<span>待办清单 <b>${todos.length}</b></span>`;
@@ -1090,8 +1362,8 @@ function renderFAggregator(){
   return `
     <div class="f-agg-section">
       <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>📜 证书到期提醒</h3>
-      <div class="desc">来自 认证管理（A类）· 含范围证书 / TC 申请 / GRS-GOTS 认证 / 原料平衡统计</div>
-      ${renderList(certs,'暂无证书相关任务')}${heldHtml}
+      <div class="desc">来自 认证管理（A类）· 含范围证书 / TC 申请 / GRS-GOTS 认证 / 原料平衡统计 / 认证台账</div>
+      ${renderList(certs,'暂无证书相关任务')}${heldHtml}${authHtml}
     </div>
     <div class="f-agg-section">
       <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/></svg>🏭 验厂排期</h3>
@@ -1195,7 +1467,7 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 function scrollToToday(){const el=document.getElementById('todayCard');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
 function aiHelp(){toast('AI 助手已就绪 · 在 WorkBuddy 对话中让我帮你')}
 function renderAll(){normalizeData();renderCards();renderToday();renderMetrics();renderKB();renderMemos();if(document.getElementById('view-cert').classList.contains('active'))renderCerts()}
-function normalizeData(){if(!data)data=seed();if(!Array.isArray(data.certs))data.certs=[]}
+function normalizeData(){if(!data)data=seed();if(!Array.isArray(data.certs))data.certs=[];if(!Array.isArray(data.auths))data.auths=defaultAuths();}
 
 /* ============ 证书库 ============ */
 let pendingCertFile=null;
