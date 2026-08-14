@@ -188,32 +188,34 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .progress-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
 .progress-row .pct{font-size:30px;font-weight:700;color:var(--primary);line-height:1}
 .progress-row .sub{font-size:12px;color:var(--muted)}
-.sub-task{display:grid;grid-template-columns:auto 1fr;gap:0 14px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff;transition:background .15s,box-shadow .15s;position:relative}
-.sub-task:hover{background:#fafbff;box-shadow:0 2px 8px rgba(30,111,255,.08)}
+.sub-task{display:grid;grid-template-columns:auto 1fr;gap:0 14px;padding:18px 22px;border:1px solid #e1e8f3;border-radius:14px;margin-bottom:14px;background:#fff;transition:background .15s,box-shadow .15s;position:relative;box-shadow:0 1px 3px rgba(15,30,80,.04)}
+.sub-task:hover{background:#fafbff;box-shadow:0 3px 12px rgba(30,111,255,.1)}
 .sub-task.done{background:#fafdfa;opacity:.92}
-.sub-task .chk{grid-column:1;grid-row:1;width:22px;height:22px;border-radius:7px;border:2px solid var(--line);cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:4px}
+.sub-task .chk{grid-column:1;grid-row:1;width:24px;height:24px;border-radius:8px;border:2px solid var(--line);cursor:pointer;display:flex;align-items:center;justify-content:center;margin-top:4px}
 .sub-task.done .chk{background:var(--green);border-color:var(--green)}
 .sub-task.done .tt{text-decoration:line-through;color:var(--muted)}
-.sub-task .main{grid-column:2;display:flex;flex-direction:column;gap:10px;min-width:0}
+.sub-task .main{grid-column:2;display:flex;flex-direction:column;gap:12px;min-width:0}
 .sub-task .row1{display:flex;align-items:center;gap:14px;justify-content:space-between}
 .sub-task .title-grp{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
-.sub-task .tt{font-size:16px;font-weight:600;line-height:1.4;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.sub-task .tt{font-size:17px;font-weight:600;line-height:1.4;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .sub-task .row1-tools{display:flex;gap:4px;align-items:center;flex-shrink:0}
-.sub-task .prog-grp{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.sub-task .pb{width:220px;height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden}
-.sub-task .pb div{height:100%;background:linear-gradient(90deg,var(--primary),#5fa1ff);transition:width .2s}
-.sub-task .pct{font-size:14px;font-weight:700;color:var(--primary);white-space:nowrap;min-width:42px;text-align:right}
-.sub-task .row2{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-.sub-task .its{display:inline-flex;align-items:center;gap:5px;background:#f1f5f9;padding:5px 11px;border-radius:8px;font-size:12px;color:#64748b;white-space:nowrap}
-.sub-task .its .ic{font-size:13px;flex:none}
+.sub-task .prog-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;min-width:240px}
+.sub-task .prog-meta{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.3px}
+.sub-task .prog-grp{display:flex;align-items:center;gap:10px;width:100%}
+.sub-task .pb{flex:1;height:12px;background:#eef2f8;border-radius:6px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(15,30,80,.06)}
+.sub-task .pb div{height:100%;background:linear-gradient(90deg,var(--primary),#5fa1ff);border-radius:6px;transition:width .25s}
+.sub-task .pct{font-size:15px;font-weight:800;color:var(--primary);white-space:nowrap;min-width:46px;text-align:right}
+.sub-task .row2{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.sub-task .its{display:inline-flex;align-items:center;gap:6px;background:#f1f5f9;border:1px solid #e2e8f0;padding:6px 12px;border-radius:9px;font-size:13px;color:#64748b;white-space:nowrap}
+.sub-task .its .ic{font-size:14px;flex:none}
 .sub-task .its em{font-style:normal;color:var(--text);font-weight:700}
 .sub-task .its .lab{color:var(--muted);font-weight:400;font-size:11px;margin-left:2px}
-.sub-task .docs{font-size:12px;display:inline-flex;gap:5px}
-.sub-task .docs .t{background:#e0e7ff;color:#3730a3;padding:4px 10px;border-radius:8px;font-weight:700}
-.sub-task .docs .d{background:#dcfce7;color:#15803d;padding:4px 10px;border-radius:8px;font-weight:700}
-.sub-task .docs .p{background:#fef3c7;color:#b45309;padding:4px 10px;border-radius:8px;font-weight:700}
-.sub-task .note{font-size:12px;color:#92400e;padding:6px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;line-height:1.5}
-.sub-task .due{font-size:12px;color:#b91c1c;background:#fee2e2;padding:4px 10px;border-radius:8px;font-weight:700;white-space:nowrap}
+.sub-task .docs{font-size:13px;display:inline-flex;gap:6px}
+.sub-task .docs .t{background:#e0e7ff;color:#3730a3;padding:5px 11px;border-radius:9px;font-weight:700}
+.sub-task .docs .d{background:#dcfce7;color:#15803d;padding:5px 11px;border-radius:9px;font-weight:700}
+.sub-task .docs .p{background:#fef3c7;color:#b45309;padding:5px 11px;border-radius:9px;font-weight:700}
+.sub-task .note{font-size:13px;color:#92400e;padding:8px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;line-height:1.5}
+.sub-task .due{font-size:13px;color:#b91c1c;background:#fee2e2;padding:5px 11px;border-radius:9px;font-weight:700;white-space:nowrap}
 .sub-task select,.sub-task input[type=date]{font-size:12px;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--text)}
 .sub-task select{width:60px}
 .sub-task .edit{cursor:pointer;color:var(--muted);border:none;background:none;padding:6px 8px;border-radius:6px;font-size:15px}
@@ -1118,9 +1120,12 @@ function renderCatTasksHTML(){
                 <button class="del" onclick="del(${x.id})" title="删除"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
               </div>
             </div>
-            <div class="prog-grp" title="资料完成进度 ${docPct}%">
-              <div class="pb"><div style="width:${docPct}%"></div></div>
-              <span class="pct">${docPct}%</span>
+            <div class="prog-wrap">
+              ${docsT?`<span class="prog-meta">已 ${docsD} / 共 ${docsT} 项资料</span>`:`<span class="prog-meta">尚未添加资料清单</span>`}
+              <div class="prog-grp" title="资料完成进度 ${docPct}%">
+                <div class="pb"><div style="width:${docPct}%"></div></div>
+                <span class="pct">${docPct}%</span>
+              </div>
             </div>
           </div>
           <div class="row2">
