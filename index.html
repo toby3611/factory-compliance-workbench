@@ -173,8 +173,8 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .sub-hd h2{font-size:17px;font-weight:700;flex:1;min-width:0}
 .sub-stats{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:4px}
 .sub-stats b{color:var(--text);font-size:14px}
-.sub-body{padding:14px 16px;max-width:900px;margin:0 auto}
-.sub-section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.sub-body{padding:14px 16px}
+.sub-section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;max-width:1000px;margin-left:auto;margin-right:auto}
 .sub-section h3{font-size:13px;margin-bottom:10px;display:flex;align-items:center;gap:6px;color:var(--muted);font-weight:600}
 .sub-section h3 .ic{width:16px;height:16px;color:var(--primary)}
 .sub-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
@@ -188,17 +188,33 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .progress-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
 .progress-row .pct{font-size:30px;font-weight:700;color:var(--primary);line-height:1}
 .progress-row .sub{font-size:12px;color:var(--muted)}
-.sub-task{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;background:#fff}
-.sub-task.done{background:#fafdfa;opacity:.85}
-.sub-task .chk{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center}
+.sub-task{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fff;transition:background .15s,box-shadow .15s}
+.sub-task:hover{background:#fafbff;box-shadow:0 1px 3px rgba(30,111,255,.06)}
+.sub-task.done{background:#fafdfa;opacity:.88}
+.sub-task .chk{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;margin-top:2px}
 .sub-task.done .chk{background:var(--green);border-color:var(--green)}
 .sub-task.done .tt{text-decoration:line-through;color:var(--muted)}
-.sub-task .tt{flex:1;font-size:14px;min-width:0}
-.sub-task select,.sub-task input[type=date]{font-size:12px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--text)}
-.sub-task select{width:62px}
-.sub-task input[type=date]{width:130px}
-.sub-task .due{font-size:11px;color:var(--muted)}
-.sub-task .due.over{color:var(--red);font-weight:600}
+.sub-task .main{flex:1;min-width:0}
+.sub-task .row1{display:flex;align-items:center;gap:8px}
+.sub-task .tt{flex:1;font-size:14px;font-weight:500;min-width:0;cursor:pointer}
+.sub-task .row1-tools{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.sub-task .row2{display:flex;gap:6px;margin-top:7px;align-items:center;flex-wrap:wrap}
+.sub-task .its{display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;padding:3px 9px;border-radius:10px;font-size:11px;color:#64748b;white-space:nowrap}
+.sub-task .its em{font-style:normal;color:var(--text);font-weight:600}
+.sub-task .docs{font-size:11px;display:inline-flex;gap:4px}
+.sub-task .docs .t{background:#e0e7ff;color:#3730a3;padding:2px 8px;border-radius:8px;font-weight:600}
+.sub-task .docs .d{background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:8px;font-weight:600}
+.sub-task .docs .p{background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:8px;font-weight:600}
+.sub-task .pb{width:120px;height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;flex:0 0 auto}
+.sub-task .pb div{height:100%;background:linear-gradient(90deg,var(--primary),#5fa1ff);transition:width .2s}
+.sub-task .note{font-size:11px;color:#92400e;padding:3px 9px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sub-task .due{font-size:11px;color:var(--muted);background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:8px;font-weight:600}
+.sub-task select,.sub-task input[type=date]{font-size:12px;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--text)}
+.sub-task select{width:60px}
+.sub-task .edit{cursor:pointer;color:var(--muted);border:none;background:none;padding:4px 6px;border-radius:4px;font-size:14px}
+.sub-task .edit:hover{background:#e0e7ff;color:var(--primary)}
+.sub-task .del{cursor:pointer;color:var(--muted);border:none;background:none;padding:4px 6px;border-radius:4px;display:flex;align-items:center}
+.sub-task .del:hover{background:#fee2e2;color:#dc2626}
 .del{cursor:pointer;color:var(--muted);border:none;background:none;padding:4px;display:flex;align-items:center}
 .done-list{max-height:220px;overflow-y:auto}
 .done-item{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
@@ -334,15 +350,20 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .auth-toolbar .filter .chip:hover{border-color:#c7d6f5}
 .auth-toolbar .filter .chip.on{background:var(--primary-soft);border-color:var(--primary);color:#1554d1;font-weight:600}
 .auth-card-tbl{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
-.auth-card-tbl table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
-.auth-card-tbl thead th{background:#f8fafc;color:#475569;font-weight:600;text-align:left;padding:10px 10px;font-size:12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.auth-card-tbl table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;min-width:1080px;table-layout:auto}
+.auth-card-tbl thead th{background:#f8fafc;color:#475569;font-weight:600;text-align:left;padding:9px 10px;font-size:12px;border-bottom:1px solid var(--line);white-space:nowrap}
 .auth-card-tbl thead th.num{text-align:center;width:46px}
-.auth-card-tbl thead th.sm{width:78px}
 .auth-card-tbl tbody tr{border-bottom:1px solid #f1f5f9;transition:background .15s;cursor:pointer}
 .auth-card-tbl tbody tr:last-child{border-bottom:0}
 .auth-card-tbl tbody tr:hover{background:#fafbff}
-.auth-card-tbl tbody td{padding:11px 10px;vertical-align:middle;border-bottom:1px solid #f1f5f9}
+.auth-card-tbl tbody td{padding:10px 10px;vertical-align:middle;border-bottom:1px solid #f1f5f9}
 .auth-card-tbl tbody td.num{text-align:center;color:var(--muted);font-weight:600}
+.auth-card-tbl td:nth-child(1){min-width:84px}
+.auth-card-tbl td:nth-child(3){min-width:130px}
+.auth-card-tbl td:nth-child(6){min-width:130px}
+.auth-card-tbl td:nth-child(7){min-width:180px}
+.auth-card-tbl td:nth-child(8){min-width:110px}
+.auth-card-tbl td:nth-child(9),.auth-card-tbl td:nth-child(10),.auth-card-tbl td:nth-child(11){min-width:108px}
 .auth-card-tbl .nm{font-weight:600;color:var(--text)}
 .auth-card-tbl .nm .tag{display:inline-block;background:var(--primary-soft);color:#1554d1;padding:1px 6px;border-radius:4px;font-size:11px;margin-right:6px;font-weight:500}
 .auth-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500}
@@ -366,6 +387,7 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 /* 抽屉（复用 .mask） */
 .drawer{position:fixed;top:0;right:0;height:100vh;width:520px;max-width:92vw;background:#fff;box-shadow:-8px 0 24px rgba(0,0,0,.08);transform:translateX(100%);transition:.25s;z-index:121;display:flex;flex-direction:column}
 .drawer.on{transform:translateX(0)}
+.drawer.open{transform:translateX(0)}
 .drawer .d-hd{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
 .drawer .d-hd h3{font-size:16px;font-weight:600}
 .drawer .d-hd .x{background:transparent;border:0;font-size:22px;color:var(--muted);cursor:pointer;line-height:1}
@@ -373,9 +395,12 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .drawer .d-ft{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:8px;justify-content:flex-end}
 .drawer .field{margin-bottom:14px}
 .drawer .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600}
-.drawer .field input,.drawer .field textarea,.drawer .field select{width:100%;font-family:inherit}
-.drawer .field textarea{resize:vertical;min-height:58px}
+.drawer .field input,.drawer .field textarea,.drawer .field select{width:100%;font-family:inherit;padding:8px 10px;font-size:13px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);outline:0}
+.drawer .field textarea{resize:vertical;min-height:58px;line-height:1.5}
+.drawer .field input:focus,.drawer .field textarea:focus,.drawer .field select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(30,111,255,.1)}
 .drawer .field .ro{background:var(--bg);color:var(--text);padding:8px 10px;border-radius:8px;font-size:13px;line-height:1.6}
+.field-row{display:flex;gap:10px}
+.field-row .field{flex:1;margin-bottom:14px}
 @media(max-width:860px){.auth-stats{grid-template-columns:repeat(2,1fr)}.auth-toolbar .filter{display:none}}
 </style>
 </head>
@@ -1064,17 +1089,40 @@ function renderCatTasksHTML(){
     <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h18v4H3zM3 10h18v10H3z"/></svg>${currentSubFilter?'【'+currentSubFilter+'】':''} 全部任务 (${filterItems.length})</h3>
     <div id="subTaskList">${order.map(x=>{
       const isOver=x.due && x.due<today && !x.done;
+      const docsT=parseInt(x.totalDocs)||0;
+      const docsD=parseInt(x.doneDocs)||0;
+      const docsP=Math.max(0,docsT-docsD);
+      const docPct=docsT?Math.round(docsD/docsT*100):0;
+      const noteLines=(x.progress||'').split('\n').filter(Boolean);
+      const lastNote=noteLines.length?noteLines[noteLines.length-1]:'';
       return `<div class="sub-task ${x.done?'done':''}">
         <div class="chk" onclick="subToggle(${x.id})">${x.done?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg>':''}</div>
-        <span class="tt">${esc(x.title)}</span>
-        <select onchange="subChangePrio(${x.id}, this.value)">
-          <option value="P0" ${x.prio==='P0'?'selected':''}>P0</option>
-          <option value="P1" ${x.prio==='P1'?'selected':''}>P1</option>
-          <option value="P2" ${x.prio==='P2'?'selected':''}>P2</option>
-        </select>
-        <input type="date" value="${x.due||''}" onchange="subChangeDate(${x.id}, this.value)">
-        ${isOver?'<span class="due over">逾期</span>':''}
-        <button class="del" onclick="del(${x.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+        <div class="main">
+          <div class="row1">
+            <span class="tt" onclick="openTaskDrawer(${x.id})" title="点击查看/编辑详情">${esc(x.title)}</span>
+            <div class="row1-tools">
+              <select onchange="subChangePrio(${x.id}, this.value)">
+                <option value="P0" ${x.prio==='P0'?'selected':''}>P0</option>
+                <option value="P1" ${x.prio==='P1'?'selected':''}>P1</option>
+                <option value="P2" ${x.prio==='P2'?'selected':''}>P2</option>
+              </select>
+              <button class="edit" onclick="openTaskDrawer(${x.id})" title="详情/编辑">📝</button>
+              <button class="del" onclick="del(${x.id})" title="删除"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+            </div>
+          </div>
+          <div class="row2">
+            <span class="its">📅 起 <em>${x.start||'—'}</em></span>
+            <span class="its">🏁 止 <em>${x.end||x.due||'—'}</em></span>
+            <span class="docs" title="资料清单总数 / 已完成 / 待完成">
+              <span class="t">总 ${docsT}</span>
+              <span class="d">已 ${docsD}</span>
+              <span class="p">待 ${docsP}</span>
+            </span>
+            ${docsT?`<div class="pb" title="资料进度 ${docPct}%"><div style="width:${docPct}%"></div></div>`:''}
+            ${isOver?'<span class="due">逾期</span>':''}
+          </div>
+          ${lastNote?`<div class="row2"><span class="note">📝 ${esc(lastNote.slice(0,80))}${lastNote.length>80?'…':''}</span></div>`:''}
+        </div>
       </div>`;
     }).join('') || '<p class="empty-mini">该子功能暂无任务，可在上方添加</p>'}</div>
   </div>`;
@@ -1279,6 +1327,92 @@ function exportAuths(){
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
   const aEl=document.createElement('a');aEl.href=URL.createObjectURL(blob);aEl.download='认证管理台账.csv';aEl.click();
   URL.revokeObjectURL(aEl.href);toast('已导出 CSV');
+}
+
+/* ============ 任务详情抽屉 ============ */
+let drawTaskId=null;
+function ensureTaskDrawer(){
+  if(document.getElementById('taskMask'))return;
+  const m=document.createElement('div');m.className='mask hidden';m.id='taskMask';m.onclick=closeTaskDrawer;
+  const d=document.createElement('div');d.className='drawer';d.id='taskDrawer';
+  d.innerHTML=`<div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--card)">
+    <h2 style="font-size:16px;flex:1;margin:0">📝 任务详情</h2>
+    <button class="btn" onclick="closeTaskDrawer()">✕</button>
+  </div>
+  <div id="taskDrawerBody" style="flex:1;overflow-y:auto;padding:16px 18px"></div>
+  <div style="display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--line);background:var(--bg)">
+    <button class="btn" onclick="taskDelete()" style="color:var(--red)">🗑 删除</button>
+    <div style="flex:1"></div>
+    <button class="btn" onclick="closeTaskDrawer()">取消</button>
+    <button class="btn primary" onclick="taskSave()">保存</button>
+  </div>`;
+  document.body.appendChild(m);
+  document.body.appendChild(d);
+}
+function openTaskDrawer(id){
+  ensureTaskDrawer();
+  const t=data.tasks.find(x=>x.id===id);if(!t)return;
+  drawTaskId=id;
+  const subs=CATS.find(x=>x.id===t.cat)?.subs||[];
+  const body=document.getElementById('taskDrawerBody');
+  body.innerHTML=`
+    <div class="field"><label>任务标题</label><input type="text" id="tdTitle" value="${esc(t.title)}"></div>
+    <div class="field"><label>子模块</label><select id="tdSub">${subs.map(s=>`<option ${t.sub===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+    <div class="field-row">
+      <div class="field"><label>优先级</label>
+        <select id="tdPrio">
+          <option value="P0" ${t.prio==='P0'?'selected':''}>P0 紧急</option>
+          <option value="P1" ${t.prio==='P1'?'selected':''}>P1 重要</option>
+          <option value="P2" ${(!t.prio||t.prio==='P2')?'selected':''}>P2 普通</option>
+        </select>
+      </div>
+      <div class="field"><label>截止日</label><input type="date" id="tdDue" value="${t.due||''}"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>📅 项目开始时间</label><input type="date" id="tdStart" value="${t.start||''}"></div>
+      <div class="field"><label>🏁 项目完成时间</label><input type="date" id="tdEnd" value="${t.end||''}"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>📂 资料清单总数</label><input type="number" id="tdTotalDocs" min="0" value="${t.totalDocs||0}"></div>
+      <div class="field"><label>✅ 已完成数量</label><input type="number" id="tdDoneDocs" min="0" value="${t.doneDocs||0}"></div>
+    </div>
+    <div class="field"><label>📝 进度记录（每行一条，可加时间戳或里程碑）</label>
+      <textarea id="tdProgress" rows="6" placeholder="例：&#10;2026-08-15 09:00 召集担当首次会议&#10;2026-08-18 14:00 资料清单 1/3 已收集提交&#10;2026-08-20 11:00 现场审核完成">${esc(t.progress||'')}</textarea>
+    </div>
+    <div class="field"><label>备注</label><textarea id="tdNote" rows="2">${esc(t.note||'')}</textarea></div>
+  `;
+  document.getElementById('taskMask').classList.remove('hidden');
+  document.getElementById('taskDrawer').classList.add('open');
+}
+function closeTaskDrawer(){
+  const m=document.getElementById('taskMask');if(m)m.classList.add('hidden');
+  const d=document.getElementById('taskDrawer');if(d)d.classList.remove('open');
+  drawTaskId=null;
+}
+function taskSave(){
+  if(!drawTaskId)return;
+  const t=data.tasks.find(x=>x.id===drawTaskId);if(!t)return;
+  t.title=document.getElementById('tdTitle').value.trim()||t.title;
+  t.sub=document.getElementById('tdSub').value;
+  t.prio=document.getElementById('tdPrio').value;
+  t.due=document.getElementById('tdDue').value;
+  t.start=document.getElementById('tdStart').value;
+  t.end=document.getElementById('tdEnd').value;
+  t.totalDocs=parseInt(document.getElementById('tdTotalDocs').value)||0;
+  t.doneDocs=parseInt(document.getElementById('tdDoneDocs').value)||0;
+  if(t.doneDocs>t.totalDocs)t.doneDocs=t.totalDocs;
+  t.progress=document.getElementById('tdProgress').value;
+  t.note=document.getElementById('tdNote').value;
+  saveData();
+  renderAll();renderSubModule();
+  closeTaskDrawer();
+  toast('已保存');
+}
+function taskDelete(){
+  if(!drawTaskId)return;
+  if(!confirm('确认删除此任务？'))return;
+  del(drawTaskId);
+  closeTaskDrawer();
 }
 
 function subToggle(id){const x=data.tasks.find(t=>t.id==id);if(x){x.done=!x.done;saveData();renderAll();renderSubModule()}}
