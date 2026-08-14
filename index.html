@@ -188,32 +188,34 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .progress-row{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
 .progress-row .pct{font-size:30px;font-weight:700;color:var(--primary);line-height:1}
 .progress-row .sub{font-size:12px;color:var(--muted)}
-.sub-task{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fff;transition:background .15s,box-shadow .15s}
-.sub-task:hover{background:#fafbff;box-shadow:0 1px 3px rgba(30,111,255,.06)}
-.sub-task.done{background:#fafdfa;opacity:.88}
-.sub-task .chk{width:20px;height:20px;border-radius:6px;border:2px solid var(--line);cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.sub-task{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff;transition:background .15s,box-shadow .15s;position:relative}
+.sub-task:hover{background:#fafbff;box-shadow:0 2px 8px rgba(30,111,255,.08)}
+.sub-task.done{background:#fafdfa;opacity:.92}
+.sub-task .chk{width:22px;height:22px;border-radius:7px;border:2px solid var(--line);cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center;margin-top:2px}
 .sub-task.done .chk{background:var(--green);border-color:var(--green)}
 .sub-task.done .tt{text-decoration:line-through;color:var(--muted)}
 .sub-task .main{flex:1;min-width:0}
-.sub-task .row1{display:flex;align-items:center;gap:8px}
-.sub-task .tt{flex:1;font-size:14px;font-weight:500;min-width:0;cursor:pointer}
+.sub-task .row1{display:flex;align-items:center;gap:10px}
+.sub-task .tt{flex:1;font-size:16px;font-weight:600;min-width:0;cursor:pointer;line-height:1.4}
 .sub-task .row1-tools{display:flex;gap:6px;align-items:center;flex-shrink:0}
-.sub-task .row2{display:flex;gap:6px;margin-top:7px;align-items:center;flex-wrap:wrap}
-.sub-task .its{display:inline-flex;align-items:center;gap:4px;background:#f1f5f9;padding:3px 9px;border-radius:10px;font-size:11px;color:#64748b;white-space:nowrap}
-.sub-task .its em{font-style:normal;color:var(--text);font-weight:600}
-.sub-task .docs{font-size:11px;display:inline-flex;gap:4px}
-.sub-task .docs .t{background:#e0e7ff;color:#3730a3;padding:2px 8px;border-radius:8px;font-weight:600}
-.sub-task .docs .d{background:#dcfce7;color:#15803d;padding:2px 8px;border-radius:8px;font-weight:600}
-.sub-task .docs .p{background:#fef3c7;color:#b45309;padding:2px 8px;border-radius:8px;font-weight:600}
-.sub-task .pb{width:120px;height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;flex:0 0 auto}
+.sub-task .row2{display:flex;gap:14px;margin-top:10px;align-items:center;flex-wrap:wrap}
+.sub-task .its{display:inline-flex;align-items:center;gap:5px;background:#f1f5f9;padding:5px 11px;border-radius:8px;font-size:12px;color:#64748b;white-space:nowrap}
+.sub-task .its .ic{width:14px;height:14px;opacity:.75;flex:none}
+.sub-task .its em{font-style:normal;color:var(--text);font-weight:700}
+.sub-task .docs{font-size:12px;display:inline-flex;gap:5px}
+.sub-task .docs .t{background:#e0e7ff;color:#3730a3;padding:4px 10px;border-radius:8px;font-weight:700}
+.sub-task .docs .d{background:#dcfce7;color:#15803d;padding:4px 10px;border-radius:8px;font-weight:700}
+.sub-task .docs .p{background:#fef3c7;color:#b45309;padding:4px 10px;border-radius:8px;font-weight:700}
+.sub-task .pb{width:180px;height:8px;background:#f1f5f9;border-radius:4px;overflow:hidden;flex:0 0 auto;position:relative}
 .sub-task .pb div{height:100%;background:linear-gradient(90deg,var(--primary),#5fa1ff);transition:width .2s}
-.sub-task .note{font-size:11px;color:#92400e;padding:3px 9px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sub-task .due{font-size:11px;color:var(--muted);background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:8px;font-weight:600}
+.sub-task .pct{font-size:13px;font-weight:700;color:var(--primary);white-space:nowrap}
+.sub-task .note{font-size:12px;color:#92400e;padding:6px 12px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:8px;display:block}
+.sub-task .due{font-size:12px;color:#b91c1c;background:#fee2e2;padding:4px 10px;border-radius:8px;font-weight:700;white-space:nowrap}
 .sub-task select,.sub-task input[type=date]{font-size:12px;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--text)}
 .sub-task select{width:60px}
-.sub-task .edit{cursor:pointer;color:var(--muted);border:none;background:none;padding:4px 6px;border-radius:4px;font-size:14px}
+.sub-task .edit{cursor:pointer;color:var(--muted);border:none;background:none;padding:6px 8px;border-radius:6px;font-size:15px}
 .sub-task .edit:hover{background:#e0e7ff;color:var(--primary)}
-.sub-task .del{cursor:pointer;color:var(--muted);border:none;background:none;padding:4px 6px;border-radius:4px;display:flex;align-items:center}
+.sub-task .del{cursor:pointer;color:var(--muted);border:none;background:none;padding:6px 8px;border-radius:6px;display:flex;align-items:center}
 .sub-task .del:hover{background:#fee2e2;color:#dc2626}
 .del{cursor:pointer;color:var(--muted);border:none;background:none;padding:4px;display:flex;align-items:center}
 .done-list{max-height:220px;overflow-y:auto}
@@ -1094,11 +1096,14 @@ function renderCatTasksHTML(){
       const docPct=docsT?Math.round(docsD/docsT*100):0;
       const noteLines=(x.progress||'').split('\n').filter(Boolean);
       const lastNote=noteLines.length?noteLines[noteLines.length-1]:'';
+      const startD=x.start||'未设定';
+      const endD=x.end||x.due||'未设定';
+      const overdueDays=(isOver && x.due)?Math.round((new Date(today)-new Date(x.due))/86400000):0;
       return `<div class="sub-task ${x.done?'done':''}">
-        <div class="chk" onclick="subToggle(${x.id})">${x.done?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg>':''}</div>
+        <div class="chk" onclick="subToggle(${x.id})">${x.done?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg>':''}</div>
         <div class="main">
           <div class="row1">
-            <span class="tt" onclick="openTaskDrawer(${x.id})" title="点击查看/编辑详情">${esc(x.title)}</span>
+            <span class="tt" onclick="openTaskDrawer(${x.id})" title="点击查看/编辑项目详情">${esc(x.title)}</span>
             <div class="row1-tools">
               <select onchange="subChangePrio(${x.id}, this.value)">
                 <option value="P0" ${x.prio==='P0'?'selected':''}>P0</option>
@@ -1110,17 +1115,20 @@ function renderCatTasksHTML(){
             </div>
           </div>
           <div class="row2">
-            <span class="its">📅 起 <em>${x.start||'—'}</em></span>
-            <span class="its">🏁 止 <em>${x.end||x.due||'—'}</em></span>
+            <span class="its" title="项目开始时间"><span class="ic">📅</span><em>${startD}</em><span style="color:var(--muted);font-weight:400">开始</span></span>
+            <span class="its" title="项目完成时间"><span class="ic">🏁</span><em>${endD}</em><span style="color:var(--muted);font-weight:400">结束</span></span>
+            ${docsT?`<span class="its" title="资料进度 ${docPct}%"><span class="ic">📊</span><em>${docPct}%</em><span style="color:var(--muted);font-weight:400">完成</span></span>`:''}
+            ${isOver?`<span class="due" title="已逾期 ${overdueDays} 天">逾期 ${overdueDays} 天</span>`:''}
+          </div>
+          ${docsT?`<div class="row2">
             <span class="docs" title="资料清单总数 / 已完成 / 待完成">
               <span class="t">总 ${docsT}</span>
               <span class="d">已 ${docsD}</span>
               <span class="p">待 ${docsP}</span>
             </span>
-            ${docsT?`<div class="pb" title="资料进度 ${docPct}%"><div style="width:${docPct}%"></div></div>`:''}
-            ${isOver?'<span class="due">逾期</span>':''}
-          </div>
-          ${lastNote?`<div class="row2"><span class="note">📝 ${esc(lastNote.slice(0,80))}${lastNote.length>80?'…':''}</span></div>`:''}
+            <div class="pb" title="资料完成进度 ${docPct}%"><div style="width:${docPct}%"></div></div>
+          </div>`:''}
+          ${lastNote?`<div class="note" title="最新进度记录（点击标题查看全部）">📝 ${esc(lastNote.slice(0,80))}${lastNote.length>80?'…':''}</div>`:''}
         </div>
       </div>`;
     }).join('') || '<p class="empty-mini">该子功能暂无任务，可在上方添加</p>'}</div>
