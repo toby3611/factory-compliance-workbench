@@ -350,7 +350,7 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .auth-toolbar .filter .chip:hover{border-color:#c7d6f5}
 .auth-toolbar .filter .chip.on{background:var(--primary-soft);border-color:var(--primary);color:#1554d1;font-weight:600}
 .auth-card-tbl{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
-.auth-card-tbl table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;min-width:1080px;table-layout:auto}
+.auth-card-tbl table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;min-width:980px;table-layout:auto}
 .auth-card-tbl thead th{background:#f8fafc;color:#475569;font-weight:600;text-align:left;padding:9px 10px;font-size:12px;border-bottom:1px solid var(--line);white-space:nowrap}
 .auth-card-tbl thead th.num{text-align:center;width:46px}
 .auth-card-tbl tbody tr{border-bottom:1px solid #f1f5f9;transition:background .15s;cursor:pointer}
@@ -358,12 +358,11 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .auth-card-tbl tbody tr:hover{background:#fafbff}
 .auth-card-tbl tbody td{padding:10px 10px;vertical-align:middle;border-bottom:1px solid #f1f5f9}
 .auth-card-tbl tbody td.num{text-align:center;color:var(--muted);font-weight:600}
-.auth-card-tbl td:nth-child(1){min-width:84px}
-.auth-card-tbl td:nth-child(3){min-width:130px}
-.auth-card-tbl td:nth-child(6){min-width:130px}
-.auth-card-tbl td:nth-child(7){min-width:180px}
-.auth-card-tbl td:nth-child(8){min-width:110px}
-.auth-card-tbl td:nth-child(9),.auth-card-tbl td:nth-child(10),.auth-card-tbl td:nth-child(11){min-width:108px}
+.auth-card-tbl td:nth-child(2){min-width:140px}
+.auth-card-tbl td:nth-child(5){min-width:120px}
+.auth-card-tbl td:nth-child(6){min-width:170px}
+.auth-card-tbl td:nth-child(7){min-width:105px}
+.auth-card-tbl td:nth-child(8),.auth-card-tbl td:nth-child(9),.auth-card-tbl td:nth-child(10){min-width:100px}
 .auth-card-tbl .nm{font-weight:600;color:var(--text)}
 .auth-card-tbl .nm .tag{display:inline-block;background:var(--primary-soft);color:#1554d1;padding:1px 6px;border-radius:4px;font-size:11px;margin-right:6px;font-weight:500}
 .auth-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:500}
@@ -1228,7 +1227,6 @@ function renderAuthTbodyHTML(){
     const lead=`<span class="auth-person"><span class="av" style="background:${personColor(a.lead)}">${esc((a.lead||'').slice(0,1))}</span><span class="pn">${esc(a.lead||'')}</span></span>`;
     const conf=`<span class="auth-person"><span class="av" style="background:${personColor(a.conf)}">${esc((a.conf||'').slice(0,1))}</span><span class="pn">${esc(a.conf||'')}</span></span>`;
     return `<tr onclick="openAuthDrawer(${a.id})">
-      <td style="font-weight:600;color:#1554d1;white-space:nowrap">${esc(a.sub||'')}</td>
       <td class="num">${i+1}</td>
       <td><div class="nm"><span class="tag">认证</span>${esc(a.name)}</div></td>
       <td>${esc(a.period||'')}</td>
@@ -1247,7 +1245,7 @@ function renderAuthTbodyHTML(){
   }).join('');
   return `<div class="auth-card-tbl"><table>
     <thead><tr>
-      <th>项目分类</th><th class="num">序号</th><th>工作明细</th><th class="sm">审核周期</th>
+      <th class="num">序号</th><th>项目分类</th><th class="sm">审核周期</th>
       <th class="sm">首次发证</th><th class="sm">有效期</th><th>实施计划</th>
       <th>对接机构</th><th>担当</th><th>协力</th><th>确认</th><th style="text-align:right">操作</th>
     </tr></thead>
@@ -1321,8 +1319,8 @@ function delAuth(id){
 }
 function exportAuths(){
   const list=data.auths||[];
-  const headers=['项目分类','序号','工作明细','审核周期','首次发证','有效期','实施计划','对接机构','担当','协力','确认','备注'];
-  const rows=list.map((a,i)=>[a.sub||'',i+1,a.name||'',a.period||'',a.first||'',a.expire||'',(a.plan||[]).join(' / '),a.org||'',a.lead||'',(a.sup||[]).join('、'),a.conf||'',a.note||'']);
+  const headers=['序号','项目分类','审核周期','首次发证','有效期','实施计划','对接机构','担当','协力','确认','备注'];
+  const rows=list.map((a,i)=>[i+1,a.name||'',a.period||'',a.first||'',a.expire||'',(a.plan||[]).join(' / '),a.org||'',a.lead||'',(a.sup||[]).join('、'),a.conf||'',a.note||'']);
   const csv='\ufeff'+headers.join(',')+'\n'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
   const aEl=document.createElement('a');aEl.href=URL.createObjectURL(blob);aEl.download='认证管理台账.csv';aEl.click();
