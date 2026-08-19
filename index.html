@@ -41,16 +41,12 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
   border-right:1px solid var(--line);padding:12px 8px;overflow-y:auto;
 }
 .sidebar-section{font-size:11px;color:var(--muted);padding:10px 12px 6px;font-weight:600;letter-spacing:.5px}
-.nav-item{
-  display:flex;align-items:center;gap:10px;
-  padding:9px 12px;border-radius:9px;
-  cursor:pointer;font-size:14px;color:var(--text);
-  margin-bottom:2px;user-select:none;transition:background .12s;
-}
+.nav-item{position:relative;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;color:var(--text);margin-bottom:2px;user-select:none;transition:background .12s;font-weight:500}
 .nav-item:hover{background:#f1f6ff}
-.nav-item.active{background:var(--primary);color:#fff;font-weight:600}
+.nav-item.active{background:linear-gradient(135deg,#1e6fff,#3b82f6);color:#fff;font-weight:700;box-shadow:0 2px 6px rgba(30,111,255,.3)}
 .nav-item .ni{width:18px;height:18px;flex:none}
 .nav-item .arrow{margin-left:auto;font-size:10px;opacity:.6;transition:transform .2s}
+.nav-item .nav-cnt{position:absolute;right:8px;top:8px;background:var(--primary);color:#fff;font-size:10px;font-weight:600;border-radius:8px;padding:1px 6px;min-width:16px;text-align:center}
 .nav-item.expand .arrow{transform:rotate(90deg)}
 .sub-content {
   max-height:0;overflow:hidden;transition:max-height .2s;
@@ -85,58 +81,84 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 }
 .today-btn .num.zero{background:var(--muted)}
 
-/* ============ 6 卡片网格 ============ */
+/* ============ 11 卡片网格（4列×3行） ============ */
 .cards-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);
+  display:grid;grid-template-columns:repeat(4,1fr);
   gap:14px;margin-bottom:22px;
 }
+@media(max-width:1280px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:880px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
 .mod-card{
-  position:relative;border-radius:16px;padding:20px;
-  min-height:160px;cursor:pointer;overflow:hidden;
+  position:relative;border-radius:18px;padding:18px 20px 16px;
+  min-height:148px;cursor:pointer;overflow:hidden;
   transition:transform .18s,box-shadow .18s;
   background:#fff;border:1px solid var(--line);
-  display:flex;flex-direction:column;
+  display:flex;flex-direction:column;gap:10px;
+  box-shadow:0 2px 6px rgba(15,30,80,.05);
 }
-.mod-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(15,30,80,.12)}
+.mod-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(15,30,80,.16)}
 .mod-card .ic{
-  width:42px;height:42px;border-radius:11px;
+  width:48px;height:48px;border-radius:13px;
   display:flex;align-items:center;justify-content:center;
-  margin-bottom:12px;flex:none;
+  flex:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
 }
-.mod-card.c-blue{background:linear-gradient(135deg,#3b8aff 0%,#5fa1ff 100%);color:#fff;border:none}
-.mod-card.c-blue .ic{background:rgba(255,255,255,.22)}
-.mod-card.c-green{background:linear-gradient(135deg,#10b981 0%,#34d399 100%);color:#fff;border:none}
-.mod-card.c-green .ic{background:rgba(255,255,255,.22)}
-.mod-card.c-teal{background:linear-gradient(135deg,#0891b2 0%,#22d3ee 100%);color:#fff;border:none}
-.mod-card.c-teal .ic{background:rgba(255,255,255,.22)}
-.mod-card.c-amber{background:linear-gradient(135deg,#f59e0b 0%,#fbbf24 100%);color:#fff;border:none}
-.mod-card.c-amber .ic{background:rgba(255,255,255,.22)}
+.mod-card .mod-card-head{display:flex;align-items:center;gap:12px}
+.mod-card .mod-card-title{font-size:15px;font-weight:700;line-height:1.3;color:inherit}
+.mod-card .mod-card-desc{font-size:11.5px;opacity:.78;line-height:1.4;color:inherit;font-weight:500}
+.mod-card.c-blue{background:linear-gradient(135deg,#1d4ed8 0%,#3b82f6 100%);color:#fff;border:none}
+.mod-card.c-blue .ic{background:rgba(255,255,255,.25)}
+.mod-card.c-green{background:linear-gradient(135deg,#047857 0%,#10b981 100%);color:#fff;border:none}
+.mod-card.c-green .ic{background:rgba(255,255,255,.25)}
+.mod-card.c-teal{background:linear-gradient(135deg,#0e7490 0%,#06b6d4 100%);color:#fff;border:none}
+.mod-card.c-teal .ic{background:rgba(255,255,255,.25)}
+.mod-card.c-amber{background:linear-gradient(135deg,#b45309 0%,#f59e0b 100%);color:#fff;border:none}
+.mod-card.c-amber .ic{background:rgba(255,255,255,.25)}
+.mod-card.c-red{background:linear-gradient(135deg,#991b1b 0%,#dc2626 100%);color:#fff;border:none}
+.mod-card.c-red .ic{background:rgba(255,255,255,.25)}
+.mod-card.c-purple{background:linear-gradient(135deg,#6b21a8 0%,#9333ea 100%);color:#fff;border:none}
+.mod-card.c-purple .ic{background:rgba(255,255,255,.25)}
+.mod-card.c-cyan{background:linear-gradient(135deg,#155e75 0%,#0ea5e9 100%);color:#fff;border:none}
+.mod-card.c-cyan .ic{background:rgba(255,255,255,.25)}
+.mod-card.c-pink{background:linear-gradient(135deg,#9d174d 0%,#ec4899 100%);color:#fff;border:none}
+.mod-card.c-pink .ic{background:rgba(255,255,255,.25)}
+.mod-card.c-orange{background:linear-gradient(135deg,#9a3412 0%,#f97316 100%);color:#fff;border:none}
+.mod-card.c-orange .ic{background:rgba(255,255,255,.25)}
+.mod-card.c-emerald{background:linear-gradient(135deg,#064e3b 0%,#059669 100%);color:#fff;border:none}
+.mod-card.c-emerald .ic{background:rgba(255,255,255,.25)}
+.mod-card.c-slate{background:linear-gradient(135deg,#334155 0%,#64748b 100%);color:#fff;border:none}
+.mod-card.c-slate .ic{background:rgba(255,255,255,.25)}
 .mod-card.c-white{background:#fff;color:var(--text)}
 .mod-card.c-white .ic{background:var(--primary-soft);color:var(--primary)}
-.mod-card.c-purple{background:#fff;color:var(--text)}
-.mod-card.c-purple .ic{background:#f3eaff;color:var(--purple)}
-.mod-card-title{font-size:15px;font-weight:700;margin-bottom:14px;line-height:1.3;display:flex;align-items:center;gap:8px}
+.mod-card-title{font-size:16px;font-weight:700;line-height:1.3;color:inherit}
 .mod-card-title .pc{font-size:11px;opacity:.7;font-weight:500}
-.mod-card-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.mod-card-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto}
 .chip{
-  font-size:11px;padding:5px 11px;border-radius:14px;
-  background:rgba(255,255,255,.22);color:#fff;
-  cursor:pointer;font-weight:500;white-space:nowrap;
+  font-size:11px;padding:4px 10px;border-radius:10px;
+  background:rgba(255,255,255,.18);color:#fff;
+  cursor:pointer;font-weight:600;white-space:nowrap;
   transition:background .15s,transform .1s;
-  border:1px solid rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.22);
+  backdrop-filter:blur(2px);
 }
-.chip:hover{background:rgba(255,255,255,.38)}
+.chip:hover{background:rgba(255,255,255,.34);transform:translateY(-1px)}
+.chip.more{background:rgba(255,255,255,.12);border-style:dashed;color:rgba(255,255,255,.85);font-weight:500}
 .mod-card.c-white .chip,.mod-card.c-purple .chip{background:#f1f5fb;color:var(--text);border-color:#e6ebf4}
 .mod-card.c-white .chip:hover,.mod-card.c-purple .chip:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
 .mod-card-bg{
   position:absolute;right:-30px;bottom:-30px;opacity:.18;pointer-events:none;
 }
 .mod-card-stat{
-  position:absolute;top:14px;right:18px;
-  font-size:11px;padding:3px 9px;border-radius:11px;
-  background:rgba(255,255,255,.25);color:#fff;font-weight:600;
+  position:absolute;top:14px;right:16px;
+  font-size:10.5px;padding:3px 9px;border-radius:11px;
+  background:rgba(255,255,255,.28);color:#fff;font-weight:700;
+  backdrop-filter:blur(2px);
+  display:flex;align-items:center;gap:4px;
 }
 .mod-card.c-white .mod-card-stat,.mod-card.c-purple .mod-card-stat{background:#fff7e8;color:#b4690e}
+.mod-card-stat .ok{color:#86efac}
+.mod-card-stat .bad{color:#fca5a5}
+.mod-card-divider{height:1px;background:rgba(255,255,255,.2);margin:0 -20px}
+.mod-card.c-white .mod-card-divider,.mod-card.c-purple .mod-card-divider{background:var(--line)}
 
 /* ============ 今日待办卡 ============ */
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
@@ -408,6 +430,78 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .field-row{display:flex;gap:10px}
 .field-row .field{flex:1;margin-bottom:14px}
 @media(max-width:860px){.auth-stats{grid-template-columns:repeat(2,1fr)}.auth-toolbar .filter{display:none}}
+
+/* ============ 11 大类通用表格视图（图 1 模板） ============ */
+.mt-wrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:6px}
+.mt-tbl{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:auto}
+.mt-tbl thead{background:linear-gradient(180deg,#1e293b,#334155);position:sticky;top:0;z-index:2}
+.mt-tbl th{padding:10px 8px;text-align:left;font-weight:700;color:#f8fafc;border-bottom:2px solid var(--primary);white-space:nowrap;font-size:12.5px;letter-spacing:.2px;text-shadow:0 1px 2px rgba(0,0,0,.15)}
+.mt-tbl td{padding:9px 8px;border-bottom:1px solid #eef0f4;vertical-align:top;line-height:1.5;word-break:break-word}
+.mt-tbl tbody tr{transition:background .12s;cursor:pointer}
+.mt-tbl tbody tr:hover{background:#f5f8ff}
+.mt-tbl tbody tr.row-done td{background:#fafdfa;color:#94a3b8}
+.mt-tbl tbody tr.row-done .td-detail{text-decoration:line-through}
+.mt-tbl .num{width:38px;text-align:center;color:var(--muted);font-weight:600}
+.mt-tbl .sm{font-size:12px;color:#475569;white-space:nowrap}
+.mt-tbl .td-detail{font-weight:600;color:var(--text);min-width:130px}
+.mt-tbl .td-content{color:#475569;font-size:12px;min-width:180px;max-width:280px}
+.mt-tbl .td-plan{display:flex;flex-direction:column;gap:3px;min-width:200px;max-width:300px}
+.mt-tbl .td-org{color:#6366f1;font-weight:500;font-size:12px;min-width:90px}
+.mt-tbl .td-sup{display:flex;flex-wrap:wrap;gap:3px;min-width:110px;max-width:180px}
+.mt-tbl .td-note{color:var(--muted);font-size:11.5px;min-width:80px;max-width:140px}
+.mt-tbl .td-ops{white-space:nowrap;text-align:right;width:60px}
+.mt-tbl .td-ops button{background:transparent;border:0;cursor:pointer;padding:3px 5px;border-radius:4px;color:var(--muted);font-size:13px}
+.mt-tbl .td-ops button:hover{background:#e0e7ff;color:var(--primary)}
+.mt-tbl .td-ops button:nth-child(2):hover{background:#fee2e2;color:#dc2626}
+.mt-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+
+.plan-pill{display:inline-flex;gap:4px;align-items:flex-start;font-size:11.5px;line-height:1.4;color:#475569;background:#f8fafc;padding:3px 6px;border-radius:6px;border:1px solid #e8edf4}
+.plan-pill b{color:var(--primary);font-weight:700;flex:none}
+
+.mt-person{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11.5px;background:#f1f5f9;color:#475569;font-weight:500;margin:1px 2px 1px 0;white-space:nowrap}
+.mt-person.lead{background:#dbeafe;color:#1e40af;font-weight:600}
+.mt-person.conf{background:#dcfce7;color:#15803d;font-weight:600}
+.mt-person.stack{display:block;margin:2px 0;padding:3px 8px;text-align:left;max-width:100%;white-space:normal;line-height:1.4}
+
+/* 任务表内嵌 date input */
+.cell-date{border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:11.5px;font-family:inherit;color:var(--text);background:#fff;width:100%;min-width:110px}
+.cell-date:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(30,111,255,.1)}
+
+.exp-bd{display:inline-block;margin-left:4px;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:600;white-space:nowrap}
+.exp-bd.ok{background:#dcfce7;color:#15803d}
+.exp-bd.warn{background:#fef3c7;color:#b45309}
+.exp-bd.bad{background:#fee2e2;color:#b91c1c}
+
+.sub-filter .btn.primary{padding:5px 12px;font-size:12px;border-radius:6px}
+
+/* ============ 按月排期视图 ============ */
+.mv-tbl{font-size:11.5px}
+.mv-tbl th.mth{font-size:11.5px;padding:8px 4px;text-align:center;background:linear-gradient(180deg,#1e293b,#334155);color:#fff;min-width:42px;font-weight:700;text-shadow:0 1px 2px rgba(0,0,0,.15)}
+.mv-tbl td.mc{text-align:center;cursor:pointer;padding:6px 2px;font-size:11.5px;border-left:1px solid #f1f5f9;transition:background .12s}
+.mv-tbl td.mc.done{background:#dcfce7;color:#15803d;font-weight:700}
+.mv-tbl td.mc.done:hover{background:#bbf7d0}
+.mv-tbl td.mc.date{background:#dbeafe;color:#1e40af;font-size:10.5px;font-weight:600}
+.mv-tbl td.mc.note{background:#fef9c3;color:#854d0e;font-size:10.5px}
+.mv-tbl td.mc.empty{color:#cbd5e1}
+.mv-tbl td.mc.empty:hover{background:#fef9e8;color:var(--primary)}
+
+/* 任务表内嵌迷你月格（12列紧凑版） */
+.mt-tbl th.mth-tbl{font-size:10px;padding:6px 2px;text-align:center;min-width:30px;color:#fff;font-weight:700;background:linear-gradient(180deg,#0f172a,#1e293b);text-shadow:0 1px 2px rgba(0,0,0,.15)}
+.mt-tbl td.mc-mini{padding:4px 1px;font-size:10px;min-width:30px;cursor:pointer;text-align:center}
+.mt-tbl td.mc-mini.done{background:#dcfce7;color:#15803d;font-weight:700}
+.mt-tbl td.mc-mini.date{background:#dbeafe;color:#1e40af;font-weight:600}
+.mt-tbl td.mc-mini.note{background:#fef9c3;color:#854d0e}
+.mt-tbl td.mc-mini.empty{color:#cbd5e1;font-size:11px}
+.mt-tbl td.mc-mini.empty:hover{background:#fef9e8;color:var(--primary);cursor:pointer}
+.mt-tbl td.mc.empty:hover{background:#fef9e8;color:var(--primary);cursor:pointer}
+.mc.empty{color:#cbd5e1}
+.mc.empty:hover{background:#fef9e8;color:var(--primary);cursor:pointer}
+.mc.editing,.mc-mini.editing{padding:1px !important;background:#fffbe8}
+
+@media(max-width:1280px){.mt-tbl{font-size:11.5px}.mt-tbl th,.mt-tbl td{padding:7px 6px}}
+@media(max-width:1500px){.mt-wrap{overflow-x:auto}.mt-tbl{min-width:1180px}.mv-tbl{min-width:1000px}}
+@media(max-width:1100px){.mt-tbl{min-width:1000px}.mv-tbl{min-width:900px}}
+@media(max-width:880px){.mt-tbl{min-width:920px;white-space:nowrap}.mv-tbl{min-width:840px;white-space:nowrap}}
 </style>
 </head>
 <body>
@@ -443,30 +537,7 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
     </div>
 
     <div class="sidebar-section">业务模块</div>
-    <div class="nav-item" data-cat="A" onclick="openSubModule('A')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>
-      <span>认证管理</span><span class="arrow">▼</span>
-    </div>
-    <div class="nav-item" data-cat="B" onclick="openSubModule('B')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-      <span>验厂管理</span><span class="arrow">▼</span>
-    </div>
-    <div class="nav-item" data-cat="C" onclick="openSubModule('C')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-7 8-13a8 8 0 10-16 0c0 6 8 13 8 13z"/><circle cx="12" cy="9" r="2.5"/></svg>
-      <span>环境能源</span><span class="arrow">▼</span>
-    </div>
-    <div class="nav-item" data-cat="D" onclick="openSubModule('D')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/></svg>
-      <span>EHS安全</span><span class="arrow">▼</span>
-    </div>
-    <div class="nav-item" data-cat="E" onclick="openSubModule('E')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16v13H4zM8 7V3h8v4"/></svg>
-      <span>综合内勤</span><span class="arrow">▼</span>
-    </div>
-    <div class="nav-item" data-cat="F" onclick="openSubModule('F')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1112 0v5l1.5 3h-15L6 13V8z"/></svg>
-      <span>备忘录提醒</span><span class="arrow">▼</span>
-    </div>
+    <div id="sideCats"></div>
 
     <div class="sidebar-section">工具</div>
     <div class="nav-item" data-view="report" onclick="showView('report')">
@@ -678,23 +749,52 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 <div id="toast" class="toast"></div>
 
 <script>
-/* ============ 6 大类（按图 1）+ 子功能 ============ */
+/* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
-  {id:'A',name:'体系与可持续认证管理',color:'c-blue',short:'认证管理',
+  {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>',
-   subs:['ISO体系','GRS/GOTS认证','范围证书','TC申请','原料平衡统计']},
-  {id:'B',name:'客户验厂 & 平台上报',color:'c-green',short:'验厂管理',
+   subs:['ISO体系','可持续认证','客户平台验证'],
+   cols:[['num','序号'],['detail','工作明细'],['period','审核周期'],['first','首次发证'],['expire','有效期'],['startDate','开始时间'],['endDate','完成时间'],['plan','实施计划'],['org','对接机构'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+  {id:'2',name:'客户验厂',color:'c-green',short:'客户验厂',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
-   subs:['各客户验厂预审','H&M PD系统','化学品平台上传','客户专项报表']},
-  {id:'C',name:'环境能源化学品管理',color:'c-teal',short:'环境能源',
-   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-7 8-13a8 8 0 10-16 0c0 6 8 13 8 13z"/></svg>',
-   subs:['ZDHC废水检测','化学品台账','水电气产量统计']},
-  {id:'D',name:'EHS 现场安全合规',color:'c-amber',short:'EHS安全',
+   subs:['社会责任','环境','质量'],
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['plan','实施计划'],['org','第三方机构'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+  {id:'3',name:'平台数据上传',color:'c-teal',short:'平台数据上传',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>',
+   subs:['化学品平台','品牌系统','Higg上报'],
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+  {id:'4',name:'数据统计',color:'c-amber',short:'数据统计',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg>',
+   subs:['化学品','能源水','费用','客户数据'],
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['plan','实施要求'],['org','对接部门/人'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+  {id:'5',name:'EHS安全应急演习',color:'c-red',short:'EHS安全应急演习',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/></svg>',
-   subs:['应急演练','安全检查','设备点检','劳工台账','职业健康']},
-  {id:'E',name:'综合内勤商务事务',color:'c-white',short:'综合内勤',
+   subs:['消防演习','应急演习'],
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['plan','实施要求'],['org','对接部门/人'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+  {id:'6',name:'本部门日常检查',color:'c-purple',short:'本部门日常检查',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z M9 22V12h6v10"/></svg>',
+   subs:['每周检查','季度检查'],
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['plan','实施要求'],['org','对接部门'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+  {id:'7',name:'检测校准管理',color:'c-cyan',short:'检测校准管理',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2v6h6V2M7 2h10M5 8h14v14H5z"/></svg>',
+   subs:['废水检测','仪器校准','人员检测'],
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['expire','有效期'],['month','1月-12月'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+  {id:'8',name:'会员会费管理',color:'c-pink',short:'会员会费管理',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12M12 22v-6M2 7h20v5H2zM12 7V3M8 3h8"/></svg>',
+   subs:['会员续费','系统账户'],
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['expire','有效期'],['month','1月-12月'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+  {id:'9',name:'EHS检查表存档',color:'c-orange',short:'EHS检查表存档',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M9 13h6M9 17h6"/></svg>',
+   subs:['点检记录','检查记录','统计记录'],
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+  {id:'10',name:'碳减排项目',color:'c-emerald',short:'碳减排项目',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2"/></svg>',
+   subs:['客户项目','ESG/碳核查'],
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+  {id:'11',name:'行程计划报销',color:'c-slate',short:'行程计划报销',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16v13H4zM8 7V3h8v4"/></svg>',
-   subs:['费用统计','客户对接','客人行程','内部协同','休假报销']},
+   subs:['客人行程','休假报销'],
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
   {id:'F',name:'备忘录提醒中心',color:'c-purple',short:'备忘录提醒',isAggregator:true,
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1112 0v5l1.5 3h-15L6 13V8z"/></svg>',
    subs:['证书到期提醒','验厂排期','检测 / 演练计划','待办清单']}
@@ -702,77 +802,99 @@ const CATS=[
 const CATNAME=Object.fromEntries(CATS.map(c=>[c.id,c.name]));
 const CATSHORT=Object.fromEntries(CATS.map(c=>[c.id,c.short]));
 
-/* ============ 53 条任务（按新 6 大类重分类，含 sub 子功能）============ */
+/* ============ 64 条任务（按图 1 重分类成 11 大类）============ */
 const TS=[
-  // A 体系与可持续认证管理 (21) - 合并原 A + 原 C
-  ["ISO 9001质量管理体系认证","A","P1","2026-08-10",false,"ISO体系"],
-  ["ISO 14001环境管理体系认证","A","P1","2026-08-25",false,"ISO体系"],
-  ["ISO 50001能源管理体系认证","A","P1","2026-09-05",false,"ISO体系"],
-  ["有机棉GOTS&OCS认证","A","P0","2026-08-30",true,"GRS/GOTS认证"],
-  ["再生棉GRS&RCS认证","A","P0","2026-08-30",false,"GRS/GOTS认证"],
-  ["再生农场认证（regenagri）","A","P1","2026-09-10",false,"GRS/GOTS认证"],
-  ["良好棉花 BCI认证","A","P2","2026-09-20",false,"GRS/GOTS认证"],
-  ["Higg FEM环境模块验证","A","P1","2026-08-25",false,"GRS/GOTS认证"],
-  ["SLCP劳工聚合项目验证（Higg FSLM）","A","P1","2026-08-28",false,"GRS/GOTS认证"],
-  ["Oeko-tex100国际标准认证","A","P1","2026-09-15",false,"范围证书"],
-  ["再生棉（GRS/RCS）添加范围证书","A","P1","2026-08-20",false,"范围证书"],
-  ["有机棉（GOTS/OCS）添加范围证书","A","P1","2026-08-22",true,"范围证书"],
-  ["再生农场添加范围证书","A","P2","2026-08-25",false,"范围证书"],
-  ["再生棉面料TC证书申请（GRS/RCS）","A","P0","2026-08-10",false,"TC申请"],
-  ["有机棉面料TC证书申请（GOTS/OCS）","A","P0","2026-08-12",false,"TC申请"],
-  ["再生农场TC证书申请","A","P1","2026-08-30",false,"TC申请"],
-  ["有机棉原料TC证书申请（GRS/RCS）","A","P1","2026-08-25",false,"TC申请"],
-  ["有机棉原料TC证书申请（GOTS/OCS）","A","P1","2026-08-28",false,"TC申请"],
-  ["再生农场原料TC证书申请","A","P1","2026-09-05",false,"TC申请"],
-  ["再生棉原料TC使用量平衡统计","A","P1","2026-08-30",false,"原料平衡统计"],
-  ["有机棉原料TC使用量平衡统计","A","P1","2026-08-30",false,"原料平衡统计"],
-
-  // B 客户验厂 & 平台上报 (8)
-  ["客户社会责任/环境/质量验厂","B","P0","2026-08-08",false,"各客户验厂预审"],
-  ["Target CMA验厂-再生棉","B","P1","2026-08-28",false,"各客户验厂预审"],
-  ["Target GFA质量验厂","B","P1","2026-09-10",false,"各客户验厂预审"],
-  ["H&M PD环保能源数据上传","B","P0","2026-08-05",false,"H&M PD系统"],
-  ["H&M PD社会责任数据上传","B","P0","2026-08-12",false,"H&M PD系统"],
-  ["Clean Chain清洁链 化学品上传","B","P1","2026-08-20",false,"化学品平台上传"],
-  ["BHIVE系统 化学品上传","B","P1","2026-08-20",false,"化学品平台上传"],
-  ["BVe3系统 化学品上传","B","P1","2026-08-20",false,"化学品平台上传"],
-
-  // C 环境能源化学品管理 (4)
-  ["ZDHC废水检测-上半年8月-10月","C","P0","2026-10-31",false,"ZDHC废水检测"],
-  ["ZDHC废水检测-上半年2月-4月","C","P0","2026-04-30",true,"ZDHC废水检测"],
-  ["化学品清单更新月度审查/库存统计","C","P1","2026-08-25",false,"化学品台账"],
-  ["能源、水、产量、碳排放统计","C","P1","2026-08-30",false,"水电气产量统计"],
-
-  // D EHS 现场安全合规 (12)
-  ["车间消防演习（2次/班组/2次/台班）","D","P0","2026-08-10",false,"应急演练"],
-  ["综合消防演习（2次/半年）","D","P0","2026-09-30",false,"应急演练"],
-  ["污水处理应急演习","D","P0","2026-10-15",false,"应急演练"],
-  ["浆池/纺塑/仓库应急演习","D","P0","2026-09-15",false,"应急演练"],
-  ["危色岗位人员检测色盲检测","D","P1","2026-08-20",false,"职业健康"],
-  ["特种设备及检查记录","D","P1","2026-08-25",false,"设备点检"],
-  ["化学品仓库检查","D","P0","2026-08-12",false,"安全检查"],
-  ["消防重点安全检查","D","P0","2026-08-30",false,"安全检查"],
-  ["认证体系维护检查","D","P1","2026-09-10",false,"安全检查"],
-  ["季度安全检查","D","P0","2026-09-30",false,"安全检查"],
-  ["特种设备登记报表","D","P1","2026-08-30",false,"设备点检"],
-  ["每月检查填报统计工人数量和工作时间","D","P1","2026-08-15",false,"劳工台账"],
-
-  // E 综合内勤商务事务 (8)
-  ["工时统计记录","E","P2","2026-08-30",false,"内部协同"],
-  ["部门费用统计","E","P2","2026-08-30",false,"费用统计"],
-  ["选绢（QU/QU）客户","E","P1","2026-08-08",false,"客户对接"],
-  ["POLO客户","E","P1","2026-08-15",false,"客户对接"],
-  ["OTTO客户","E","P1","2026-08-18",false,"客户对接"],
-  ["客人行程跟进","E","P2","2026-08-20",false,"客人行程"],
-  ["业务/销售/国内同事","E","P2","2026-08-25",false,"内部协同"],
-  ["中方人员休假请/休假出席报销","E","P2","2026-08-30",false,"休假报销"]
+  // 1. 认证管理 (10)
+  ["ISO 9001质量管理体系认证","1","P1","2026-12-17",false,"ISO体系","","1年","2020-12-18","2026-12-17","①确认合同付款\n②准备审核资料\n③现场审核\n④不符合整改","天祥认证机构","武氏草原","黎氏庄","黄海涛","","|||||||||||","2020-12-18","2026-12-17"],
+  ["ISO 14001环境管理体系认证","1","P1","2026-12-08",false,"ISO体系","","1年","2020-12-09","2026-12-08","①确认合同付款\n②准备审核资料\n③现场审核\n④不符合整改","天祥认证机构","黎氏庄","武氏草原","黄海涛","","|||||||||||","2020-12-09","2026-12-08"],
+  ["ISO 50001能源管理认证","1","P1","2026-12-04",false,"ISO体系","","1年","2023-12-05","2026-12-04","①确认合同付款\n②准备审核资料\n③现场审核\n④不符合整改","TUV认证机构","黎氏庄","武氏草原","黄海涛","","|||||||||||","2023-12-05","2026-12-04"],
+  ["有机棉GOTS&OCS认证","1","P1","2026-10-31",false,"可持续认证","","1年","2022-11-30","2026-10-31","①确认合同付款\n②准备审核资料\n③现场审核\n④不符合整改","北京ECOCERT机构","武氏草原","黎氏庄/陶氏云英/陈氏春","黄海涛","","|||||||||||","2022-11-30","2026-10-31"],
+  ["再生棉GRS&RCS认证","1","P1","2025-09-06",false,"可持续认证","","1年","2020-02-12","2025-09-06","①确认合同付款\n②准备审核资料\n③现场审核\n④不符合整改","北京ECOCERT机构","武氏草原","黎氏庄/陶氏云英/陈氏春","黄海涛","","|||||||||||","2020-02-12","2025-09-06"],
+  ["再生农业认证(Regenagri)","1","P1","2025-12-16",false,"可持续认证","","1年","2024-12-17","2025-12-16","①确认合同付款\n②准备审核资料\n③现场审核\n④不符合整改","CU认证机构","陶氏云英","武氏草原/陈氏春","黄海涛","","|||||||||||","2024-12-17","2025-12-16"],
+  ["Higg FEM环境模块验证","1","P1","2026-04-15",false,"客户平台验证","","1年","2022-06-01","2026-04-15","①确认合同付款\n②准备审核资料\n③现场审核\n④不符合整改","TNB审核机构","黎氏庄","武氏草原","黄海涛","","|||||||||||","2022-06-01","2026-04-15"],
+  ["Higg SLCP社会责任模块","1","P1","2026-04-30",false,"客户平台验证","","1年","2022-07-07","2026-04-30","①确认合同付款\n②准备审核资料\n③现场审核\n④不符合整改","TNB审核机构","武氏草原","黎氏庄","黄海涛","","|||||||||||","2022-07-07","2026-04-30"],
+  ["Oeko-tex100国际标准认证","1","P1","2024-10-15",false,"可持续认证","","1年","2021-10-15","2024-10-15","①确认合同付款\n②准备测试布板\n③寄板机构检测\n④通过后出证书","TESTEX AG机构","武氏草原","黎氏庄","黄海涛","","|||||||||||","2021-10-15","2024-10-15"],
+  ["良好棉花 BCI认证","1","P1","2028-12-01",false,"可持续认证","","3年","2025-12-01","2028-12-01","①确认合同付款\n②准备审核资料\n③现场审核\n④不符合整改","BV机构","武氏草原","黎氏庄","黄海涛","","|||||||||||","2025-12-01","2028-12-01"],
+  // 2. 客户验厂 (3)
+  ["社会责任验厂","2","P1","",false,"社会责任","","不定时","","","①确认客户审核标准\n②准备审核资料\n③现场审核\n④不符合整改","审核机构/业务","武氏草原","黎氏庄","黄海涛","","Levi'S验厂||||H&M验厂|||Levi'S验厂||||","",""],
+  ["环境管理验厂","2","P1","",false,"环境","","不定时","","","H&M验厂","审核机构/业务","黎氏庄","武氏草原","黄海涛","","H&M验厂||H&M验厂|H&M验厂||H&M验厂||H&M验厂|H&M验厂|H&M验厂|H&M验厂|","",""],
+  ["质量管理验厂","2","P1","",false,"质量","","不定时","","","①确认客户审核标准\n②准备审核资料\n③现场审核\n④不符合整改","审核机构/业务","武氏草原","武氏草原","黄海涛","","H&M验厂|||||||||||","",""],
+  // 3. 平台数据上传 (5)
+  ["Clean Chain&化学品数据上传","3","P1","",false,"化学品平台","","月度","","","完成","H&M客户","武氏草原","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["Bhiev&化学品数据上传","3","P1","",false,"化学品平台","","月度","","","完成","TUV机构","武氏草原","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["Bve3&化学品数据上传","3","P1","",false,"化学品平台","","月度","","","完成","BV机构","黎氏庄","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["H&M&PD环境能源数据上传","3","P1","2026-03-30",false,"品牌系统","","季度","2026-01-01","2026-03-30","2026-04-01","H&M","黎氏庄","黎氏庄","黄海涛","","2026-01-01|2026-03-30|2026-04-01|2026-06-30|2026-07-01|2026-09-30|2026-10-01|2026-12-30|①统计每月能源能耗数|||","",""],
+  ["HIGG FDM&数据上报","3","P1","2026-03-30",false,"Higg上报","","季度","2026-01-01","2026-03-30","2026-04-01","worldly平台","黎氏庄","黎氏庄","黄海涛","","2026-01-01|2026-03-30|2026-04-01|2026-06-30|2026-07-01|2026-09-30|2026-10-01|2026-12-30|①统计每月能源能耗数|||","",""],
+  // 4. 数据统计 (4)
+  ["化学品清单更新","4","P1","",false,"化学品","","月度","","","完成","仓库/ERP/盘点表","黎氏庄","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["能源、水、产量、回收物统计","4","P1","",false,"能源水","","月度","","","完成","人事部/仓库/工务","黎氏庄","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["验厂认证费用统计","4","P1","",false,"费用","","月度","","","完成","本部门","黎氏庄","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["Levi'S&员工数量和工作时间","4","P1","",false,"客户数据","","月度","","","完成","Levi'S客户","","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  // 5. EHS安全应急演习 (4)
+  ["车间消防演习","5","P1","",false,"消防演习","","6个月","","","完成","人事部/各部门","黎氏庄","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["宿舍消防演习","5","P1","",false,"消防演习","","6个月","","","完成","","黎氏庄","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["污水泄露应急演习","5","P1","",false,"应急演习","","6个月","","","完成","人事部/各部门","黎氏庄","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["化学品应急演习","5","P1","",false,"应急演习","","6个月","","","完成","浆染/化工仓/工务","黎氏庄","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  // 6. 本部门日常检查 (4)
+  ["化学品仓库检查","6","P1","",false,"每周检查","","1周","","","完成","化学品使用部门","黎氏庄","武氏草原","确认","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["消防重点安全隐患检查","6","P1","",false,"每周检查","","1周","","","完成","各部门","武氏草原","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["认证体系维护检查","6","P1","",false,"每周检查","","1周","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["季度安全检查","6","P1","2026-03-30",false,"季度检查","","季度","2026-01-01","2026-03-30","2026-04-01","各部门","黄海涛","武氏草原","黄海涛","","2026-01-01|2026-03-30|2026-04-01|2026-06-30|2026-07-01|2026-09-30|2026-10-01|2026-12-30|①按表内容检查工厂设|||","",""],
+  // 7. 检测校准管理 (5)
+  ["ZDHC 废水检测-上半年2月-4月","7","P1","2021-04-14",false,"废水检测","","6个月","2021-04-14","2021-04-14","2021-04-14","检测机构","武氏草原","武氏草原","黄海涛","","2021-04-14|2021-04-14|2021-04-14|2021-04-14|2021-04-14|2021-04-14|2021-04-14|2021-04-14|2021-04-14|2021-04-14|2021-04-14|2021-04-14","",""],
+  ["ZDHC 废水检测-下半年8月-10月","7","P1","2021-04-15",false,"废水检测","","6个月","2021-04-14","2021-04-15","2021-04-16","检测机构","武氏草原","武氏草原","黄海涛","","2021-04-14|2021-04-15|2021-04-16|2021-04-17|2021-04-18|2021-04-19|2021-04-20|2021-04-21|2021-04-22|2021-04-23|2021-04-24|2021-04-25","",""],
+  ["实验室仪器校准","7","P1","2025-10-10",false,"仪器校准","","年度","2021-04-14","2025-10-10","2030-04-07","检测机构","武氏草原","武氏草原","黄海涛","","2021-04-14|2025-10-10|2030-04-07|2034-10-03|2039-03-31|2043-09-26|2048-03-23|2052-09-18|2057-03-16|2061-09-11|2066-03-09|2070-09-04","",""],
+  ["能源计量器具校准","7","P1","2025-10-10",false,"仪器校准","","年度","2021-04-14","2025-10-10","2030-04-07","检测机构","武氏草原","武氏草原","黄海涛","","2021-04-14|2025-10-10|2030-04-07|2034-10-03|2039-03-31|2043-09-26|2048-03-23|2052-09-18|2057-03-16|2061-09-11|2066-03-09|2070-09-04","",""],
+  ["看色岗位人员检测色盲检测","7","P1","2024-08-01",false,"人员检测","","年度","2021-02-03","2024-08-01","2028-01-28","浆染/品控","武氏草原","武氏草原","黄海涛","","2021-02-03|2024-08-01|2028-01-28|2031-07-26|2035-01-21|2038-07-19|2042-01-14|2045-07-12|2049-01-07|2052-07-05|2056-01-01|2059-06-29","",""],
+  // 8. 会员会费管理 (6)
+  ["良好棉花 BCI会员","8","P1","2026-03-17",false,"会员续费","","年度","2022-03-17","2026-03-17","2030-03-17","安环部","武氏草原","武氏草原","黄海涛","","2022-03-17|2026-03-17|2030-03-17|2034-03-17|2038-03-17|2042-03-17|2046-03-17|2050-03-17|2054-03-17|2058-03-17|2062-03-17|2066-03-17","",""],
+  ["Clean Chain化学品管理系统","8","P1","2026-09-17",false,"系统账户","","年度","2022-03-17","2026-09-17","2031-03-17","ADEC机构","武氏草原","武氏草原","黄海涛","","2022-03-17|2026-09-17|2031-03-17|2035-09-17|2040-03-17|2044-09-17|2049-03-17|2053-09-17|2058-03-17|2062-09-17|2067-03-17|2071-09-17","",""],
+  ["Bhiev化学品管理系统","8","P1","2026-09-17",false,"系统账户","","年度","2022-03-17","2026-09-17","2031-03-17","TUV机构","武氏草原","武氏草原","黄海涛","","2022-03-17|2026-09-17|2031-03-17|2035-09-17|2040-03-17|2044-09-17|2049-03-17|2053-09-17|2058-03-17|2062-09-17|2067-03-17|2071-09-17","",""],
+  ["Bve3化学品管理系统","8","P1","2026-09-18",false,"系统账户","","年度","2022-03-17","2026-09-18","2031-03-22","BV机构","武氏草原","武氏草原","黄海涛","","2022-03-17|2026-09-18|2031-03-22|2035-09-23|2040-03-26|2044-09-27|2049-03-31|2053-10-02|2058-04-05|2062-10-07|2067-04-10|2071-10-12","",""],
+  ["H&M客户环境绩效PD数据上传系统","8","P1","2022-03-17",false,"系统账户","","年度","2022-03-17","2022-03-17","2022-03-17","BV机构","武氏草原","武氏草原","黄海涛","","2022-03-17|2022-03-17|2022-03-17|2022-03-17|2022-03-17|2022-03-17|2022-03-17|2022-03-17|2022-03-17|2022-03-17|2022-03-17|2022-03-17","",""],
+  ["HIGG社会责任/环境模块平台","8","P1","2026-09-19",false,"系统账户","","年度","2022-03-17","2026-09-19","2031-03-24","worldly平台","武氏草原","武氏草原","黄海涛","","2022-03-17|2026-09-19|2031-03-24|2035-09-26|2040-03-30|2044-10-02|2049-04-06|2053-10-09|2058-04-13|2062-10-16|2067-04-20|2071-10-23","",""],
+  // 9. EHS检查表存档 (15)
+  ["特种设备点检表记录","9","P1","",false,"点检记录","","1个月","","","完成","各部门","武氏草原","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["经期休息登记记录表","9","P1","",false,"检查记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["工时统计记录","9","P1","",false,"统计记录","","1个月","","","完成","人事部/香港业务","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["车间班组长会议记录","9","P1","",false,"检查记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["安全培训记录","9","P1","",false,"检查记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["消防设施检查记录","9","P1","",false,"检查记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["除尘室检查记录","9","P1","",false,"检查记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["地下风道检查记录","9","P1","",false,"检查记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["柴油叉车日常点检表","9","P1","",false,"点检记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["成品仓库检查记录","9","P1","",false,"检查记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["电动叉车点检表","9","P1","",false,"点检记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["化工仓防护用品检查记录","9","P1","",false,"检查记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["化学品仓库巡查记录表","9","P1","",false,"检查记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["湿度计点检表","9","P1","",false,"点检记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  ["洗眼器点检表","9","P1","",false,"点检记录","","1个月","","","完成","各部门","陶氏云英","武氏草原","黄海涛","","done|done|done|done|done|done|done|done|done|done|done|done","",""],
+  // 10. 碳减排项目 (5)
+  ["迅销（GU/QU）客户","10","P1","2026-08-30",false,"客户项目","","季度","2026-08-01","2026-08-30","2026-09-28","各部门","黄海涛","武氏草原","黄海涛","","2026-08-01|2026-08-30|2026-09-28|2026-10-27|2026-11-25|2026-12-24|2027-01-22|2027-02-20|2027-03-21|2027-04-19|2027-05-18|2027-06-16","",""],
+  ["POLO客户","10","P1","2026-08-30",false,"客户项目","","季度","2026-08-01","2026-08-30","2026-09-28","各部门","黄海涛","武氏草原","黄海涛","","2026-08-01|2026-08-30|2026-09-28|2026-10-27|2026-11-25|2026-12-24|2027-01-22|2027-02-20|2027-03-21|2027-04-19|2027-05-18|2027-06-16","",""],
+  ["OTTO客户","10","P1","2026-08-30",false,"客户项目","","季度","2026-08-01","2026-08-30","2026-09-28","各部门","黄海涛","武氏草原","黄海涛","","2026-08-01|2026-08-30|2026-09-28|2026-10-27|2026-11-25|2026-12-24|2027-01-22|2027-02-20|2027-03-21|2027-04-19|2027-05-18|2027-06-16","",""],
+  ["ESG项目","10","P1","2026-08-30",false,"ESG/碳核查","","季度","2026-08-01","2026-08-30","2026-09-28","各部门","黄海涛","武氏草原","黄海涛","","2026-08-01|2026-08-30|2026-09-28|2026-10-27|2026-11-25|2026-12-24|2027-01-22|2027-02-20|2027-03-21|2027-04-19|2027-05-18|2027-06-16","",""],
+  ["碳核查项目","10","P1","2026-08-01",false,"ESG/碳核查","","季度","2026-08-01","2026-08-01","2026-08-01","各部门","黄海涛","武氏草原","黄海涛","","2026-08-01|2026-08-01|2026-08-01|2026-08-01|2026-08-01|2026-08-01|2026-08-01|2026-08-01|2026-08-01|2026-08-01|2026-08-01|2026-08-01","",""],
+  // 11. 行程计划报销 (3)
+  ["客人行程跟进","11","P1","",false,"客人行程","","不定时","","","①汇总工厂上班计划，上班时间\n②管理室搜集记录存档","各部门","黄海涛","武氏草原","黄海涛","","2日优衣库客户参观|||||||20日GAP客户参观||||","",""],
+  ["业务/销售/国内同事","11","P1","",false,"休假报销","","不定时","","","①汇总工厂上班计划，上班时间\n②管理室搜集记录存档","各部门","黄海涛","武氏草原","黄海涛","","3日郑雨霞下午3点来|8日郑雨霞中午12点||8日郑雨霞中午12点|8日郑雨霞中午12点||8日郑雨霞中午12点||8日郑雨霞中午12点|||","",""],
+  ["中方人员休假统计/休假出差报销","11","P1","",false,"休假报销","","不定时","","","8日郑雨霞中午12点回国","各部门","陶氏云英","武氏草原","黄海涛","","回国休假/出差报销5||8日郑雨霞中午12点|8日郑雨霞中午12点|||8日郑雨霞中午12点|||8日郑雨霞中午12点||","",""],
 ];
 const EXP_TYPES=["招待费","差旅费","样品费","认证费","办公费","其他"];
 const EXP_COLORS=["#2563eb","#16a34a","#f59e0b","#e5484d","#7c3aed","#0891b2"];
 
 function seed(){
   return {
-    tasks:TS.map((t,i)=>({id:i+1,title:t[0],cat:t[1],prio:t[2],due:t[3],done:t[4],sub:t[5]})),
+    tasks:TS.map((t,i)=>({
+      id:i+1,title:t[0],cat:t[1],prio:t[2],due:t[3],done:t[4],sub:t[5],
+      workDetail:t[0],projectContent:t[6]||'',period:t[7]||'',firstCert:t[8]||'',expire:t[9]||'',
+      plan:t[10]?t[10].split('\n').filter(Boolean):[],org:t[11]||'',lead:t[12]||'',
+      supports:t[13]?t[13].split(/[、,,]/).map(s=>s.trim()).filter(Boolean):[],
+      confirmer:t[14]||'',note:t[15]||'',
+      monthly:t[16]?t[16].split('|'):new Array(12).fill(''),
+      startDate:t[17]||'',endDate:t[18]||'',
+      start:'',end:t[3],totalDocs:0,doneDocs:0,progress:''
+    })),
     meets:[
       {id:1,date:'2026-08-11',who:'张总、认证部',topic:'TC 证书与平衡统计推进',result:'优先 GOTS/GRS 范围证书',follow:'本周提交再生棉TC'},
       {id:2,date:'2026-08-12',who:'EHS、车间',topic:'8 月应急演练计划',result:'车间消防演习下周启动',follow:'跟踪车间/仓库演习'}
@@ -897,24 +1019,47 @@ async function loadFromCloud(manual){
 function renderCards(){
   document.getElementById('cardsGrid').innerHTML=CATS.map(c=>{
     let total=0,done=0,overdue=0;
-    if(c.isAggregator){
-      // F 不计数，徽章显示"提醒"
-    }else{
+    if(!c.isAggregator){
       const it=data.tasks.filter(x=>x.cat===c.id);
       total=it.length;done=it.filter(x=>x.done).length;
       const t=todayStr();
       overdue=it.filter(x=>!x.done && x.due && x.due<t).length;
     }
-    const statText=c.isAggregator?'聚合视图':(total?`${done}/${total}${overdue ?` · <span style="color:#ffd0d2">逾期 ${overdue}</span>`:''}`:'暂无');
-    const bgIcon=c.color==='c-blue'||c.color==='c-green'||c.color==='c-teal'||c.color==='c-amber'?
-      `<div class="mod-card-bg">${c.icon}</div>`:'';
+    // 右上角徽章：F=聚合提示；其他=完成数+逾期红点
+    const statHtml=c.isAggregator
+      ? `<div class="mod-card-stat" style="background:rgba(255,255,255,.28)">💡 聚合视图</div>`
+      : (total?`<div class="mod-card-stat">${done}<span style="opacity:.6">/${total}</span>${overdue?`<span class="bad"> · ${overdue}逾期</span>`:''}</div>`:'');
+    // 副标题（描述）
+    const descMap={
+      '1':'ISO体系 · 认证台账',
+      '2':'社会责任 · 环境 · 质量验厂',
+      '3':'清洁链 · BHIVE · Higg 数据',
+      '4':'化学品 · 水电气 · 碳排放',
+      '5':'消防 / 应急 / 污水演练',
+      '6':'每周检查 · 季度安全',
+      '7':'废水 / 仪器校准 / 人员',
+      '8':'BCI · 各系统账户续费',
+      '9':'点检 · 检查 · 统计存档',
+      '10':'迅销 / POLO / OTTO 减排',
+      '11':'客人行程 · 休假报销',
+      'F':'证书到期 · 验厂排期 · 待办'
+    };
+    const desc=descMap[c.id]||'';
+    // chips 重新设计：前 3 个 sub 名称 + "+N" 折叠
+    const subs=c.subs||[];
+    const subChips=subs.slice(0,3).map(s=>`<span class="chip" onclick="event.stopPropagation();openSubModule('${c.id}','${s.replace(/'/g,"\\'")}')">${esc(s)}</span>`).join('');
+    const moreChip=subs.length>3?`<span class="chip more" onclick="event.stopPropagation();openSubModule('${c.id}')" title="还有 ${subs.length-3} 个子分类">+${subs.length-3}</span>`:'';
     return `<div class="mod-card ${c.color}" onclick="openSubModule('${c.id}')">
-      ${bgIcon}
-      ${c.isAggregator?'':`<div class="mod-card-stat">${done}/${total}${overdue?` 逾期 ${overdue}`:''}</div>`}
-      <div class="ic">${c.icon}</div>
-      <div class="mod-card-title">${esc(c.name)}</div>
+      ${statHtml}
+      <div class="mod-card-head">
+        <div class="ic">${c.icon}</div>
+        <div style="flex:1;min-width:0">
+          <div class="mod-card-title">${esc(c.name)}</div>
+          <div class="mod-card-desc">${esc(desc)}</div>
+        </div>
+      </div>
       <div class="mod-card-chips">
-        ${c.subs.map(s=>`<span class="chip" onclick="event.stopPropagation();openSubModule('${c.id}','${s.replace(/'/g,"\\'")}')">${esc(s)}</span>`).join('')}
+        ${subChips}${moreChip}
       </div>
     </div>`;
   }).join('');
@@ -1017,6 +1162,7 @@ function showView(v){
 /* ============ 子模块 ============ */
 let currentSubCat=null;
 let currentSubFilter=null;
+let subViewMode='list';  // 'list'=通用表格，'monthly'=按月排期
 let authTab='table';
 let authFilter='all';
 let authKeyword='';
@@ -1024,19 +1170,21 @@ let authKeyword='';
 function openSubModule(catId,subName){
   currentSubCat=catId;
   currentSubFilter=subName||null;
-  if(catId==='A'){authTab='table';authFilter='all';authKeyword='';}
+  subViewMode='list';  // 每次进入模块默认任务表视图
   showView('sub');
+  refreshSideActive();
   renderSubModule();
 }
 function closeSubModule(){
   currentSubCat=null;currentSubFilter=null;
   showView('home');
+  refreshSideActive();
 }
 
 function renderSubModule(){
   if(!currentSubCat)return;
   const c=CATS.find(x=>x.id===currentSubCat);
-  document.getElementById('subName').textContent=c.name+' · '+c.id+' 类';
+  document.getElementById('subName').textContent=c.name;
   const body=document.getElementById('subBody');
 
   // F 聚合视图
@@ -1045,15 +1193,9 @@ function renderSubModule(){
     return;
   }
 
-  // A 类：未指定子模块时，由 renderAuthView 统一渲染（认证台账表格 / 执行任务 双 tab）
-  if(currentSubCat==='A' && !currentSubFilter){
-    renderAuthView();
-    return;
-  }
-
-  // B-E 子模块（执行任务）—— 通用任务列表
-  body.innerHTML=renderCatTasksHTML();
-  bindSubNotes();
+  // 11 大类统一走通用表格视图（按图 1 模板）
+  body.innerHTML=renderModuleTableHTML();
+  bindModuleTable();
 }
 
 /* ============ A 类执行任务通用列表（从 renderSubModule 抽取，可复用） ============ */
@@ -1185,9 +1327,317 @@ function authSetTab(t){authTab=t;renderAuthView();}
 function authSetFilter(f){authFilter=f;renderAuthView();}
 function authSearch(v){authKeyword=v;const w=document.getElementById('authTblWrap');if(w)w.innerHTML=renderAuthTbodyHTML();}
 
+/* ============ 11 大类通用表格视图（按图 1 模板） ============ */
+function renderModuleTableHTML(){
+  const c=CATS.find(x=>x.id===currentSubCat);
+  const items=data.tasks.filter(x=>x.cat===currentSubCat);
+  const filterItems=currentSubFilter?items.filter(x=>x.sub===currentSubFilter):items;
+
+  // 顶部统计 + 工具栏
+  const stEl=document.getElementById('subStats');
+  if(stEl)stEl.innerHTML=
+    `<span>共 <b>${items.length}</b> 条</span>`+
+    `<span>当前显示 <b style="color:var(--primary)">${filterItems.length}</b></span>`+
+    `<span>已完成 <b style="color:var(--green)">${items.filter(x=>x.done).length}</b></span>`+
+    `<span>待办 <b style="color:var(--amber)">${items.filter(x=>!x.done).length}</b></span>`;
+
+  // 子分类筛选 chips + 视图切换
+  const chips=`<div class="sub-filter">
+    <span class="fchip ${!currentSubFilter?'active':''}" onclick="filterSub(null)">全部 (${items.length})</span>
+    ${c.subs.map(s=>{
+      const ct=items.filter(x=>x.sub===s).length;
+      return `<span class="fchip ${currentSubFilter===s?'active':''}" onclick="filterSub('${s.replace(/'/g,"\\'")}')">${esc(s)} (${ct})</span>`;
+    }).join('')}
+    <span style="flex:1"></span>
+    ${c.cols&&c.cols.some(x=>x[0]==='month')?`<span class="fchip" style="background:#fff7e8;color:#92400e;border:1px solid #fde68a" title="操作提示：单击月份格直接输入信息">
+      ✏️ 点月格输入（客户名 / done / 日期）
+    </span>`:''}
+    <span class="fchip ${subViewMode==='list'?'active':''}" onclick="setSubView('list')" style="background:#f0f5ff">📋 任务表</span>
+    <span class="fchip ${subViewMode==='monthly'?'active':''}" onclick="setSubView('monthly')" style="background:#fef9e8">📅 按月排期</span>
+    <button class="btn primary" onclick="openModuleAdd()" style="padding:5px 12px;font-size:12px">＋ 添加条目</button>
+  </div>`;
+
+  if(subViewMode==='monthly'){
+    return chips + renderMonthlyViewHTML(filterItems);
+  }
+
+  // 表格（按当前分类的 cols 配置渲染专属列）
+  const cols=c.cols||[['num','序号'],['detail','工作明细'],['period','周期'],['plan','实施要求'],['org','对接'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']];
+  const thHTML=cols.map(col=>{
+    const [k,t]=col;
+    if(k==='num')return `<th class="num">${t}</th>`;
+    if(k==='month')return MONTH_LABELS.map((m,mi)=>`<th class="mth mth-tbl" title="月份排期">${m}</th>`).join('');
+    if(k==='first'||k==='expire')return `<th class="sm">${t}</th>`;
+    if(k==='note')return `<th>${t}</th>`;
+    return `<th>${t}</th>`;
+  }).join('')+'<th style="text-align:right">操作</th>';
+  const colCount=cols.reduce((n,col)=>n+(col[0]==='month'?12:1),0)+1;
+
+  const rows=filterItems.map((t,i)=>{
+    const detail=t.workDetail||t.title||'';
+    const content=t.projectContent||'';
+    const period=t.period||'';
+    const first=t.firstCert||'';
+    const exp=t.expire||'';
+    const expBadge=exp?(t.expireStatus==='bad'?'<span class="exp-bd bad">已过期</span>':t.expireStatus==='warn'?'<span class="exp-bd warn">即将到期</span>':'<span class="exp-bd ok">有效</span>'):'';
+    const plan=(t.plan||[]).map((p,j)=>`<span class="plan-pill"><b>${'①②③④⑤⑥'.charAt(j)}</b>${esc(p)}</span>`).join('');
+    const org=t.org||'';
+    const lead=t.lead||'';
+    const supports=(t.supports||[]).map(n=>`<span class="mt-person">${esc(n)}</span>`).join('');
+    const conf=t.confirmer||'';
+    const note=t.note||'';
+    const doneCls=t.done?'row-done':'';
+    const monthly=(t.monthly && t.monthly.length===12)?t.monthly:new Array(12).fill('');
+    const tdHTML=cols.map(col=>{
+      const [k]=col;
+      if(k==='num')return `<td class="num">${i+1}</td>`;
+      if(k==='detail')return `<td class="td-detail" title="${esc(detail)}">${esc(detail)}</td>`;
+      if(k==='content')return `<td class="td-content">${esc(content)||'—'}</td>`;
+      if(k==='period')return `<td class="sm">${esc(period)||'—'}</td>`;
+      if(k==='first')return `<td class="sm">${esc(first)||'—'}</td>`;
+      if(k==='expire')return `<td class="sm">${esc(exp)||'—'} ${expBadge}</td>`;
+      if(k==='startDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.startDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'startDate',this.value)"></td>`;
+      if(k==='endDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.endDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'endDate',this.value)"></td>`;
+      if(k==='plan')return `<td class="td-plan">${plan||'—'}</td>`;
+      if(k==='org')return `<td class="td-org">${esc(org)||'—'}</td>`;
+      if(k==='lead')return `<td>${lead?`<span class="mt-person lead">${esc(lead)}</span>`:'—'}</td>`;
+      if(k==='sup')return `<td class="td-sup">${(t.supports||[]).map(n=>`<span class="mt-person stack">${esc(n)}</span>`).join('')||'—'}</td>`;
+      if(k==='conf')return `<td>${conf?`<span class="mt-person conf">${esc(conf)}</span>`:'—'}</td>`;
+      if(k==='note')return `<td class="td-note" title="${esc(note)}">${esc(note.slice(0,20))}${note.length>20?'…':''}</td>`;
+      if(k==='month')return monthly.map((v,mi)=>{
+        if(v==='done')return `<td class="mc mc-mini done" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} 已完成。点击编辑">✓</td>`;
+        if(v && /^\d{4}-\d{2}-\d{2}$/.test(v))return `<td class="mc mc-mini date" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} 计划：${v}。点击编辑">${v.slice(5)}</td>`;
+        if(v)return `<td class="mc mc-mini note" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]}：${esc(v)}。点击编辑">${esc(v.slice(0,2))}</td>`;
+        return `<td class="mc mc-mini empty" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} ✏️ 点击输入（客户名 / done / 日期）">✏️</td>`;
+      }).join('');
+      return `<td>—</td>`;
+    }).join('');
+    return `<tr class="${doneCls}" onclick="openModuleEdit(${t.id})" title="单击编辑详情">
+      ${tdHTML}
+      <td class="td-ops" onclick="event.stopPropagation()">
+        <button title="${t.done?'标记未完成':'标记完成'}" onclick="toggleTaskDone(${t.id})" style="${t.done?'color:var(--green)':'color:var(--muted)'}">${t.done?'✓':'○'}</button>
+        <button title="编辑" onclick="openModuleEdit(${t.id})">✎</button>
+        <button title="删除" onclick="del(${t.id})">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `${chips}<div class="mt-wrap">
+    <table class="mt-tbl">
+      <thead><tr>${thHTML}</tr></thead>
+      <tbody>${rows||`<tr><td colspan="${colCount}" class="mt-empty">暂无条目，点右上「＋ 添加条目」或导入数据</td></tr>`}</tbody>
+    </table>
+  </div>
+  <div class="auth-foot">💡 单击任意一行可查看详情 / 编辑；月份格点击可切换完成状态；数据自动同步至云端 Gist，电脑手机一致。</div>`;
+}
+function bindModuleTable(){ /* 预留 */ }
+
+/* ============ 按月排期视图 ============ */
+const MONTH_LABELS=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+function setSubView(m){subViewMode=m;renderSubModule()}
+function renderMonthlyViewHTML(filterItems){
+  const head='<th class="num">序号</th><th>工作明细</th><th class="sm">周期</th><th>担当</th>'+
+    MONTH_LABELS.map((m,i)=>`<th class="mth">${m}</th>`).join('')+
+    '<th class="mth" style="text-align:right">操作</th>';
+  const body=filterItems.map((t,i)=>{
+    const monthly=(t.monthly && t.monthly.length===12)?t.monthly:new Array(12).fill('');
+    const cells=monthly.map((v,mi)=>{
+      if(v==='done') return `<td class="mc done" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} 已完成。点击编辑">✓</td>`;
+      if(v && /^\d{4}-\d{2}-\d{2}$/.test(v)) return `<td class="mc date" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} 计划：${v}。点击编辑">${v.slice(5)}</td>`;
+      if(v) return `<td class="mc note" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]}：${esc(v)}。点击编辑">${esc(v.slice(0,4))}</td>`;
+      return `<td class="mc empty" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} ✏️ 点击输入（客户名 / done / 日期）">✏️</td>`;
+    }).join('');
+    const completed=monthly.filter(v=>v==='done').length;
+    return `<tr>
+      <td class="num">${i+1}</td>
+      <td class="td-detail" title="${esc(t.workDetail||'')}">${esc(t.workDetail||'')}</td>
+      <td class="sm">${esc(t.period||'')}</td>
+      <td>${t.lead?`<span class="mt-person lead">${esc(t.lead)}</span>`:'—'}</td>
+      ${cells}
+      <td class="td-ops" onclick="event.stopPropagation()">
+        <span class="month-stat" style="font-size:11px;color:${completed?'var(--green)':'var(--muted)'};margin-right:6px">${completed}/12</span>
+        <button title="编辑" onclick="openModuleEdit(${t.id})">✎</button>
+      </td>
+    </tr>`;
+  }).join('');
+  return `<div class="mt-wrap">
+    <table class="mt-tbl mv-tbl">
+      <thead><tr>${head}</tr></thead>
+      <tbody>${body||`<tr><td colspan="17" class="mt-empty">暂无条目</td></tr>`}</tbody>
+    </table>
+  </div>
+  <div class="auth-foot">💡 点击月份格切换完成/未完成；显示日期为该月计划执行日；显示文字为该月备注。</div>`;
+}
+function toggleMonthCell(taskId,monthIdx){
+  const t=data.tasks.find(x=>x.id==taskId);
+  if(!t)return;
+  if(!t.monthly || t.monthly.length!==12)t.monthly=new Array(12).fill('');
+  const cur=t.monthly[monthIdx];
+  const mn=MONTH_LABELS[monthIdx];
+  // Inline edit：把格子变成 input，自动聚焦；Enter/Esc 失焦保存
+  // 优先找迷你表格（任务表）的格子，否则找按月排期视图的格子
+  let cell=document.querySelector(`.mc-mini[data-tid="${taskId}"][data-mid="${monthIdx}"]`);
+  if(!cell)cell=document.querySelector(`.mc[data-tid="${taskId}"][data-mid="${monthIdx}"]`);
+  if(!cell)return;
+  if(cell.querySelector('input'))return;  // 已在编辑
+  const display=cur==='done'?'':cur;
+  const isDate=/^\d{4}-\d{2}-\d{2}$/.test(cur);
+  cell.classList.add('editing');
+  cell.innerHTML=`<input type="text" value="${esc(display)}" placeholder="AEO客户 / done / 2026-08-15" data-orig="${esc(cur||'')}" style="width:100%;min-width:80px;border:1px solid var(--primary);border-radius:4px;padding:2px 4px;font-size:10px;font-family:inherit;background:#fffbe8;color:#1e40af;outline:none" autocomplete="off">`;
+  const inp=cell.querySelector('input');
+  inp.focus();inp.select();
+  const save=()=>{
+    const v=inp.value.trim();
+    let nv='';
+    if(v==='done'||v==='完成')nv='done';
+    else if(/^\d{4}-\d{2}-\d{2}$/.test(v))nv=v;
+    else if(v)nv=v;
+    if(nv!==cur){
+      t.monthly[monthIdx]=nv;
+      saveData();
+      toast(nv?'已保存':'已清除');
+    }
+    renderSubModule();
+  };
+  const cancel=()=>{renderSubModule();};
+  inp.addEventListener('blur',save);
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();inp.blur();}
+    else if(e.key==='Escape'){e.preventDefault();cancel();}
+  });
+}
+function updateTaskField(taskId,field,value){
+  const t=data.tasks.find(x=>x.id==taskId);
+  if(!t)return;
+  t[field]=value;
+  saveData();
+  toast('已保存');
+}
+function toggleTaskDone(taskId){
+  const t=data.tasks.find(x=>x.id==taskId);
+  if(!t)return;
+  t.done=!t.done;
+  saveData();
+  renderSubModule();
+  toast(t.done?'已标记完成':'已标记未完成');
+}
+function openModuleAdd(){
+  ensureModuleDrawer();
+  window._moduleEditId=null;
+  document.getElementById('moduleDrawerTitle').textContent='新增条目 · '+CATSHORT[currentSubCat];
+  const c=CATS.find(x=>x.id===currentSubCat);
+  document.getElementById('moduleDrawerBody').innerHTML=moduleDrawerBody({cat:currentSubCat,sub:currentSubFilter||c.subs[0]});
+  document.getElementById('moduleMask').classList.remove('hidden');
+  document.getElementById('moduleDrawer').classList.add('on');
+}
+function openModuleEdit(id){
+  ensureModuleDrawer();
+  const t=data.tasks.find(x=>x.id==id);
+  if(!t)return;
+  window._moduleEditId=id;
+  document.getElementById('moduleDrawerTitle').textContent='编辑 · '+(t.workDetail||t.title||'条目');
+  document.getElementById('moduleDrawerBody').innerHTML=moduleDrawerBody(t);
+  document.getElementById('moduleMask').classList.remove('hidden');
+  document.getElementById('moduleDrawer').classList.add('on');
+}
+function closeModuleDrawer(){
+  document.getElementById('moduleMask').classList.add('hidden');
+  document.getElementById('moduleDrawer').classList.remove('on');
+}
+function ensureModuleDrawer(){
+  if(document.getElementById('moduleMask'))return;
+  const m=document.createElement('div');m.className='mask hidden';m.id='moduleMask';m.onclick=closeModuleDrawer;
+  const d=document.createElement('div');d.className='drawer';d.id='moduleDrawer';
+  d.innerHTML=`<div class="d-hd"><h3 id="moduleDrawerTitle">编辑</h3><button class="x" onclick="closeModuleDrawer()">×</button></div>
+    <div class="d-bd" id="moduleDrawerBody"></div>
+    <div class="d-ft">
+      <button class="btn" onclick="closeModuleDrawer()">关闭</button>
+      <button class="btn primary" onclick="saveModule()">💾 保存</button>
+    </div>`;
+  document.body.appendChild(m);document.body.appendChild(d);
+}
+function moduleDrawerBody(t){
+  const c=CATS.find(x=>x.id===currentSubCat);
+  const v=(k,def)=>t[k]!=null?t[k]:(def||'');
+  const arr=(k,def)=>{
+    const v=t[k]; if(Array.isArray(v))return v.join('、');
+    return def||'';
+  };
+  const planStr=Array.isArray(t.plan)?t.plan.join('\n'):(t.plan||'');
+  return `
+    <div class="field"><label>工作明细（项目名）*</label><input id="md_detail" value="${esc(v('workDetail',v('title')))}" placeholder="如：ISO 9001 质量管理体系认证"></div>
+    <div class="field"><label>项目内容（实施细节）</label><input id="md_content" value="${esc(v('projectContent'))}" placeholder="如：①确认合作范围 ②准备审核材料 ③接受一阶段审核"></div>
+    <div class="field"><label>子分类</label><select id="md_sub">${c.subs.map(s=>`<option ${(t.sub||c.subs[0])===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+    <div class="field"><label>审核周期</label><input id="md_period" value="${esc(v('period'))}" placeholder="如 1年"></div>
+    ${(currentSubCat==='1'||currentSubCat==='7'||currentSubCat==='8')?`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${currentSubCat==='1'?`
+      <div class="field"><label>开始时间</label><input id="md_startDate" type="date" value="${esc(v('startDate',v('firstCert')))}"></div>
+      <div class="field"><label>完成时间</label><input id="md_endDate" type="date" value="${esc(v('endDate',v('expire')))}"></div>`:`
+      <div class="field"><label>有效期</label><input id="md_expire" type="date" value="${esc(v('expire'))}"></div>
+      <div class="field"></div>`}
+    </div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="field"><label>对接机构</label><input id="md_org" value="${esc(v('org'))}" placeholder="如 TUVUL、TUV南德"></div>
+      <div class="field"><label>担当</label><input id="md_lead" value="${esc(v('lead'))}" placeholder="主担当"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div class="field"><label>协力（顿号/逗号分隔）</label><input id="md_supports" value="${esc(arr('supports'))}"></div>
+      <div class="field"><label>确认</label><input id="md_conf" value="${esc(v('confirmer'))}"></div>
+      <div class="field"><label>优先级</label><select id="md_prio">
+        <option value="P2" ${t.prio==='P2'?'selected':''}>P2 普通</option>
+        <option value="P1" ${t.prio==='P1'?'selected':''}>P1 重要</option>
+        <option value="P0" ${t.prio==='P0'?'selected':''}>P0 紧急</option>
+      </select></div>
+    </div>
+    <div class="field"><label>实施计划（每行一项 ①②③…）</label><textarea id="md_plan" rows="4">${esc(planStr)}</textarea></div>
+    <div class="field"><label>备注</label><textarea id="md_note" rows="2">${esc(v('note'))}</textarea></div>
+  `;
+}
+function saveModule(){
+  const id=window._moduleEditId;
+  const c=CATS.find(x=>x.id===currentSubCat);
+  const detail=document.getElementById('md_detail').value.trim();
+  if(!detail){toast('请填写「工作明细」');return;}
+  const obj={
+    cat:currentSubCat,
+    sub:document.getElementById('md_sub').value,
+    workDetail:detail,
+    projectContent:document.getElementById('md_content').value.trim(),
+    period:document.getElementById('md_period').value.trim(),
+    org:document.getElementById('md_org').value.trim(),
+    lead:document.getElementById('md_lead').value.trim(),
+    supports:document.getElementById('md_supports').value.split(/[、,,]/).map(s=>s.trim()).filter(Boolean),
+    confirmer:document.getElementById('md_conf').value.trim(),
+    prio:document.getElementById('md_prio').value,
+    plan:document.getElementById('md_plan').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    note:document.getElementById('md_note').value.trim(),
+    done:false
+  };
+  // 仅 1/7/8 类抽屉里含日期字段
+  const sEl=document.getElementById('md_startDate');
+  const eEl=document.getElementById('md_endDate');
+  const expEl=document.getElementById('md_expire');
+  if(sEl)obj.startDate=sEl.value;
+  if(eEl)obj.endDate=eEl.value;
+  if(expEl)obj.expire=expEl.value;
+  if(id){
+    const i=data.tasks.findIndex(x=>x.id==id);
+    if(i>=0)data.tasks[i]={...data.tasks[i],...obj};
+  }else{
+    obj.id=Date.now();
+    obj.title=obj.workDetail;
+    data.tasks.unshift(obj);
+  }
+  saveData();
+  closeModuleDrawer();
+  renderSubModule();
+  toast(id?'已保存':'已新增');
+}
+
 function renderAuthView(){
   const body=document.getElementById('subBody');
-  const atCount=data.tasks.filter(x=>x.cat==='A').length;
+  const atCount=data.tasks.filter(x=>x.cat==='1').length;
   const tabs=`<div class="auth-tabs">
     <div class="t ${authTab==='table'?'on':''}" onclick="authSetTab('table')">📋 认证台账</div>
     <div class="t ${authTab==='tasks'?'on':''}" onclick="authSetTab('tasks')">📝 执行任务（${atCount}）</div>
@@ -1290,10 +1740,6 @@ function openAuthDrawer(id){
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       <div class="field"><label>项目分类</label><input id="ad_sub" value="${esc(v('sub','认证管理'))}"></div>
       <div class="field"><label>审核周期</label><input id="ad_period" value="${esc(v('period'))}" placeholder="如 1年"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="field"><label>首次发证</label><input id="ad_first" type="date" value="${esc(v('first'))}"></div>
-      <div class="field"><label>有效期</label><input id="ad_expire" type="date" value="${esc(v('expire'))}"></div>
     </div>
     <div class="field"><label>对接机构</label><input id="ad_org" value="${esc(v('org'))}"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
@@ -1451,9 +1897,9 @@ function addSubTask(){
 /* ============ F 聚合视图 ============ */
 function renderFAggregator(){
   const today=todayStr();
-  // 1. 证书到期提醒：取 A 类 + sub 范围证书/TC申请/GRS-GOTS认证/Oeko-tex 的未来 60 天到期项
-  const certSubs=['范围证书','TC申请','GRS/GOTS认证','原料平衡统计'];
-  const certs=data.tasks.filter(x=>x.cat==='A' && certSubs.includes(x.sub) && !x.done)
+  // 1. 证书到期提醒：取 1 认证管理 + sub 范围证书/TC申请/GRS-GOTS认证 的未来 60 天到期项
+  const certSubs=['ISO体系','可持续认证','客户平台验证'];
+  const certs=data.tasks.filter(x=>x.cat==='1' && certSubs.includes(x.sub) && !x.done)
     .sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,12);
   // 证书库里已上传的原件（按到期日聚合进提醒）
   const heldCerts=(data.certs||[]).filter(c=>c.expiry).map(c=>{
@@ -1471,19 +1917,19 @@ function renderFAggregator(){
   const authReminds=(data.auths||[]).filter(a=>{const s=authStatus(a);return s==='bad'||s==='warn';})
     .map(a=>({a,s:authStatus(a)})).sort((x,y)=>(x.a.expire||'9999').localeCompare(y.a.expire||'9999')).slice(0,12);
   const authHtml=authReminds.length?`<div class="f-agg-list">${authReminds.map(({a,s})=>`
-    <div class="today-item ${s==='bad'?'overdue':''}" onclick="openSubModule('A')">
+    <div class="today-item ${s==='bad'?'overdue':''}" onclick="openSubModule('1')">
       <span class="tag ${s==='bad'?'P0':'P1'}">${s==='bad'?'逾期':'临期'}</span>
       <div style="flex:1;min-width:0"><div style="font-size:13px">${esc(a.name)}</div>
       <div class="due ${s==='bad'?'over':''}">认证台账 · ${s==='bad'?'已过期':'60天内到期'} ${esc(a.expire||'')}</div></div>
     </div>`).join('')}</div>`:'';
 
-  // 2. 验厂排期：B 各客户验厂预审 + D 安全检查 + D 特种设备
-  const auditSubs=['各客户验厂预审','安全检查','设备点检'];
+  // 2. 验厂排期：2 客户验厂（社会责任/环境/质量）+ 6 本部门日常检查
+  const auditSubs=['社会责任','环境','质量','每周检查','季度检查'];
   const audits=data.tasks.filter(x=>auditSubs.includes(x.sub) && !x.done)
     .sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,12);
 
-  // 3. 检测/演练计划：C ZDHC废水检测 + D 应急演练
-  const detSubs=['ZDHC废水检测','应急演练'];
+  // 3. 检测/演练计划：5 EHS安全应急演习（消防演习/应急演习）+ 7 检测校准管理（废水检测/仪器校准）
+  const detSubs=['消防演习','应急演习','废水检测','仪器校准'];
   const detects=data.tasks.filter(x=>detSubs.includes(x.sub) && !x.done)
     .sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,12);
 
@@ -1512,17 +1958,17 @@ function renderFAggregator(){
   return `
     <div class="f-agg-section">
       <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>📜 证书到期提醒</h3>
-      <div class="desc">来自 认证管理（A类）· 含范围证书 / TC 申请 / GRS-GOTS 认证 / 原料平衡统计 / 认证台账</div>
+      <div class="desc">来自 1 认证管理 · ISO体系 / 可持续认证 / 客户平台验证 / 认证台账</div>
       ${renderList(certs,'暂无证书相关任务')}${heldHtml}${authHtml}
     </div>
     <div class="f-agg-section">
       <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/></svg>🏭 验厂排期</h3>
-      <div class="desc">来自 验厂管理（B类）· 各客户验厂预审 / 安全检查 / 设备点检</div>
+      <div class="desc">来自 2 客户验厂 + 6 本部门日常检查 · 验厂预审 / 周检 / 季度检查</div>
       ${renderList(audits,'暂无验厂排期')}
     </div>
     <div class="f-agg-section">
       <h3><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M12 3v18"/></svg>🔬 检测 / 演练计划</h3>
-      <div class="desc">来自 环境能源（C类）+ EHS安全（D类）· ZDHC 废水检测 / 应急演练</div>
+      <div class="desc">来自 5 EHS安全应急演习（消防/应急）+ 7 检测校准管理（废水/校准）</div>
       ${renderList(detects,'暂无检测/演练安排')}
     </div>
     <div class="f-agg-section">
@@ -1616,8 +2062,41 @@ function disconnectSync(){
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 function scrollToToday(){const el=document.getElementById('todayCard');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
 function aiHelp(){toast('AI 助手已就绪 · 在 WorkBuddy 对话中让我帮你')}
-function renderAll(){normalizeData();renderCards();renderToday();renderMetrics();renderKB();renderMemos();if(document.getElementById('view-cert').classList.contains('active'))renderCerts()}
-function normalizeData(){if(!data)data=seed();if(!Array.isArray(data.certs))data.certs=[];if(!Array.isArray(data.auths))data.auths=defaultAuths();}
+function renderAll(){normalizeData();renderSideCats();renderCards();renderToday();renderMetrics();renderKB();renderMemos();if(document.getElementById('view-cert').classList.contains('active'))renderCerts()}
+
+/* ============ 侧栏业务模块（从 CATS 动态生成 11 大类） ============ */
+function renderSideCats(){
+  const box=document.getElementById('sideCats');
+  if(!box)return;
+  box.innerHTML=CATS.map(c=>{
+    const cnt=data.tasks.filter(x=>x.cat===c.id).length;
+    return `<div class="nav-item" data-cat="${c.id}" onclick="openSubModule('${c.id}')">
+      ${c.icon.replace('<svg width="22" height="22"','<svg class="ni"')}
+      <span>${c.id==='F'?esc(c.short):'<b style="color:#1e293b;font-weight:600">'+esc(c.short)+'</b>'}</span>
+      <span class="arrow">▼</span>
+      ${cnt?`<span class="nav-cnt">${cnt}</span>`:''}
+    </div>`;
+  }).join('');
+}
+function refreshSideActive(){
+  document.querySelectorAll('.nav-item[data-cat]').forEach(el=>{
+    el.classList.toggle('active', currentSubCat!==null && el.dataset.cat===currentSubCat);
+  });
+}
+function normalizeData(){
+  if(!data)data=seed();
+  // 版本迁移：旧版（6大类 A-F）→ 新版（11大类 1-11），用 64 条新任务替换旧任务
+  if(!data._catVer || data._catVer<13){
+    const oldTasks=data.tasks||[];
+    const fresh=seed();
+    data.tasks=fresh.tasks;
+    data._catVer=13;
+    // 保留用户后续可能新增的旧任务？旧 cat 已无意义 → 全部以新版为准（按图1重分类）
+    void oldTasks;
+  }
+  if(!Array.isArray(data.certs))data.certs=[];
+  if(!Array.isArray(data.auths))data.auths=defaultAuths();
+}
 
 /* ============ 证书库 ============ */
 let pendingCertFile=null;
