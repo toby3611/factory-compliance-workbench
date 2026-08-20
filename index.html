@@ -712,6 +712,14 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
           </div>
           <textarea id="kbContent" placeholder="内容 / 要点…" style="min-height:90px"></textarea>
           <input id="kbUrl" placeholder="相关链接（可选）…">
+          <div>
+            <label class="btn" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z M9 12l2 2 4-4"/></svg>
+              添加附件（图片自动压缩 / 单个 ≤500KB）
+              <input id="kbFiles" type="file" accept="image/*,application/pdf" multiple hidden>
+            </label>
+            <div id="kbFileChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+          </div>
           <button class="btn primary" type="submit">添加条目</button>
         </form>
         <div id="kbList"></div>
@@ -1191,21 +1199,45 @@ function renderKB(){
   const box=document.getElementById('kbList');
   const list=data.kb.slice().sort((a,b)=>b.ts-a.ts).filter(k=>{
     if(!q)return true;
-    return (k.title+k.content+k.url+k.cat).toLowerCase().includes(q);
+    return (k.title+k.content+k.url+k.cat+(k.files||[]).map(f=>f.name).join(' ')).toLowerCase().includes(q);
   });
   if(!list.length){box.innerHTML='<p class="empty">没有匹配的知识条目</p>';return}
-  box.innerHTML=list.map(k=>`
+  box.innerHTML=list.map(k=>{
+    const filesHtml=(k.files&&k.files.length)?`
+      <div class="att" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+        ${k.files.map((f,i)=>`<span class="tag" style="background:#eef3fb;color:#1565c0;padding:5px 9px;display:inline-flex;align-items:center;gap:4px;font-size:12px">
+          ${f.mime==='application/pdf'?'📄':'🖼️'} <a href="javascript:void(0)" onclick="viewKbFile(${k.id},${i})" style="color:#1565c0;text-decoration:none">${esc(f.name)}</a>
+          <span style="color:var(--muted);font-size:11px">(${(f.size/1024).toFixed(0)}KB)</span>
+          <a href="javascript:void(0)" onclick="dlKbFile(${k.id},${i})" title="下载" style="color:#666;text-decoration:none;margin-left:2px">⬇</a>
+        </span>`).join('')}
+      </div>`:'';
+    return `
     <div class="kb">
       <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11l5 5v11H4zM15 4v5h5"/></svg></div>
       <div class="body" onclick="toggleKB(${k.id})">
-        <div class="nm">${esc(k.title)} <span class="tag P2" style="background:#eef3fb;color:var(--muted)">${esc(k.cat)}</span></div>
+        <div class="nm">${esc(k.title)} <span class="tag P2" style="background:#eef3fb;color:var(--muted)">${esc(k.cat)}</span>${k.files&&k.files.length?` <span class="tag" style="background:#fff3e0;color:#e65100;font-size:11px">📎 ${k.files.length}</span>`:''}</div>
         <div class="ct" id="kbct-${k.id}" style="display:none">${esc(k.content)}</div>
         ${k.url?`<div class="url" id="kburl-${k.id}" style="display:none">🔗 ${esc(k.url)}</div>`:''}
+        <div id="kbatt-${k.id}" style="display:none">${filesHtml}</div>
       </div>
       <button class="del" onclick="delKB(${k.id})"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
-    </div>`).join("");
+    </div>`}).join("");
 }
-function toggleKB(id){const c=document.getElementById('kbct-'+id);if(c)c.style.display=c.style.display==='none'?'block':'none';const u=document.getElementById('kburl-'+id);if(u)u.style.display=u.style.display==='none'?'block':'none';}
+function toggleKB(id){
+  ['kbct-','kburl-','kbatt-'].forEach(p=>{const e=document.getElementById(p+id);if(e)e.style.display=e.style.display==='none'?'block':'none';});
+}
+function viewKbFile(kid,idx){
+  const k=data.kb.find(x=>x.id===kid);if(!k)return;
+  const f=(k.files||[])[idx];if(!f)return;
+  window.open(f.data,'_blank');
+}
+function dlKbFile(kid,idx){
+  const k=data.kb.find(x=>x.id===kid);if(!k)return;
+  const f=(k.files||[])[idx];if(!f)return;
+  const a=document.createElement('a');
+  a.href=f.data;a.download=f.name||'附件';
+  document.body.appendChild(a);a.click();a.remove();
+}
 function delKB(id){if(!confirm('删除该知识条目？'))return;data.kb=data.kb.filter(k=>k.id!=id);saveData();renderKB()}
 
 function renderMemos(){
@@ -2186,32 +2218,127 @@ function normalizeData(){
   }
   if(!Array.isArray(data.certs))data.certs=[];
   if(!Array.isArray(data.auths))data.auths=defaultAuths();
+  if(!Array.isArray(data.kb))data.kb=[];
+}
+
+/* ============ 文件上传公用：附件（图片自动压缩 + 限额） ============ */
+// opts: { maxKB=500, autoCompress=true }
+// 返回 Promise<{name,mime,size,data:'data:..;base64,...'} | null>；null = 跳过
+function attachFile(input, opts = {}) {
+  const maxKB = opts.maxKB || 500;
+  const autoCompress = opts.autoCompress !== false;
+  // 接受 File / Blob 或 input 元素
+  let f, sourceInput = null;
+  if (input instanceof File || input instanceof Blob) {
+    f = input;
+  } else {
+    sourceInput = input;
+    f = input.files && input.files[0];
+    if (sourceInput) sourceInput.value = '';
+  }
+  if (!f) return Promise.resolve(null);
+  const isImage = (f.type || '').indexOf('image/') === 0;
+  const isPdf = f.type === 'application/pdf';
+  const isWord = /\.(doc|docx|xls|xlsx|ppt|pptx)$/i.test(f.name);
+  const runRead = () => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(f);
+  });
+  return (async () => {
+    // Word/Excel 等不能压缩也不在浏览器预览——直接拒绝，引导 PDF/图
+    if (!isImage && !isPdf) {
+      toast('此格式浏览器不能预览，建议先转 PDF 或截图传图');
+      return null;
+    }
+    let blob = f;
+    // 图片自动压缩（PNG/BMP/TIFF 等大幅图转 JPG 质量 0.8、最长边 1600px）
+    if (autoCompress && isImage) {
+      try {
+        const compressed = await imageCompress(f, { maxSide: 1600, quality: 0.8 });
+        if (compressed && compressed.size < f.size) blob = compressed;
+        if (compressed) console.log(`图片压缩 ${(f.size / 1024).toFixed(0)}KB → ${(compressed.size / 1024).toFixed(0)}KB`);
+      } catch (e) { console.warn('compress fail use original', e); }
+    }
+    // 压缩后再判大小
+    if (blob.size > maxKB * 1024) {
+      const tips = isPdf
+        ? `PDF 仍 ${(blob.size / 1024).toFixed(0)}KB 超过 ${maxKB}KB，请先用 PDF 工具压缩后再传（Gist 总容量约 1MB）`
+        : `图 ${(blob.size / 1024).toFixed(0)}KB 超过 ${maxKB}KB，请裁剪/降分辨率后重试`;
+      toast(tips);
+      return null;
+    }
+    // 转 base64 dataURL
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+    const b64Len = dataUrl.split(',')[1]?.length || 0;
+    if (b64Len > 700 * 1024) {
+      toast('编码后过大，请进一步压缩');
+      return null;
+    }
+    const finalType = blob === f ? f.type : (blob.type || 'image/jpeg');
+    const finalName = blob === f ? f.name : (f.name.replace(/\.(png|bmp|tiff?)$/i, '.jpg'));
+    return { name: finalName, mime: finalType, size: blob.size, data: dataUrl };
+  })();
+}
+// 浏览器端图片压缩：最长边 maxSide，JPG quality
+function imageCompress(file, opts = {}) {
+  return new Promise((resolve, reject) => {
+    if (!file.type || file.type.indexOf('image/') !== 0) return resolve(null);
+    // 动图（GIF）跳过
+    if (file.type === 'image/gif') return resolve(null);
+    const maxSide = opts.maxSide || 1600;
+    const quality = opts.quality || 0.8;
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        let { width, height } = img;
+        if (Math.max(width, height) > maxSide) {
+          const r = maxSide / Math.max(width, height);
+          width = Math.round(width * r);
+          height = Math.round(height * r);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(b => {
+          URL.revokeObjectURL(url);
+          resolve(b || null);
+        }, 'image/jpeg', quality);
+      } catch (e) { URL.revokeObjectURL(url); reject(e); }
+    };
+    img.onerror = e => { URL.revokeObjectURL(url); reject(e); };
+    img.src = url;
+  });
 }
 
 /* ============ 证书库 ============ */
 let pendingCertFile=null;
 function onCertFile(input){
-  const f=input.files&&input.files[0];input.value='';
-  if(!f)return;
-  if(f.size>700*1024){toast('文件过大（>700KB），请转成图片或压缩 PDF 再传（Gist 单文件上限约1MB）');return;}
-  const reader=new FileReader();
-  reader.onload=()=>{
-    const dataUrl=reader.result;
-    const b64=dataUrl.split(',')[1]||'';
-    if(b64.length>900000){toast('编码后过大（Gist 单文件约1MB），请压缩后上传');return;}
-    pendingCertFile={name:f.name,mime:f.type,size:f.size,data:dataUrl};
-    document.getElementById('certFileMeta').textContent='已选文件：'+f.name+'（'+(f.size/1024).toFixed(0)+' KB）';
-    document.getElementById('certFormWrap').style.display='block';
-    document.getElementById('certType').value='GRS';
-    document.getElementById('certNo').value='';
-    document.getElementById('certIssuer').value='';
-    document.getElementById('certIssued').value=todayStr();
-    document.getElementById('certExpiry').value='';
-    document.getElementById('certScope').value='';
-    if(f.type==='application/pdf')autoExtractPdf(dataUrl);
-    document.getElementById('certFormWrap').scrollIntoView({behavior:'smooth'});
-  };
-  reader.readAsDataURL(f);
+  attachFile(input, { maxKB: 500, autoCompress: true }).then(file => {
+    if (!file) return;
+    pendingCertFile = file;
+    document.getElementById('certFileMeta').textContent = '已选文件：' + file.name + '（' + (file.size / 1024).toFixed(0) + ' KB）';
+    document.getElementById('certFormWrap').style.display = 'block';
+    document.getElementById('certType').value = 'GRS';
+    document.getElementById('certNo').value = '';
+    document.getElementById('certIssuer').value = '';
+    document.getElementById('certIssued').value = todayStr();
+    document.getElementById('certExpiry').value = '';
+    document.getElementById('certScope').value = '';
+    if (file.mime === 'application/pdf') autoExtractPdf(file.data);
+    document.getElementById('certFormWrap').scrollIntoView({ behavior: 'smooth' });
+  });
 }
 async function autoExtractPdf(dataUrl){
   try{
@@ -2282,10 +2409,38 @@ document.getElementById('kbForm').addEventListener('submit',e=>{
   e.preventDefault();
   const title=document.getElementById('kbTitle').value.trim();
   if(!title){toast('请输入标题');return}
-  data.kb.push({id:Date.now(),cat:document.getElementById('kbCat').value,title,content:document.getElementById('kbContent').value,url:document.getElementById('kbUrl').value,ts:Date.now()});
+  const files=kbPending.slice();
+  kbPending=[];
+  renderKbChips();
+  data.kb.push({id:Date.now(),cat:document.getElementById('kbCat').value,title,content:document.getElementById('kbContent').value,url:document.getElementById('kbUrl').value,files,ts:Date.now()});
   saveData();renderKB();e.target.reset();
+  toast(files.length?`已添加，附带 ${files.length} 个附件`:'已添加');
 });
 document.getElementById('kbSearch').addEventListener('input',renderKB);
+
+// 知识库附件暂存区（提交后清空）
+let kbPending=[];
+function renderKbChips(){
+  const box=document.getElementById('kbFileChips');
+  if(!box)return;
+  if(!kbPending.length){box.innerHTML='';return}
+  box.innerHTML=kbPending.map((f,i)=>`<span class="tag" style="background:#eef3fb;color:#1565c0;padding:4px 8px;display:inline-flex;align-items:center;gap:4px">
+    📎 ${esc(f.name)} <span style="color:var(--muted)">(${(f.size/1024).toFixed(0)}KB)</span>
+    <a href="javascript:void(0)" onclick="kbPending.splice(${i},1);renderKbChips()" style="color:#999;text-decoration:none;margin-left:2px">✕</a>
+  </span>`).join('');
+}
+async function onKbFiles(input){
+  const list=Array.from(input.files||[]);input.value='';
+  if(!list.length)return;
+  const remain=5-kbPending.length;
+  if(remain<=0){toast('一次最多 5 个附件');return}
+  const todo=list.slice(0,remain);
+  for(const f of todo){
+    const got=await attachFile(f,{maxKB:500,autoCompress:true});
+    if(got){kbPending.push(got);renderKbChips();}
+  }
+}
+document.getElementById('kbFiles').addEventListener('change',e=>onKbFiles(e.target));
 document.getElementById('certForm').addEventListener('submit',saveCert);
 document.getElementById('memoInput').addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')addMemo()});
 document.getElementById('expBtn').addEventListener('click',()=>{
