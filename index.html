@@ -1480,8 +1480,12 @@ function renderModuleTableHTML(){
       if(k==='detail')return `<td class="td-detail" title="${esc(detail)}">${esc(detail)}</td>`;
       if(k==='content')return `<td class="td-content">${esc(content)||'—'}</td>`;
       if(k==='period')return `<td class="sm">${esc(period)||'—'}</td>`;
-      if(k==='first')return `<td class="sm">${esc(first)||'—'}</td>`;
-      if(k==='expire')return `<td class="sm">${esc(exp)||'—'} ${expBadge}</td>`;
+      if(k==='first')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.firstCert||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'firstCert',this.value)" title="点击日历修改首次发证日期"></td>`;
+      if(k==='expire'){
+        const st=exp?authStatus(t):'';
+        const bdg=st==='bad'?'<span class="exp-bd bad">已过期</span>':st==='warn'?'<span class="exp-bd warn">即将到期</span>':st==='ok'?'<span class="exp-bd ok">有效</span>':'';
+        return `<td class="sm"><div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><input type="date" class="cell-date" value="${esc(exp)}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'expire',this.value)" title="点击日历修改有效期（续证时改）">${bdg}</div></td>`;
+      }
       if(k==='startDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.startDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'startDate',this.value)"></td>`;
       if(k==='endDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.endDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'endDate',this.value)"></td>`;
       if(k==='plan')return `<td class="td-plan">${plan||'—'}</td>`;
