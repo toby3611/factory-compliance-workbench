@@ -326,19 +326,78 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .f-agg-section .desc{font-size:12px;color:var(--muted);margin-bottom:10px;margin-left:24px}
 .f-agg-list{display:flex;flex-direction:column;gap:6px}
 
-/* 响应式 */
-@media(max-width:980px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:680px){
-  .layout{flex-direction:column}
-  .sidebar{display:flex;flex-direction:row;overflow-x:auto;width:100%;border-right:none;border-bottom:1px solid var(--line);padding:8px;flex:none}
-  .sidebar-section{display:none}
-  .nav-item{flex:none;padding:7px 11px;font-size:12px;white-space:nowrap}
-  .nav-item .arrow{display:none}
-  .nav-item.expand + .sub-content{display:none}
-  .cards-grid{grid-template-columns:1fr}
-  .main{padding:14px 14px 90px}
-  .topbar .brand .tagline{display:none}
+/* 底部 tabbar（桌面端默认隐藏，手机端显示） */
+.mobile-tabbar{
+  display:none;position:fixed;bottom:0;left:0;right:0;z-index:45;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);
+  padding:5px 6px calc(5px + env(safe-area-inset-bottom));
+  justify-content:space-around;align-items:center;
+  box-shadow:0 -2px 12px rgba(15,30,80,.06);
 }
+.mobile-tabbar .tab{
+  flex:1;background:none;border:none;padding:6px 2px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  color:var(--muted);font-size:10.5px;font-weight:600;cursor:pointer;
+  border-radius:8px;transition:color .15s,background .15s;
+  min-width:0;-webkit-tap-highlight-color:transparent;
+}
+.mobile-tabbar .tab.active{color:var(--primary);background:var(--primary-soft)}
+.mobile-tabbar .tab:active{background:var(--primary-soft);opacity:.8}
+.mobile-tabbar .tab svg{width:22px;height:22px;flex:none;stroke-width:2}
+
+/* 响应式 */
+@media(max-width:1280px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:880px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:680px){
+  /* 顶栏精简 */
+  .topbar{height:52px;padding:0 10px;gap:4px}
+  .topbar .brand .logo{width:30px;height:30px;border-radius:8px}
+  .topbar .brand .logo svg{width:18px;height:18px}
+  .topbar .brand h1{font-size:15px;letter-spacing:0}
+  .topbar .brand .tagline{display:none}
+  .topbar .actions{gap:4px}
+  .topbar .actions .icon-btn{width:30px;height:30px;border-radius:8px}
+  .topbar .actions .icon-btn svg{width:15px;height:15px}
+  .topbar .actions .avatar{width:30px;height:30px;font-size:13px}
+  #syncBadge{font-size:11px!important;padding:4px 8px!important;letter-spacing:0}
+  .hide-mobile{display:none!important}
+  /* 隐藏侧栏（手机端卡片即模块入口，侧栏冗余） */
+  .layout{flex-direction:column}
+  .sidebar{display:none!important}
+  /* 主区紧凑 */
+  .main{padding:10px 12px 90px}
+  .greeting-bar{padding:2px 0 10px;flex-wrap:wrap;gap:8px}
+  .greeting-bar h2{font-size:17px}
+  .greeting-bar .greet-meta{font-size:11px;margin-top:1px}
+  .today-btn{padding:6px 10px 6px 11px;font-size:12px;border-radius:18px}
+  .today-btn .num{padding:0 6px;font-size:10px;min-width:18px}
+  /* 卡片 2 列紧凑 */
+  .cards-grid{grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:14px}
+  .mod-card{min-height:104px;padding:12px 12px 11px;border-radius:14px;gap:7px;box-shadow:0 1px 4px rgba(15,30,80,.06)}
+  .mod-card:hover{transform:none}
+  .mod-card .ic{width:38px;height:38px;border-radius:10px;flex:none}
+  .mod-card .ic svg{width:21px;height:21px}
+  .mod-card .mod-card-head{gap:10px;align-items:flex-start}
+  .mod-card .mod-card-title{font-size:13.5px;line-height:1.25}
+  .mod-card .mod-card-desc{font-size:10.5px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .mod-card .mod-card-chips{display:none}
+  .mod-card-stat{font-size:9.5px;padding:2px 6px;top:8px;right:8px;border-radius:9px;gap:2px}
+  /* 今日待办 */
+  #todayCard{padding:12px 13px}
+  #todayCard h2{font-size:15px}
+  .today-item{padding:10px 11px;gap:9px}
+  .today-item .tag{font-size:10px;padding:2px 6px}
+  /* 底部 tabbar 启用 */
+  .mobile-tabbar{display:flex}
+  /* 通用 card 紧凑 */
+  .card{padding:13px}
+  .card h2{font-size:15px}
+  /* 报告/知识/备忘/证书视图内的 textarea/输入紧凑 */
+  .auth-stats{grid-template-columns:repeat(2,1fr)}
+}
+
 /* ============ 账号密码锁 ============ */
 .auth-gate{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:linear-gradient(135deg,#1e6fff 0%,#3b8aff 55%,#5fa1ff 100%);padding:20px}
 .auth-gate.show{display:flex}
@@ -542,10 +601,10 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
   </div>
   <div class="actions">
     <span id="syncBadge" onclick="openSync()" style="font-size:12px;padding:5px 11px;border-radius:14px;background:rgba(255,255,255,.16);cursor:pointer;font-weight:600">☁ 本地模式</span>
-    <button class="icon-btn" id="expBtn" title="导出备份"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></button>
-    <button class="icon-btn" id="impBtn" title="导入备份"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9m0 0l-4 4m4-4l4 4M5 3h14"/></svg></button>
+    <button class="icon-btn hide-mobile" id="expBtn" title="导出备份"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></button>
+    <button class="icon-btn hide-mobile" id="impBtn" title="导入备份"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9m0 0l-4 4m4-4l4 4M5 3h14"/></svg></button>
     <input type="file" id="impFile" accept="application/json" hidden>
-    <button class="icon-btn" onclick="loadFromCloud(true)" title="刷新云端"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5"/></svg></button>
+    <button class="icon-btn hide-mobile" onclick="loadFromCloud(true)" title="刷新云端"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5"/></svg></button>
     <button class="icon-btn" onclick="doLogout()" title="退出登录"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
     <div class="avatar">黄</div>
   </div>
@@ -1179,6 +1238,8 @@ function showView(v){
       el.classList.toggle('active', v==='sub' && el.dataset.cat===currentSubCat);
     }
   });
+  // 同步手机端底部 tabbar
+  document.querySelectorAll('.tab[data-view]').forEach(el=>el.classList.toggle('active', v!=='sub' && el.dataset.view===v));
   if(v==='report')genWeekReport();
   if(v==='cert')renderCerts();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -2349,6 +2410,30 @@ async function _wbBoot(){
   }
 })();
 </script>
+
+<!-- 手机端底部 tabbar（App 风格 5 标签） -->
+<nav class="mobile-tabbar" id="mobileTabbar">
+  <button class="tab active" data-view="home" onclick="showView('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+    <span>首页</span>
+  </button>
+  <button class="tab" data-view="report" onclick="showView('report')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V10zM14 3v6h6M8 13h8M8 17h5"/></svg>
+    <span>报告</span>
+  </button>
+  <button class="tab" data-view="kb" onclick="showView('kb')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h12a4 4 0 014 4v10H8a4 4 0 01-4-4V5zM4 5v10a4 4 0 004 4"/></svg>
+    <span>知识</span>
+  </button>
+  <button class="tab" data-view="memo" onclick="showView('memo')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>
+    <span>备忘</span>
+  </button>
+  <button class="tab" data-view="cert" onclick="showView('cert')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6zM15 2v5h5M9 13h6M9 17h6"/></svg>
+    <span>证书</span>
+  </button>
+</nav>
 
 </body>
 </html>
