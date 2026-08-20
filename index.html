@@ -506,6 +506,31 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 </head>
 <body>
 
+<!-- ============ 登录挡板（必须在脚本之前定义，否则首屏启动 getElementById 会返回 null） ============ -->
+<div class="auth-gate" id="authGate">
+  <div class="auth-card">
+    <div class="auth-ico">🔐</div>
+    <h2 id="agTitle">🔐 登录综合工作台</h2>
+    <p id="agSub" class="auth-sub">请输入账号和密码</p>
+    <div class="auth-field" id="setupRow">
+      <label>账号</label>
+      <input id="agUser" type="text" placeholder="如：黄总" autocomplete="username" onkeydown="if(event.key==='Enter')submitAuth()">
+    </div>
+    <div class="auth-field">
+      <label>密码</label>
+      <input id="agPwd" type="password" placeholder="请输入密码" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAuth()">
+    </div>
+    <div class="auth-field" id="setupRow2">
+      <label>确认密码</label>
+      <input id="agPwd2" type="password" placeholder="再次输入密码" onkeydown="if(event.key==='Enter')submitAuth()">
+    </div>
+    <label class="auth-remember"><input id="agRemember" type="checkbox" checked> 记住本设备 7 天</label>
+    <div id="agErr" class="auth-err"></div>
+    <button class="auth-btn" onclick="submitAuth()">进入工作台</button>
+    <p class="auth-tip">数据存于你的私有云端。本登录仅防止他人随意打开工作台。</p>
+  </div>
+</div>
+
 <!-- ============ 顶蓝条 ============ -->
 <header class="topbar">
   <div class="brand">
@@ -2293,9 +2318,9 @@ function submitAuth(){
 function doLogout(){clearSession();location.reload();}
 
 /* ============ 启动 ============ */
-document.getElementById('todayDate').textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
+async function _wbBoot(){
+  document.getElementById('todayDate').textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
 
-(async function(){
   loadSyncCfg();
   if(sync.enabled){
     setStatus('syncing');
@@ -2314,32 +2339,16 @@ document.getElementById('todayDate').textContent=new Date().toLocaleDateString('
   }else{
     showLoginGate();
   }
+}
+(function(){
+  // DOM 就绪后再启动：防止 auth-gate 等关键节点尚未解析就被同步路径引用
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',_wbBoot);
+  }else{
+    _wbBoot();
+  }
 })();
 </script>
-
-<div class="auth-gate" id="authGate">
-  <div class="auth-card">
-    <div class="auth-ico">🔐</div>
-    <h2 id="agTitle">🔐 登录综合工作台</h2>
-    <p id="agSub" class="auth-sub">请输入账号和密码</p>
-    <div class="auth-field" id="setupRow">
-      <label>账号</label>
-      <input id="agUser" type="text" placeholder="如：黄总" autocomplete="username" onkeydown="if(event.key==='Enter')submitAuth()">
-    </div>
-    <div class="auth-field">
-      <label>密码</label>
-      <input id="agPwd" type="password" placeholder="请输入密码" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAuth()">
-    </div>
-    <div class="auth-field" id="setupRow2">
-      <label>确认密码</label>
-      <input id="agPwd2" type="password" placeholder="再次输入密码" onkeydown="if(event.key==='Enter')submitAuth()">
-    </div>
-    <label class="auth-remember"><input id="agRemember" type="checkbox" checked> 记住本设备 7 天</label>
-    <div id="agErr" class="auth-err"></div>
-    <button class="auth-btn" onclick="submitAuth()">进入工作台</button>
-    <p class="auth-tip">数据存于你的私有云端。本登录仅防止他人随意打开工作台。</p>
-  </div>
-</div>
 
 </body>
 </html>
