@@ -2510,7 +2510,9 @@ async function autoExtractPdf(src){
     // 5. 证书编号（覆盖 Cert No / Scope Cert / License / Registration / Ref / No. / 编号 / 注册号 等写法）
     const noPatterns=[
       /(?:证书号|证书编号|编号|证号|注册号|登记号|注册证书号)\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/]{4,55})/i,
-      /(?:Scope\s*Cert(?:ificate)?\.?\s*(?:No|Number|#)|Cert(?:ificate)?\.?\s*(?:No|Number|ID|#)|License\s*(?:No|Number)?|Registration\s*(?:No|Number)?|Reference|Ref|Certificate\s*ID)\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55})/i,
+      /(?:Scope\s*Cert(?:ificate)?\.?\s*(?:No|Number|#)\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55}))/i,
+      /(?:Cert(?:ificate)?\.?\s*(?:No|Number|ID|#)\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55}))/i,
+      /(?:License|Registration|Reference|Ref|Certificate\s*ID)\.?\s*(?:No|Number)?\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55})/i,
       /\bCert(?:ificate)?\s*No\.?\s*([A-Za-z0-9][A-Za-z0-9\-]{4,55})/i,
       /\bNo\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{5,55})/i,
       /\bID\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55})/i
