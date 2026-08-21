@@ -2471,7 +2471,7 @@ async function autoExtractPdf(src){
     const noPatterns=[
       /(?:Scope\s*Cert(?:ificate)?\.?\s*(?:No|Number)|Cert(?:ificate)?\.?\s*(?:No|Number)|证书号|证书编号|编号)\s*[:#]?\s*([A-Z0-9][A-Z0-9\-_/]{5,50})/i,
       /\bCert\s*No[.:]\s*([A-Z0-9][A-Z0-9\-]{5,50})/i,
-      /Scope\s*Cert\.?\s*No\.?\s*[:#]?\s*([A-Z0-9][A-Z0-9\-]{5,30})/i
+      /Scope\s*Cert\.?\s*No\.?\s*[:#]?\s*([A-Z0-9][A-Z0-9\-_/]{5,50})/i
     ];
     for(const re of noPatterns){const m=txt.match(re);if(m&&m[1]){setIfEmpty('certNo',m[1].trim());break;}}
 
