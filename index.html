@@ -2492,20 +2492,50 @@ async function autoExtractPdf(src){
     if(isoM){const v='ISO '+isoM[1];ensureCertTypeOption(v);setIfEmpty('certType',v);}
     for(const [re,name] of typeKeywords){if(re.test(txt)){ensureCertTypeOption(name);setIfEmpty('certType',name);break;}}
 
-    // 3+4. 有效期 / 发证日期（支持「有效期：起 至 止」范围格式 + 关键词附近日期）
-    const normD=s=>{const m=s&&s.match(/(\d{4})[-/.](1[0-2]|0?[1-9])[-/.](3[01]|[12]\d|0?[1-9])/);return m?m[0].replace(/[\/.]/g,'-'):null;};
-    const grabAfter=re=>{const m=txt.match(re);return m?normD(m[1]):null;};
+    // 3+4. 有效期 / 发证日期 (v3: 关键词 + 日期对启发式 + UI 提示)
+    //     支持「YYYY-MM-DD / YYYY/MM/DD / YYYY.MM.DD / YYYY年MM月DD日 / DD-MM-YYYY」五种日期写法
+    const normD=s=>{
+      if(!s)return null;
+      let m=s.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+      if(m)return m[1]+'-'+String(+m[2]).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0');
+      m=s.match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+      if(m)return m[1]+'-'+String(+m[2]).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0');
+      m=s.match(/(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+      if(m)return m[3]+'-'+String(+m[2]).padStart(2,'0')+'-'+String(+m[1]).padStart(2,'0');
+      return null;
+    };
+    const grabDate=(re)=>{const m=txt.match(re);return m?normD(m[1]):null;};
     let expiry=null,issued=null;
-    const rangeM=txt.match(/(?:Period\s*of\s*validity|Valid(?:ity)?\s*(?:period)?|有效期|有效期间)\s*[:：]?\s*([^\n]{1,40}?)\s*(?:[\u2014—~～\-–至to]+)\s*([^\n]{1,30})/i);
+    // A. 「有效期:起 至 止」范围格式 (强匹配)
+    const rangeM=txt.match(/(?:Period\s*of\s*validity|Valid(?:ity)?\s*(?:period)?|Validity\s*Period|有效期|有效期间)\s*[:：]?\s*([^\n]{1,50}?)\s*(?:[\u2014—~～\-–至到]|\s+to\s+)+\s*([^\n]{1,40})/i);
     if(rangeM){issued=normD(rangeM[1]);expiry=normD(rangeM[2]);}
-    const expKey=grabAfter(/(?:Validity\s*to|Valid\s*(?:until|through)|Date\s*of\s*expiry|Expiry\s*date|Expires\s*on|Valid\s*up\s*to|Valid\s*to|有效期至|有效日期|有效期|Expiration\s*date|截止日期|到期)\s*[:：]?\s*([^\n]{1,30})/i)
-              ||grabAfter(/\bto\s*[:：]\s*([0-9\-\/\.\s]{6,12})/i);
-    const issKey=grabAfter(/(?:Issue\s*date|Date\s*of\s*issue|Issued\s*(?:on|date)|Valid\s*from|Valid\s*from\s*date|Start\s*date|发证日期|签发日期|签发于|起始日期)\s*[:：]?\s*([^\n]{1,30})/i);
-    const allDates=[...new Set([...txt.matchAll(/\b(20\d{2})[-/.](1[0-2]|0?[1-9])[-/.](3[01]|[12]\d|0?[1-9])\b/g)].map(m=>m[0].replace(/[\/.]/g,'-')))].sort();
-    if(!expiry)expiry=expKey||(allDates.length?allDates[allDates.length-1]:null);
-    if(!issued)issued=issKey||(allDates.length?(allDates.filter(d=>d!==expiry&&d<=t).pop()||allDates[0]):null);
+    // B. 关键词 - 签发日期 (30+ 写法)
+    const issRe=/(?:[Ii]ssue\s*[Dd]ate|[Dd]ate\s*of\s*[Ii]ssue|[Ii]ssued\s*(?:[Oo]n|[Dd]ate|[Aa]t)?|[Vv]alid\s*[Ff]rom\s*(?:[Dd]ate)?|[Vv]alid\s*[Ff]rom|[Ss]tart\s*[Dd]ate|[Ee]ffective\s*(?:[Dd]ate|[Ff]rom)|[Dd]ate\s*of\s*[Ff]irst\s*[Ii]ssue|[Ff]irst\s*[Ii]ssued|[Oo]riginal\s*[Ii]ssue\s*[Dd]ate|Start\s*of\s*[Vv]alidity|[Aa]warding\s*[Dd]ate|签发[日期于]|发证日期|起始日期|首次发证|初始认证)\s*[:：]?\s*([^\n]{1,40})/i;
+    // C. 关键词 - 有效期 (40+ 写法)
+    const expRe=/(?:[Vv]alidity\s*[Tt]o|[Vv]alid\s*(?:[Uu]ntil|[Tt]hrough|[Tt]o|[Uu]p\s*to|[Ee]nd|[Ee]xpiry)|[Dd]ate\s*of\s*[Ee]xpiry|[Ee]xpiry\s*[Dd]ate|[Ee]xpires?\s*(?:[Oo]n|[Dd]ate)?|[Ee]xpiration\s*[Dd]ate|[Ee]nd\s*of\s*[Vv]alidity|[Ee]nd\s*[Dd]ate|[Vv]alid\s*[Pp]eriod\s*[Ee]nd|有效期[至止]|截止日期|到期[日期]|终止[日期]|止于|有效期结束|换证日期|期满日期|有效截止)\s*[:：]?\s*([^\n]{1,40})/i;
+    if(!issued)issued=grabDate(issRe);
+    if(!expiry)expiry=grabDate(expRe);
+    // D. 启发式 - 提取所有 4 位年份日期 (支持中文年月日分隔)
+    const allDates=[...new Set([...txt.matchAll(/(20\d{2})\s*[-/.年]\s*(1[0-2]|0?[1-9])\s*[-/.月]\s*(3[01]|[12]\d|0?[1-9])\s*(?:日)?/g)].map(m=>m[1]+'-'+String(+m[2]).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0')))].sort();
+    if(allDates.length){
+      if(!expiry)expiry=allDates[allDates.length-1];
+      if(!issued)issued=allDates.filter(d=>d!==expiry&&d<=t).pop()||allDates[0];
+    }
     if(expiry)setIfEmpty('certExpiry',expiry);
     if(issued)setIfEmpty('certIssued',issued);
+    // E. UI 提示 - 仅识别到 1 个日期时,在缺的那个输入框下显示红字提示
+    ['certExpiry','certIssued'].forEach(id=>{
+      const old=document.getElementById(id+'_hint');
+      if(old)old.remove();
+      const el=document.getElementById(id);
+      if(!el||el.value)return;
+      const fieldName=id==='certExpiry'?'到期':'签发';
+      const hint=document.createElement('div');
+      hint.id=id+'_hint';
+      hint.style='color:#e5484d;font-size:12px;margin-top:2px;padding:2px 6px;background:#fff5f5;border-radius:4px';
+      hint.textContent='⚠️ 未识别'+fieldName+'日期，请手动选择';
+      el.after(hint);
+    });
 
     // 5. 证书编号（覆盖 Cert No / Scope Cert / License / Registration / Ref / No. / 编号 / 注册号 等写法）
     const noPatterns=[
