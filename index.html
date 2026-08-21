@@ -2498,13 +2498,26 @@ async function autoExtractPdf(src){
       if(!s)return null;
       let m=s.match(/(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
       if(m)return m[1]+'-'+String(+m[2]).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0');
-      m=s.match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/);
+      m=s.match(/(\d{4})\s*[-/.]\s*(\d{1,2})\s*[-/.]\s*(\d{1,2})/);
       if(m)return m[1]+'-'+String(+m[2]).padStart(2,'0')+'-'+String(+m[3]).padStart(2,'0');
-      m=s.match(/(\d{1,2})[-/.](\d{1,2})[-/.](\d{4})/);
+      m=s.match(/(\d{1,2})\s*[-/.]\s*(\d{1,2})\s*[-/.]\s*(\d{4})/);
       if(m)return m[3]+'-'+String(+m[2]).padStart(2,'0')+'-'+String(+m[1]).padStart(2,'0');
       return null;
     };
-    const grabDate=(re)=>{const m=txt.match(re);return m?normD(m[1]):null;};
+    const grabDate=(re)=>{
+      const m=txt.match(re);if(!m)return null;
+      // 1) 整段 normD
+      let d=normD(m[1]);if(d)return d;
+      // 2) 拆分回退：normD 失败可能是 PDF.js 把日期数字间塞了空格 ("2023 - 12 - 05")
+      //    按空白切，取首段含日期的部分再尝试；最后做"数字合并"容错
+      const cleaned=m[1].replace(/\s+(?=\d)/g,'').replace(/\s+/g,' ');
+      d=normD(cleaned);if(d)return d;
+      // 3) 数字合并兜底：从整段里抽 8 个连续数字（YYYYMMDD 形式）
+      const n=cleaned.replace(/\D/g,'');
+      const dm=n.match(/^(\d{4})(\d{2})(\d{2})$/);
+      if(dm)return dm[1]+'-'+dm[2]+'-'+dm[3];
+      return null;
+    };
     let expiry=null,issued=null;
     // A. 「有效期:起 至 止」范围格式 (强匹配)
     const rangeM=txt.match(/(?:Period\s*of\s*validity|Valid(?:ity)?\s*(?:period)?|Validity\s*Period|有效期|有效期间)\s*[:：]?\s*([^\n]{1,50}?)\s*(?:[\u2014—~～\-–至到]|\s+to\s+)+\s*([^\n]{1,40})/i);
@@ -2547,7 +2560,15 @@ async function autoExtractPdf(src){
       /\bNo\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{5,55})/i,
       /\bID\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55})/i
     ];
-    for(const re of noPatterns){const m=txt.match(re);if(m&&m[1]){setIfEmpty('certNo',m[1].trim());break;}}
+    for(const re of noPatterns){
+    const m=txt.match(re);
+    if(m&&m[1]){
+      // 证书号去内部空白：PDF.js 经常把字符间距拆开 ("TNV21 4230251" -> "TNV214230251")
+      const cleaned=m[1].replace(/\s+/g,'').trim();
+      if(cleaned)setIfEmpty('certNo',cleaned);
+      break;
+    }
+  }
 
     // 6. 范围（取关键词后第一段有效文本）
     const scopeM=txt.match(/(?:Scope\s*of\s*(?:Registration|Certification)|Product\s*Scope|Scope\s*:|范围\s*[:：]|认证范围)\s*([^\n.;。]{6,140}?)(?=\s*(?:Certificate|No\.|Issued|Valid|Expiry|Registration|License|ID|$))/i);
