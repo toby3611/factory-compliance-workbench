@@ -88,6 +88,58 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 }
 @media(max-width:1280px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:880px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ============ 工作进度总览 ============ */
+#progressCard .pov-sub{font-size:12px;font-weight:600;color:var(--muted);margin-left:6px}
+.pov-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px;
+}
+@media(max-width:880px){.pov-grid{grid-template-columns:1fr}}
+
+/* ============ 可视化大屏入口按钮（首页 CTA） ============ */
+.dash-cta{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 36px;background:linear-gradient(135deg,#185fa5 0%,#378add 100%);
+  color:#fff;font-size:15px;font-weight:600;border:none;border-radius:24px;
+  cursor:pointer;letter-spacing:1px;
+  box-shadow:0 6px 20px rgba(24,95,165,.28);
+  transition:transform .18s,box-shadow .18s;
+}
+.dash-cta:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(24,95,165,.4)}
+.dash-cta:active{transform:translateY(0)}
+.dash-cta svg{width:20px;height:20px;stroke-width:2.2}
+.dash-cta-arrow{font-size:18px;margin-left:2px;transition:transform .18s}
+.dash-cta:hover .dash-cta-arrow{transform:translateX(4px)}
+
+.pov-item{
+  display:flex;gap:14px;align-items:flex-start;
+  padding:14px 16px;border:1px solid var(--line);border-radius:14px;
+  background:#fff;cursor:pointer;transition:all .15s;
+}
+.pov-item:hover{box-shadow:0 8px 22px rgba(15,30,80,.12);transform:translateY(-2px);border-color:var(--col)}
+.pov-ic{
+  width:42px;height:42px;border-radius:12px;flex:none;
+  display:flex;align-items:center;justify-content:center;color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2);
+}
+.pov-body{flex:1;min-width:0}
+.pov-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.pov-name{font-size:14.5px;font-weight:700;color:var(--text)}
+.pov-pct{font-size:16px;font-weight:800;color:var(--col)}
+.pov-bar{
+  height:8px;border-radius:6px;background:#eef1f6;overflow:hidden;margin:8px 0 8px;
+}
+.pov-bar i{
+  display:block;height:100%;border-radius:6px;background:var(--col);
+  transition:width .6s ease;
+}
+.pov-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pov-flag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:10px;background:#eef1f6;color:var(--muted)}
+.pov-flag.bad{background:#fdeaea;color:#dc2626}
+.pov-flag.warn{background:#fff5e6;color:#d97706}
+.pov-flag.ok{background:#e8f7ee;color:#059669}
+.pov-stat{font-size:12px;color:var(--muted);font-weight:600}
+
 .mod-card{
   position:relative;border-radius:18px;padding:18px 20px 16px;
   min-height:148px;cursor:pointer;overflow:hidden;
@@ -567,6 +619,55 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 @media(max-width:1500px){.mt-wrap{overflow-x:auto}.mt-tbl{min-width:1180px}.mv-tbl{min-width:1000px}}
 @media(max-width:1100px){.mt-tbl{min-width:1000px}.mv-tbl{min-width:900px}}
 @media(max-width:880px){.mt-tbl{min-width:920px;white-space:nowrap}.mv-tbl{min-width:840px;white-space:nowrap}}
+
+/* ============ 可视化大屏 ============ */
+.dash{
+  background:linear-gradient(180deg,#081634 0%,#0a1d3f 100%);
+  color:#cfe0ff;border-radius:16px;padding:18px;position:relative;overflow:hidden;min-height:80vh;
+}
+.dash::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 10%,rgba(56,138,221,.16),transparent 50%),radial-gradient(circle at 90% 80%,rgba(0,200,180,.10),transparent 50%);pointer-events:none}
+.dash-head{display:flex;justify-content:space-between;align-items:center;padding:0 8px 14px;border-bottom:1px solid rgba(56,138,221,.25);position:relative}
+.dash-title{font-size:20px;font-weight:700;letter-spacing:2px;background:linear-gradient(90deg,#5ec3ff,#1d9e75);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.dash-clock{font-size:12px;color:#7fb6e8;font-family:ui-monospace,monospace}
+.dash-row{display:grid;gap:12px;margin-top:12px;position:relative}
+.dash-r1{grid-template-columns:1fr 1.7fr 1fr}
+.dash-r2{grid-template-columns:1.4fr 1fr 1fr}
+@media(max-width:1100px){.dash-r1,.dash-r2{grid-template-columns:1fr 1fr}.dash-r1 .d-card:nth-child(2){grid-column:1/-1;order:-1}}
+@media(max-width:680px){.dash-r1,.dash-r2{grid-template-columns:1fr}.dash-r1 .d-card:nth-child(2){grid-column:auto;order:0}}
+.d-card{background:rgba(13,33,69,.7);border:1px solid rgba(56,138,221,.25);border-radius:10px;padding:14px;position:relative}
+.d-card::before{content:"";position:absolute;top:0;left:10px;right:10px;height:1px;background:linear-gradient(90deg,transparent,#5ec3ff,transparent)}
+.d-ctitle{font-size:13px;color:#7fb6e8;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.d-ctitle::before{content:"";width:3px;height:12px;background:#5ec3ff;border-radius:1px}
+.d-kpi-list{display:flex;flex-direction:column;gap:8px;height:100%;justify-content:center}
+.d-kpi{display:flex;align-items:center;justify-content:space-between;background:rgba(8,22,52,.5);border-radius:7px;padding:11px 13px;border:1px solid rgba(56,138,221,.15)}
+.d-kpi-l{font-size:12px;color:#7fb6e8}
+.d-kpi-n{font-size:26px;font-weight:700;color:#5ec3ff;line-height:1}
+.d-kpi.warn .d-kpi-n{color:#e24b4a}
+.d-kpi.ok .d-kpi-n{color:#1d9e75}
+.d-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:300px}
+.d-donut-wrap{position:relative}
+.d-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.d-donut-num{font-size:52px;font-weight:800;background:linear-gradient(180deg,#5ec3ff,#185fa5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.d-donut-pct{font-size:15px;color:#7fb6e8;margin-top:2px}
+.d-donut-sub{font-size:11px;color:#7fb6e8;margin-top:6px}
+.d-legend{display:grid;grid-template-columns:repeat(2,1fr);gap:5px 16px;margin-top:14px;font-size:11px;color:#cfe0ff}
+.d-lg{display:flex;align-items:center;gap:6px}
+.d-lg-dot{width:9px;height:9px;border-radius:2px;flex:none}
+.d-lg-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d-lg-n{color:#5ec3ff;font-family:ui-monospace,monospace;font-size:11px}
+.d-cert-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed rgba(56,138,221,.15);font-size:11.5px}
+.d-cert-row:last-child{border-bottom:none}
+.d-cert-n{color:#cfe0ff;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d-cert-d{font-family:ui-monospace,monospace;font-size:10px;padding:1px 6px;border-radius:3px;margin-left:6px;white-space:nowrap}
+.d-b-red{background:#e24b4a;color:#fff}
+.d-b-amb{background:#ef9f27;color:#fff}
+.d-b-grn{background:#1d9e75;color:#fff}
+.d-bar-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:11.5px}
+.d-bar-n{width:62px;color:#cfe0ff;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d-bar-tr{height:13px;background:rgba(56,138,221,.12);border-radius:3px;flex:1;overflow:hidden}
+.d-bar-fi{height:100%;border-radius:3px}
+.d-bar-s{width:38px;text-align:right;color:#5ec3ff;font-family:ui-monospace,monospace;font-size:10px;flex:none}
+.d-note{font-size:10px;color:#7fb6e8;margin-top:8px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -646,6 +747,10 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
       <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6zM15 2v5h5M9 13h6M9 17h6"/></svg>
       <span>证书库</span>
     </div>
+    <div class="nav-item" data-view="dashboard" onclick="showView('dashboard')">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/><circle cx="7" cy="14" r="0"/></svg>
+      <span>可视化大屏</span>
+    </div>
   </aside>
 
   <!-- ============ 主区 ============ -->
@@ -666,6 +771,11 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 
       <div class="cards-grid" id="cardsGrid"></div>
 
+      <div class="card" id="progressCard">
+        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg>工作进度总览 <span class="pov-sub" id="povSub"></span></h2>
+        <div id="progressOverview" class="pov-grid"></div>
+      </div>
+
       <div class="card" id="todayCard">
         <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今日要处理</h2>
         <div class="today-range" id="todayRange">
@@ -677,6 +787,14 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
         </div>
         <div class="today-upd" id="todayUpd"></div>
         <div id="todayList"></div>
+      </div>
+
+      <div class="center" style="margin-top:18px;text-align:center">
+        <button class="dash-cta" onclick="showView('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg>
+          可视化大屏
+          <span class="dash-cta-arrow">→</span>
+        </button>
       </div>
 
       <div class="center" style="margin-top:14px;text-align:center">
@@ -795,6 +913,11 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
         </div>
         <div id="certList"></div>
       </div>
+    </div>
+
+    <!-- 可视化大屏 -->
+    <div class="view" id="view-dashboard">
+      <div id="dashRoot"></div>
     </div>
 
   <!-- 子模块视图（左侧栏始终保留，可直接切换其他模块） -->
@@ -1174,6 +1297,57 @@ function renderCards(){
   }).join('');
 }
 
+/* ============ 工作进度总览（首页）============ */
+// 颜色类 -> 主色（用于进度条/圆环）
+const POV_COLOR={ 'c-blue':'#3b82f6','c-teal':'#06b6d4','c-amber':'#f59e0b','c-red':'#ef4444',
+  'c-purple':'#9333ea','c-cyan':'#0ea5e9','c-pink':'#ec4899','c-orange':'#f97316',
+  'c-emerald':'#059669','c-slate':'#64748b','c-green':'#22c55e' };
+function renderProgressOverview(){
+  const box=document.getElementById('progressOverview');
+  if(!box) return;
+  const t=todayStr();
+  // 各分类统计
+  const rows=CATS.filter(c=>!c.isAggregator).map(c=>{
+    const it=data.tasks.filter(x=>x.cat===c.id);
+    const total=it.length;
+    const done=it.filter(x=>x.done).length;
+    // 真·逾期：排除 PERIOD_SUBS（周期任务）且 due<今天
+    const overdue=it.filter(x=>!x.done && !PERIOD_SUBS.has(x.sub) && x.due && x.due<t).length;
+    // 近期：effectiveDue 在 60 天内
+    const near=it.filter(x=>!x.done && !PERIOD_SUBS.has(x.sub) && (()=>{const d=effectiveDue(x);return d&&d>t&&d<=fmtDate(new Date(Date.now()+60*864e5));})()).length;
+    return {c,total,done,overdue,near,pct:total?Math.round(done/total*100):0};
+  });
+  // 总体
+  const gTotal=rows.reduce((s,r)=>s+r.total,0);
+  const gDone=rows.reduce((s,r)=>s+r.done,0);
+  const gOver=rows.reduce((s,r)=>s+r.overdue,0);
+  const gPct=gTotal?Math.round(gDone/gTotal*100):0;
+  document.getElementById('povSub').textContent=`总体完成 ${gDone}/${gTotal}（${gPct}%）`;
+  // 排序：逾期 > 近期 > 低完成率，让最需要关注的排前面
+  const sorted=[...rows].sort((a,b)=> (b.overdue-a.overdue)|| (b.near-a.near)|| (a.pct-b.pct));
+  box.innerHTML=sorted.map(r=>{
+    const col=POV_COLOR[r.c.color]||'#3b82f6';
+    const status = r.overdue? `<span class="pov-flag bad">${r.overdue} 项逾期</span>`
+      : r.near? `<span class="pov-flag warn">${r.near} 项临期</span>`
+      : r.pct===100? `<span class="pov-flag ok">已全部完成</span>`
+      : `<span class="pov-flag">进行中</span>`;
+    return `<div class="pov-item" onclick="openSubModule('${r.c.id}')" style="--col:${col}">
+      <div class="pov-ic" style="background:${col}">${r.c.icon}</div>
+      <div class="pov-body">
+        <div class="pov-top">
+          <span class="pov-name">${esc(r.c.name)}</span>
+          <span class="pov-pct">${r.pct}%</span>
+        </div>
+        <div class="pov-bar"><i style="width:${r.pct}%"></i></div>
+        <div class="pov-foot">
+          ${status}
+          <span class="pov-stat">已完成 ${r.done}/${r.total}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 /* ============ 周期任务感知（首页/F 聚合共用）============ */
 // 周期任务 sub 集合：这些任务的 due 字段是历史日期，不该进"今日待办"或"真·待办"
 const PERIOD_SUBS=new Set(['ISO体系','可持续认证','客户平台验证',
@@ -1336,7 +1510,123 @@ function showView(v){
   document.querySelectorAll('.tab[data-view]').forEach(el=>el.classList.toggle('active', v!=='sub' && el.dataset.view===v));
   if(v==='report')genWeekReport();
   if(v==='cert')renderCerts();
+  if(v==='dashboard')renderDashboard();
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ============ 可视化大屏（独立 tab：方案 B） ============ */
+const DASH_COLOR={ '1':'#185fa5','2':'#1d9e75','3':'#ef9f27','4':'#378add','5':'#e24b4a','6':'#534ab7','7':'#0ea5e9','8':'#ec4899','9':'#f97316','10':'#059669','11':'#64748b' };
+function dashDonut(seg,total){
+  // seg: [{c,val}] 顺时针拼环；返回 svg circle 串
+  const R=88, C=2*Math.PI*R; let off=0; const circ=[];
+  seg.forEach(s=>{
+    const len=total? s.val/total*C : 0;
+    circ.push(`<circle cx="120" cy="120" r="${R}" fill="none" stroke="${s.c}" stroke-width="32" stroke-dasharray="${len.toFixed(1)} ${(C-len).toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}" transform="rotate(-90 120 120)" stroke-linecap="butt"/>`);
+    off+=len;
+  });
+  return circ.join('');
+}
+function renderDashboard(){
+  const root=document.getElementById('dashRoot');
+  if(!root) return;
+  const t=todayStr();
+  const tasks=data.tasks||[];
+  const total=tasks.length;
+  const done=tasks.filter(x=>x.done).length;
+  // 逾期 / 临期（排除周期 sub）
+  // 逾期：用原始 due 判定（effectiveDue 会把 seed 静态 due 漂到下一个周期，污染"真·逾期"）
+  const overdue=tasks.filter(x=>!x.done && !PERIOD_SUBS.has(x.sub) && x.due && x.due<t).length;
+  // 临期：原始 due 在 (今天, 今天+60天] 内 OR effectiveDue 同窗口（用于无静态 due 的任务）—用 Set 去重
+  const win=fmtDate(new Date(Date.now()+60*864e5));
+  const nearIds=new Set();
+  tasks.forEach(x=>{
+    if(x.done || PERIOD_SUBS.has(x.sub)) return;
+    if(x.due && x.due>t && x.due<=win) nearIds.add(x.id);
+    else { const d=effectiveDue(x); if(d && d>t && d<=win) nearIds.add(x.id); }
+  });
+  const near=nearIds.size;
+  const wip=total-done; // 进行中（含临期/逾期视觉另算，但饼图"进行中"=未完成未逾期临期）
+  const inprog=wip-overdue-near;
+  const pct=total?Math.round(done/total*100):0;
+  // 11 大类
+  const cats=CATS.filter(c=>!c.isAggregator).map(c=>{
+    const it=tasks.filter(x=>x.cat===c.id);
+    const d=it.filter(x=>x.done).length;
+    return {c,total:it.length,done:d,pct:it.length?Math.round(d/it.length*100):0};
+  });
+  // 担当分布
+  const leadMap={};
+  tasks.forEach(x=>{const l=(x.lead||'(未分配)').trim();if(l)leadMap[l]=(leadMap[l]||0)+1;});
+  const leads=Object.entries(leadMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const leadMax=leads.length?leads[0][1]:1;
+  // 证书倒计时（取 6 张最近到期/逾期）
+  const certs=(data.certs||[]).map(c=>({n:c.name||'(未命名)',e:c.expiry||''})).filter(c=>c.e)
+    .sort((a,b)=>a.e<b.e?-1:1).slice(0,6);
+  function certCls(e){ if(!e) return 'd-b-grn'; const days=Math.round((new Date(e)-new Date(t))/864e5); if(days<0) return 'd-b-red'; if(days<=60) return 'd-b-amb'; return 'd-b-grn'; }
+  function certTxt(e){ if(!e) return '—'; const days=Math.round((new Date(e)-new Date(t))/864e5); return days<0?`逾期${-days}天`:days<=60?`${days}天`:e; }
+  // 饼图段：已完成/进行中/临期/逾期
+  const seg=[{c:'#1d9e75',val:done},{c:'#185fa5',val:inprog},{c:'#ef9f27',val:near},{c:'#e24b4a',val:overdue}];
+  const donut=dashDonut(seg,total);
+  root.innerHTML=`
+  <div class="dash">
+    <div class="dash-head">
+      <div class="dash-title">北江纺织 · 合规运营可视化大屏</div>
+      <div class="dash-clock">${new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'})} · 实时数据 <span style="color:#1d9e75">●</span></div>
+    </div>
+    <div class="dash-row dash-r1">
+      <div class="d-card">
+        <div class="d-ctitle">KPI 总览</div>
+        <div class="d-kpi-list">
+          <div class="d-kpi"><span class="d-kpi-l">任务总数</span><span class="d-kpi-n">${total}</span></div>
+          <div class="d-kpi ok"><span class="d-kpi-l">已完成</span><span class="d-kpi-n">${done}</span></div>
+          <div class="d-kpi warn"><span class="d-kpi-l">已逾期</span><span class="d-kpi-n">${overdue}</span></div>
+          <div class="d-kpi"><span class="d-kpi-l">临期 (60 天)</span><span class="d-kpi-n">${near}</span></div>
+          <div class="d-kpi"><span class="d-kpi-l">证书数</span><span class="d-kpi-n">${(data.certs||[]).length}</span></div>
+        </div>
+      </div>
+      <div class="d-card">
+        <div class="d-ctitle">任务总览 · ${total} 条任务完成分布</div>
+        <div class="d-stage">
+          <div class="d-donut-wrap">
+            <svg width="240" height="240" viewBox="0 0 240 240">
+              <circle cx="120" cy="120" r="88" fill="none" stroke="rgba(56,138,221,.1)" stroke-width="32"/>
+              ${donut}
+            </svg>
+            <div class="d-donut-center">
+              <div class="d-donut-num">${pct}%</div>
+              <div class="d-donut-pct">已完成 ${done}/${total}</div>
+              <div class="d-donut-sub">未完成 ${wip} 条</div>
+            </div>
+          </div>
+        </div>
+        <div class="d-legend">
+          <div class="d-lg"><span class="d-lg-dot" style="background:#1d9e75"></span><span class="d-lg-t">已完成</span><span class="d-lg-n">${done}</span></div>
+          <div class="d-lg"><span class="d-lg-dot" style="background:#185fa5"></span><span class="d-lg-t">进行中</span><span class="d-lg-n">${inprog}</span></div>
+          <div class="d-lg"><span class="d-lg-dot" style="background:#ef9f27"></span><span class="d-lg-t">临期 (60天)</span><span class="d-lg-n">${near}</span></div>
+          <div class="d-lg"><span class="d-lg-dot" style="background:#e24b4a"></span><span class="d-lg-t">已逾期</span><span class="d-lg-n">${overdue}</span></div>
+        </div>
+      </div>
+      <div class="d-card">
+        <div class="d-ctitle">证书到期倒计时</div>
+        ${(certs.length?certs:certs.concat([{n:'暂无证书',e:''}])).map(c=>`<div class="d-cert-row"><div class="d-cert-n">${esc(c.n)}</div><div class="d-cert-d ${certCls(c.e)}">${certTxt(c.e)}</div></div>`).join('')}
+        <div class="d-note">红=已逾期 · 橙=60天内 · 绿=安全</div>
+      </div>
+    </div>
+    <div class="dash-row dash-r2">
+      <div class="d-card">
+        <div class="d-ctitle">11 大类完成率（已完成 / 总数）</div>
+        ${cats.map(r=>`<div class="d-bar-row"><span class="d-bar-n" title="${esc(r.c.name)}">${esc(r.c.short||r.c.name)}</span><div class="d-bar-tr"><div class="d-bar-fi" style="width:${r.pct}%;background:${DASH_COLOR[r.c.id]||'#185fa5'}"></div></div><span class="d-bar-s">${r.done}/${r.total}</span></div>`).join('')}
+      </div>
+      <div class="d-card">
+        <div class="d-ctitle">逾期 / 临期任务</div>
+        ${overdue||near?tasks.filter(x=>!x.done&&!PERIOD_SUBS.has(x.sub)&&(x.due&&x.due<t||(()=>{const d=effectiveDue(x);return d&&d>t&&d<=fmtDate(new Date(Date.now()+60*864e5));})())).sort((a,b)=>(a.due||'').localeCompare(b.due||'')).slice(0,6).map(x=>{const late=x.due&&x.due<t;const d=effectiveDue(x)||x.due;return `<div class="d-cert-row"><div class="d-cert-n" style="color:${late?'#e24b4a':'#ef9f27'}">● ${esc(x.detail||x.workDetail||'任务')}</div><div class="d-cert-d ${late?'d-b-red':'d-b-amb'}">${late?'逾期':certTxt(d)}</div></div>`;}).join(''):'<div class="d-note">暂无逾期/临期任务 ✓</div>'}
+      </div>
+      <div class="d-card">
+        <div class="d-ctitle">担当工作量分布</div>
+        ${leads.map(([n,v])=>`<div class="d-bar-row"><span class="d-bar-n">${esc(n)}</span><div class="d-bar-tr"><div class="d-bar-fi" style="width:${Math.round(v/leadMax*100)}%;background:#185fa5"></div></div><span class="d-bar-s">${v}</span></div>`).join('')}
+      </div>
+    </div>
+  </div>`;
 }
 
 /* ============ 子模块 ============ */
@@ -2266,7 +2556,7 @@ function disconnectSync(){
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 function scrollToToday(){const el=document.getElementById('todayCard');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
 function aiHelp(){toast('AI 助手已就绪 · 在 WorkBuddy 对话中让我帮你')}
-function renderAll(){normalizeData();renderSideCats();renderCards();renderToday();renderMetrics();renderKB();renderMemos();if(document.getElementById('view-cert').classList.contains('active'))renderCerts()}
+function renderAll(){normalizeData();renderSideCats();renderCards();renderProgressOverview();renderToday();renderMetrics();renderKB();renderMemos();if(document.getElementById('view-cert').classList.contains('active'))renderCerts()}
 
 /* ============ 侧栏业务模块（从 CATS 动态生成 11 大类） ============ */
 function renderSideCats(){
@@ -2939,6 +3229,10 @@ async function _wbBoot(){
   <button class="tab" data-view="cert" onclick="showView('cert')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6zM15 2v5h5M9 13h6M9 17h6"/></svg>
     <span>证书</span>
+  </button>
+  <button class="tab" data-view="dashboard" onclick="showView('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg>
+    <span>大屏</span>
   </button>
 </nav>
 
