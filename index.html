@@ -89,13 +89,6 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 @media(max-width:1280px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:880px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
 
-/* ============ 工作进度总览 ============ */
-#progressCard .pov-sub{font-size:12px;font-weight:600;color:var(--muted);margin-left:6px}
-.pov-grid{
-  display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:6px;
-}
-@media(max-width:880px){.pov-grid{grid-template-columns:1fr}}
-
 /* ============ 可视化大屏入口按钮（首页 CTA） ============ */
 .dash-cta{
   display:inline-flex;align-items:center;gap:10px;
@@ -110,35 +103,6 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .dash-cta svg{width:20px;height:20px;stroke-width:2.2}
 .dash-cta-arrow{font-size:18px;margin-left:2px;transition:transform .18s}
 .dash-cta:hover .dash-cta-arrow{transform:translateX(4px)}
-
-.pov-item{
-  display:flex;gap:14px;align-items:flex-start;
-  padding:14px 16px;border:1px solid var(--line);border-radius:14px;
-  background:#fff;cursor:pointer;transition:all .15s;
-}
-.pov-item:hover{box-shadow:0 8px 22px rgba(15,30,80,.12);transform:translateY(-2px);border-color:var(--col)}
-.pov-ic{
-  width:42px;height:42px;border-radius:12px;flex:none;
-  display:flex;align-items:center;justify-content:center;color:#fff;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.2);
-}
-.pov-body{flex:1;min-width:0}
-.pov-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-.pov-name{font-size:14.5px;font-weight:700;color:var(--text)}
-.pov-pct{font-size:16px;font-weight:800;color:var(--col)}
-.pov-bar{
-  height:8px;border-radius:6px;background:#eef1f6;overflow:hidden;margin:8px 0 8px;
-}
-.pov-bar i{
-  display:block;height:100%;border-radius:6px;background:var(--col);
-  transition:width .6s ease;
-}
-.pov-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.pov-flag{font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:10px;background:#eef1f6;color:var(--muted)}
-.pov-flag.bad{background:#fdeaea;color:#dc2626}
-.pov-flag.warn{background:#fff5e6;color:#d97706}
-.pov-flag.ok{background:#e8f7ee;color:#059669}
-.pov-stat{font-size:12px;color:var(--muted);font-weight:600}
 
 .mod-card{
   position:relative;border-radius:18px;padding:18px 20px 16px;
@@ -771,11 +735,6 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 
       <div class="cards-grid" id="cardsGrid"></div>
 
-      <div class="card" id="progressCard">
-        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg>工作进度总览 <span class="pov-sub" id="povSub"></span></h2>
-        <div id="progressOverview" class="pov-grid"></div>
-      </div>
-
       <div class="card" id="todayCard">
         <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今日要处理</h2>
         <div class="today-range" id="todayRange">
@@ -1292,57 +1251,6 @@ function renderCards(){
       </div>
       <div class="mod-card-chips">
         ${subChips}${moreChip}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-/* ============ 工作进度总览（首页）============ */
-// 颜色类 -> 主色（用于进度条/圆环）
-const POV_COLOR={ 'c-blue':'#3b82f6','c-teal':'#06b6d4','c-amber':'#f59e0b','c-red':'#ef4444',
-  'c-purple':'#9333ea','c-cyan':'#0ea5e9','c-pink':'#ec4899','c-orange':'#f97316',
-  'c-emerald':'#059669','c-slate':'#64748b','c-green':'#22c55e' };
-function renderProgressOverview(){
-  const box=document.getElementById('progressOverview');
-  if(!box) return;
-  const t=todayStr();
-  // 各分类统计
-  const rows=CATS.filter(c=>!c.isAggregator).map(c=>{
-    const it=data.tasks.filter(x=>x.cat===c.id);
-    const total=it.length;
-    const done=it.filter(x=>x.done).length;
-    // 真·逾期：排除 PERIOD_SUBS（周期任务）且 due<今天
-    const overdue=it.filter(x=>!x.done && !PERIOD_SUBS.has(x.sub) && x.due && x.due<t).length;
-    // 近期：effectiveDue 在 60 天内
-    const near=it.filter(x=>!x.done && !PERIOD_SUBS.has(x.sub) && (()=>{const d=effectiveDue(x);return d&&d>t&&d<=fmtDate(new Date(Date.now()+60*864e5));})()).length;
-    return {c,total,done,overdue,near,pct:total?Math.round(done/total*100):0};
-  });
-  // 总体
-  const gTotal=rows.reduce((s,r)=>s+r.total,0);
-  const gDone=rows.reduce((s,r)=>s+r.done,0);
-  const gOver=rows.reduce((s,r)=>s+r.overdue,0);
-  const gPct=gTotal?Math.round(gDone/gTotal*100):0;
-  document.getElementById('povSub').textContent=`总体完成 ${gDone}/${gTotal}（${gPct}%）`;
-  // 排序：逾期 > 近期 > 低完成率，让最需要关注的排前面
-  const sorted=[...rows].sort((a,b)=> (b.overdue-a.overdue)|| (b.near-a.near)|| (a.pct-b.pct));
-  box.innerHTML=sorted.map(r=>{
-    const col=POV_COLOR[r.c.color]||'#3b82f6';
-    const status = r.overdue? `<span class="pov-flag bad">${r.overdue} 项逾期</span>`
-      : r.near? `<span class="pov-flag warn">${r.near} 项临期</span>`
-      : r.pct===100? `<span class="pov-flag ok">已全部完成</span>`
-      : `<span class="pov-flag">进行中</span>`;
-    return `<div class="pov-item" onclick="openSubModule('${r.c.id}')" style="--col:${col}">
-      <div class="pov-ic" style="background:${col}">${r.c.icon}</div>
-      <div class="pov-body">
-        <div class="pov-top">
-          <span class="pov-name">${esc(r.c.name)}</span>
-          <span class="pov-pct">${r.pct}%</span>
-        </div>
-        <div class="pov-bar"><i style="width:${r.pct}%"></i></div>
-        <div class="pov-foot">
-          ${status}
-          <span class="pov-stat">已完成 ${r.done}/${r.total}</span>
-        </div>
       </div>
     </div>`;
   }).join('');
@@ -2556,7 +2464,7 @@ function disconnectSync(){
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 function scrollToToday(){const el=document.getElementById('todayCard');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
 function aiHelp(){toast('AI 助手已就绪 · 在 WorkBuddy 对话中让我帮你')}
-function renderAll(){normalizeData();renderSideCats();renderCards();renderProgressOverview();renderToday();renderMetrics();renderKB();renderMemos();if(document.getElementById('view-cert').classList.contains('active'))renderCerts()}
+function renderAll(){normalizeData();renderSideCats();renderCards();renderToday();renderMetrics();renderKB();renderMemos();if(document.getElementById('view-cert').classList.contains('active'))renderCerts()}
 
 /* ============ 侧栏业务模块（从 CATS 动态生成 11 大类） ============ */
 function renderSideCats(){
