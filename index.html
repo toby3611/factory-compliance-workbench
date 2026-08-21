@@ -175,6 +175,12 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;min-height:30px}
 .mini.done{background:var(--green);color:#fff;border-color:var(--green)}
 .empty{color:var(--muted);font-size:13px;text-align:center;padding:18px}
+.today-range{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.rchip{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:16px;padding:4px 11px;font-size:12px;cursor:pointer;transition:.15s;font-family:inherit}
+.rchip:hover{border-color:var(--primary);color:var(--primary)}
+.rchip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.today-upd{font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.today-upd .dot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;flex:none}
 .cert-card{display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff}
 .cert-thumb{width:52px;height:52px;border-radius:8px;object-fit:cover;border:1px solid var(--line);flex:none;background:#f3f6fb;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer}
 .cert-main{flex:1;min-width:0}
@@ -662,6 +668,14 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 
       <div class="card" id="todayCard">
         <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今日要处理</h2>
+        <div class="today-range" id="todayRange">
+          <button class="rchip" data-r="today" onclick="setTodayRange('today')">今日</button>
+          <button class="rchip" data-r="week" onclick="setTodayRange('week')">本周</button>
+          <button class="rchip" data-r="7" onclick="setTodayRange('7')">7天</button>
+          <button class="rchip" data-r="30" onclick="setTodayRange('30')">30天</button>
+          <button class="rchip" data-r="all" onclick="setTodayRange('all')">全部积压</button>
+        </div>
+        <div class="today-upd" id="todayUpd"></div>
         <div id="todayList"></div>
       </div>
 
@@ -819,6 +833,11 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
     <div class="field">
       <label>Gist ID（留空=自动新建私有 Gist）</label>
       <input id="syncGist" placeholder="如 a1b2c3d4e5f6..." style="width:100%">
+    </div>
+    <div class="field">
+      <label>文件上传 Token（可选，public_repo 权限）</label>
+      <input id="syncUploadToken" type="password" placeholder="ghp_... 留空则附件仍内嵌 Gist（约 1MB 上限）" style="width:100%">
+      <p style="margin:4px 0 0;font-size:11px;color:var(--muted)">配置后，知识库/证书附件改为存到本仓库 <code>files/</code> 目录，容量从 1MB 提升到单文件几十 MB。注意：公开仓库里的文件任何人凭链接都能下载。</p>
     </div>
     <div class="row">
       <button class="btn primary" style="flex:1" onclick="saveSync()">保存并连接</button>
@@ -1042,7 +1061,8 @@ let data;
 let sync={enabled:false,gistId:null,token:null};
 
 function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function todayStr(){return new Date().toISOString().slice(0,10)}
+function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function todayStr(){return fmtDate(new Date())}
 function setStatus(kind){
   const b=document.getElementById('syncBadge');
   if(kind==='cloud'||kind==='synced'){b.textContent='☁ 已同步';b.style.background='rgba(255,255,255,.22)';}
@@ -1157,21 +1177,41 @@ function renderCards(){
   }).join('');
 }
 
+/* ============ 今日待办：时间范围筛选 ============ */
+let todayRange=(localStorage.getItem('wb_today_range')||'today');
+function rangeEnd(){
+  const t=todayStr();
+  if(todayRange==='today') return t;
+  if(todayRange==='week'){ const d=new Date(); const add=(7-d.getDay())%7; const e=new Date(d.getFullYear(),d.getMonth(),d.getDate()+add); return fmtDate(e); }
+  if(todayRange==='7'){ return fmtDate(new Date(Date.now()+7*864e5)); }
+  if(todayRange==='30'){ return fmtDate(new Date(Date.now()+30*864e5)); }
+  return '9999-12-31';
+}
+const RANGE_LABEL={today:'今日（逾期+今日到期）',week:'本周内到期',7:'未来7天',30:'未来30天',all:'全部积压（含远期）'};
+function setTodayRange(r){ todayRange=r; try{localStorage.setItem('wb_today_range',r)}catch(e){} renderToday(); }
 /* ============ 渲染：今日待办 ============ */
 function renderToday(){
   const t=todayStr();
-  const items=data.tasks.filter(x=>!x.done && x.due && x.due<=t).sort((a,b)=>a.due.localeCompare(b.due));
+  const end=rangeEnd();
+  let items=data.tasks.filter(x=>!x.done && x.due && x.due<=end).sort((a,b)=>a.due.localeCompare(b.due));
+  if(todayRange==='all') items=items.slice(0,30);
   const box=document.getElementById('todayList');
   const cnt=document.getElementById('todayCount');
+  // 同步范围 chip 激活态
+  document.querySelectorAll('#todayRange .rchip').forEach(b=>b.classList.toggle('active', b.dataset.r===todayRange));
+  // 自动更新时间戳
+  const upd=document.getElementById('todayUpd');
+  if(upd) upd.innerHTML='<span class="dot"></span>自动更新于 '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})+' · '+RANGE_LABEL[todayRange];
   cnt.textContent=items.length;
   cnt.className='num'+(items.length?'':' zero');
-  if(!items.length){box.innerHTML='<p class="empty">今天没有待处理事项，状态很好！</p>';return}
+  if(!items.length){box.innerHTML='<p class="empty">该时间范围内没有待处理事项，状态很好！</p>';return}
   box.innerHTML=items.map(x=>{
     const over=x.due<t;
+    const days=x.due>t?Math.round((new Date(x.due)-new Date(t))/864e5):0;
     return `<div class="today-item ${over?'overdue':''}">
       <span class="tag ${x.prio}">${x.prio}</span>
       <div style="flex:1;min-width:0"><div style="font-size:14px">${esc(x.title)}</div>
-      <div class="due ${over?'over':''}">${esc(CATSHORT[x.cat]||'')} · ${esc(x.sub||'')} · ${over?'已逾期 ':'到期 '}${x.due}</div></div>
+      <div class="due ${over?'over':''}">${esc(CATSHORT[x.cat]||'')} · ${esc(x.sub||'')} · ${over?'已逾期 ':'还有 '+days+'天 '}${x.due}</div></div>
       <button class="mini done" onclick="finish(${x.id})">完成</button>
     </div>`}).join("");
 }
@@ -1229,13 +1269,13 @@ function toggleKB(id){
 function viewKbFile(kid,idx){
   const k=data.kb.find(x=>x.id===kid);if(!k)return;
   const f=(k.files||[])[idx];if(!f)return;
-  window.open(f.data,'_blank');
+  window.open(f.url||f.data,'_blank');
 }
 function dlKbFile(kid,idx){
   const k=data.kb.find(x=>x.id===kid);if(!k)return;
   const f=(k.files||[])[idx];if(!f)return;
   const a=document.createElement('a');
-  a.href=f.data;a.download=f.name||'附件';
+  a.href=f.url||f.data;a.download=f.name||'附件';
   document.body.appendChild(a);a.click();a.remove();
 }
 function delKB(id){if(!confirm('删除该知识条目？'))return;data.kb=data.kb.filter(k=>k.id!=id);saveData();renderKB()}
@@ -2130,6 +2170,7 @@ function openSync(){
   if(sync.enabled){
     document.getElementById('syncToken').value=sync.token;
     document.getElementById('syncGist').value=sync.gistId||'';
+    document.getElementById('syncUploadToken').value=sync.uploadToken||'';
     document.getElementById('syncActions').style.display='block';
     document.getElementById('syncLink').value=location.origin+location.pathname+'#gist='+sync.gistId+'&t='+encodeURIComponent(sync.token);
   }else{
@@ -2142,12 +2183,13 @@ function closeSync(){document.getElementById('syncMask').classList.add('hidden')
 async function saveSync(){
   const token=document.getElementById('syncToken').value.trim();
   const gist=document.getElementById('syncGist').value.trim();
+  const up=document.getElementById('syncUploadToken').value.trim();
   const err=document.getElementById('syncErr');
   err.textContent='';
   if(!token){err.textContent='请填写 GitHub Token';return}
   setStatus('syncing');
   try{
-    sync={enabled:true,gistId:gist||null,token};
+    sync={enabled:true,gistId:gist||null,token,uploadToken:up||sync.uploadToken||''};
     if(!sync.gistId){await gistCreate();}
     else{
       const d=await gistRead();
@@ -2221,10 +2263,29 @@ function normalizeData(){
   if(!Array.isArray(data.kb))data.kb=[];
 }
 
-/* ============ 文件上传公用：附件（图片自动压缩 + 限额） ============ */
+/* ============ 文件上传：优先存到仓库 files/（放开容量），否则内嵌 Gist ============ */
+// 把文件传到本仓库 files/ 目录（Git Blobs API，单文件可达几十 MB），返回 raw URL
+async function uploadToRepo(blob, origName){
+  if(!sync.uploadToken) throw new Error('未配置上传 Token');
+  const owner='toby3611', repo='factory-compliance-workbench', branch='main';
+  const safe=Date.now()+'_'+origName.replace(/[^\w.\-]+/g,'_');
+  const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(blob);});
+  const H={'Authorization':'token '+sync.uploadToken,'Content-Type':'application/json','Accept':'application/vnd.github+json'};
+  const ref=await (await fetch(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`,{headers:H})).json();
+  if(!ref.object) throw new Error('获取分支失败');
+  const baseSha=ref.object.sha;
+  const blobJson=await (await fetch(`https://api.github.com/repos/${owner}/${repo}/git/blobs`,{method:'POST',headers:H,body:JSON.stringify({content:b64,encoding:'base64'})})).json();
+  if(!blobJson.sha) throw new Error('上传文件失败');
+  const treeJson=await (await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees`,{method:'POST',headers:H,body:JSON.stringify({base_tree:baseSha,tree:[{path:'files/'+safe,mode:'100644',type:'blob',sha:blobJson.sha}]})})).json();
+  const cmJson=await (await fetch(`https://api.github.com/repos/${owner}/${repo}/git/commits`,{method:'POST',headers:H,body:JSON.stringify({message:'add file '+safe,tree:treeJson.sha,parents:[baseSha]})})).json();
+  const up=await fetch(`https://api.github.com/repos/${owner}/${repo}/git/refs/heads/${branch}`,{method:'PATCH',headers:H,body:JSON.stringify({sha:cmJson.sha})});
+  if(!up.ok) throw new Error('更新分支失败');
+  return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/files/${encodeURIComponent(safe)}`;
+}
+
 // opts: { maxKB=500, autoCompress=true }
-// 返回 Promise<{name,mime,size,data:'data:..;base64,...'} | null>；null = 跳过
-function attachFile(input, opts = {}) {
+// 返回 Promise<{name,mime,size,url} | {name,mime,size,data} | null>；null = 跳过
+async function attachFile(input, opts = {}) {
   const maxKB = opts.maxKB || 500;
   const autoCompress = opts.autoCompress !== false;
   // 接受 File / Blob 或 input 元素
@@ -2239,52 +2300,54 @@ function attachFile(input, opts = {}) {
   if (!f) return Promise.resolve(null);
   const isImage = (f.type || '').indexOf('image/') === 0;
   const isPdf = f.type === 'application/pdf';
-  const isWord = /\.(doc|docx|xls|xlsx|ppt|pptx)$/i.test(f.name);
-  const runRead = () => new Promise((resolve, reject) => {
+  if (!isImage && !isPdf) {
+    toast('此格式浏览器不能预览，建议先转 PDF 或截图传图');
+    return Promise.resolve(null);
+  }
+  let blob = f;
+  // 图片自动压缩（PNG/BMP/TIFF 等大幅图转 JPG 质量 0.8、最长边 1600px），减小体积
+  if (autoCompress && isImage) {
+    try {
+      const compressed = await imageCompress(f, { maxSide: 1600, quality: 0.8 });
+      if (compressed && compressed.size < f.size) blob = compressed;
+    } catch (e) { console.warn('compress fail use original', e); }
+  }
+  // 已配置仓库上传 Token → 存到仓库 files/（容量从 1MB 提升到几十 MB，单文件可达几十 MB）
+  if (sync.uploadToken) {
+    try {
+      toast('正在上传到仓库…');
+      const url = await uploadToRepo(blob, f.name);
+      const finalName = (blob === f) ? f.name : f.name.replace(/\.(png|bmp|tiff?)$/i, '.jpg');
+      const finalType = (blob === f) ? f.type : (blob.type || 'image/jpeg');
+      return { name: finalName, mime: finalType, size: blob.size, url };
+    } catch (e) {
+      console.warn('repo upload failed, fallback base64', e);
+      toast('仓库上传失败，改以内嵌保存：' + e.message);
+    }
+  }
+  // 回退：内嵌 base64（受 Gist 1MB 总容量限制）
+  if (blob.size > maxKB * 1024) {
+    const tips = isPdf
+      ? `PDF 仍 ${(blob.size / 1024).toFixed(0)}KB 超过 ${maxKB}KB，请先压缩；或在同步设置里配置“文件上传 Token”放开容量`
+      : `图 ${(blob.size / 1024).toFixed(0)}KB 超过 ${maxKB}KB，请裁剪/降分辨率后重试`;
+    toast(tips);
+    return null;
+  }
+  // 转 base64 dataURL
+  const dataUrl = await new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.onerror = reject;
-    reader.readAsDataURL(f);
+    reader.readAsDataURL(blob);
   });
-  return (async () => {
-    // Word/Excel 等不能压缩也不在浏览器预览——直接拒绝，引导 PDF/图
-    if (!isImage && !isPdf) {
-      toast('此格式浏览器不能预览，建议先转 PDF 或截图传图');
-      return null;
-    }
-    let blob = f;
-    // 图片自动压缩（PNG/BMP/TIFF 等大幅图转 JPG 质量 0.8、最长边 1600px）
-    if (autoCompress && isImage) {
-      try {
-        const compressed = await imageCompress(f, { maxSide: 1600, quality: 0.8 });
-        if (compressed && compressed.size < f.size) blob = compressed;
-        if (compressed) console.log(`图片压缩 ${(f.size / 1024).toFixed(0)}KB → ${(compressed.size / 1024).toFixed(0)}KB`);
-      } catch (e) { console.warn('compress fail use original', e); }
-    }
-    // 压缩后再判大小
-    if (blob.size > maxKB * 1024) {
-      const tips = isPdf
-        ? `PDF 仍 ${(blob.size / 1024).toFixed(0)}KB 超过 ${maxKB}KB，请先用 PDF 工具压缩后再传（Gist 总容量约 1MB）`
-        : `图 ${(blob.size / 1024).toFixed(0)}KB 超过 ${maxKB}KB，请裁剪/降分辨率后重试`;
-      toast(tips);
-      return null;
-    }
-    // 转 base64 dataURL
-    const dataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-    const b64Len = dataUrl.split(',')[1]?.length || 0;
-    if (b64Len > 700 * 1024) {
-      toast('编码后过大，请进一步压缩');
-      return null;
-    }
-    const finalType = blob === f ? f.type : (blob.type || 'image/jpeg');
-    const finalName = blob === f ? f.name : (f.name.replace(/\.(png|bmp|tiff?)$/i, '.jpg'));
-    return { name: finalName, mime: finalType, size: blob.size, data: dataUrl };
-  })();
+  const b64Len = dataUrl.split(',')[1]?.length || 0;
+  if (b64Len > 700 * 1024) {
+    toast('编码后过大，请进一步压缩');
+    return null;
+  }
+  const finalType = blob === f ? f.type : (blob.type || 'image/jpeg');
+  const finalName = blob === f ? f.name : (f.name.replace(/\.(png|bmp|tiff?)$/i, '.jpg'));
+  return { name: finalName, mime: finalType, size: blob.size, data: dataUrl };
 }
 // 浏览器端图片压缩：最长边 maxSide，JPG quality
 function imageCompress(file, opts = {}) {
@@ -2325,7 +2388,8 @@ function imageCompress(file, opts = {}) {
 /* ============ 证书库 ============ */
 let pendingCertFile=null;
 function onCertFile(input){
-  attachFile(input, { maxKB: 500, autoCompress: true }).then(file => {
+  const f0=input.files&&input.files[0];
+  attachFile(input, { maxKB: 500, autoCompress: true }).then(async file => {
     if (!file) return;
     pendingCertFile = file;
     document.getElementById('certFileMeta').textContent = '已选文件：' + file.name + '（' + (file.size / 1024).toFixed(0) + ' KB）';
@@ -2336,17 +2400,18 @@ function onCertFile(input){
     document.getElementById('certIssued').value = todayStr();
     document.getElementById('certExpiry').value = '';
     document.getElementById('certScope').value = '';
-    if (file.mime === 'application/pdf') autoExtractPdf(file.data);
+    // 从本地原文件提取 PDF 信息（仓库模式 file.data 为空，故用原文件 f0）
+    if (f0 && f0.type === 'application/pdf') { try { await autoExtractPdf(f0); } catch(e){ console.warn('pdf auto-extract skipped',e); } }
     document.getElementById('certFormWrap').scrollIntoView({ behavior: 'smooth' });
   });
 }
-async function autoExtractPdf(dataUrl){
+async function autoExtractPdf(src){
   try{
     if(!window.pdfjsLib){
       await new Promise((res,rej)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';s.onload=res;s.onerror=rej;document.head.appendChild(s)});
       window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
     }
-    const buf=await fetch(dataUrl).then(r=>r.arrayBuffer());
+    const buf = (typeof src==='string') ? await fetch(src).then(r=>r.arrayBuffer()) : await src.arrayBuffer();
     const pdf=await window.pdfjsLib.getDocument({data:buf}).promise;
     let txt='';
     for(let i=1;i<=Math.min(pdf.numPages,3);i++){const p=await pdf.getPage(i);const c=await p.getTextContent();txt+=c.items.map(it=>it.str).join(' ')+' ';}
@@ -2365,13 +2430,13 @@ function saveCert(e){
   data.certs.push({id:maxId+1,type:document.getElementById('certType').value,no:document.getElementById('certNo').value.trim(),
     issuer:document.getElementById('certIssuer').value.trim(),issued:document.getElementById('certIssued').value,
     expiry:document.getElementById('certExpiry').value,scope:document.getElementById('certScope').value.trim(),
-    name:pendingCertFile.name,mime:pendingCertFile.mime,size:pendingCertFile.size,data:pendingCertFile.data,ts:Date.now()});
+    name:pendingCertFile.name,mime:pendingCertFile.mime,size:pendingCertFile.size,data:pendingCertFile.data,url:pendingCertFile.url,ts:Date.now()});
   pendingCertFile=null;
   document.getElementById('certFormWrap').style.display='none';
   saveData();renderCerts();toast('证书已保存');
 }
 function cancelCert(){pendingCertFile=null;document.getElementById('certFormWrap').style.display='none';document.getElementById('certFileMeta').textContent=''}
-function viewCert(id){const c=data.certs.find(x=>x.id==id);if(c)window.open(c.data,'_blank')}
+function viewCert(id){const c=data.certs.find(x=>x.id==id);if(c)window.open(c.url||c.data,'_blank')}
 function delCert(id){if(!confirm('删除该证书？'))return;data.certs=data.certs.filter(c=>c.id!=id);saveData();renderCerts();toast('已删除')}
 function renderCerts(){
   normalizeData();
@@ -2382,7 +2447,7 @@ function renderCerts(){
     const over=c.expiry&&c.expiry<t;
     const soon=c.expiry&&!over&&(new Date(c.expiry)-new Date(t))<=60*DAY;
     const thumb=c.mime&&c.mime.indexOf('image/')===0?
-      `<img class="cert-thumb" src="${c.data}" onclick="viewCert(${c.id})" alt="">`:
+      `<img class="cert-thumb" src="${c.url||c.data}" onclick="viewCert(${c.id})" alt="">`:
       `<div class="cert-thumb" onclick="viewCert(${c.id})">PDF</div>`;
     return `<div class="cert-card">
       ${thumb}
@@ -2559,6 +2624,9 @@ async function _wbBoot(){
   }else{
     showLoginGate();
   }
+  // 自动更新：每分钟检测跨天，跨天则重算今日待办（数据/同步变动已由 renderAll 触发）
+  let _lastToday=todayStr();
+  setInterval(()=>{ const tt=todayStr(); if(tt!==_lastToday){ _lastToday=tt; const td=document.getElementById('todayDate'); if(td) td.textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'}); renderToday(); } }, 60000);
 }
 (function(){
   // DOM 就绪后再启动：防止 auth-gate 等关键节点尚未解析就被同步路径引用
