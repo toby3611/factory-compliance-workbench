@@ -1174,6 +1174,26 @@ function renderCards(){
   }).join('');
 }
 
+/* ============ 周期任务感知（首页/F 聚合共用）============ */
+// 周期任务 sub 集合：这些任务的 due 字段是历史日期，不该进"今日待办"或"真·待办"
+const PERIOD_SUBS=new Set(['ISO体系','可持续认证','客户平台验证',
+  '消防演习','应急演习','废水检测','仪器校准','人员检测',
+  '社会责任','环境','质量','每周检查','季度检查',
+  '会员续费','系统账户']);
+// 从 monthly[12] 数组里挑第一个 >今天 的有效日期作为 effective due
+// 解决 seed 静态 due 永远过期、所有周期任务都标「已逾期」的 bug
+function effectiveDue(t){
+  if(t.monthly && t.monthly.length===12){
+    const dates=t.monthly
+      .map(v=>(v||'').split('|')[0].trim())
+      .filter(v=>/^\d{4}-\d{2}-\d{2}$/.test(v))
+      .filter(v=>v>todayStr())
+      .sort();
+    if(dates.length) return dates[0];
+  }
+  return t.due||null;
+}
+
 /* ============ 今日待办：时间范围筛选 ============ */
 let todayRange=(localStorage.getItem('wb_today_range')||'today');
 function rangeEnd(){
@@ -1190,7 +1210,12 @@ function setTodayRange(r){ todayRange=r; try{localStorage.setItem('wb_today_rang
 function renderToday(){
   const t=todayStr();
   const end=rangeEnd();
-  let items=data.tasks.filter(x=>!x.done && x.due && x.due<=end).sort((a,b)=>a.due.localeCompare(b.due));
+  // 用 effectiveDue 替换周期任务的静态 due，并排除 PERIOD_SUBS 里的周期任务
+  // 这样「今日待办」只显示真·今日/近期待办，不再被周期任务淹没
+  let items=data.tasks.filter(x=>!x.done && !PERIOD_SUBS.has(x.sub))
+    .map(x=>Object.assign({},x,{due:effectiveDue(x)}))
+    .filter(x=>x.due && x.due<=end)
+    .sort((a,b)=>a.due.localeCompare(b.due));
   if(todayRange==='all') items=items.slice(0,30);
   const box=document.getElementById('todayList');
   const cnt=document.getElementById('todayCount');
@@ -2056,19 +2081,7 @@ function addSubTask(){
 /* ============ F 聚合视图 ============ */
 function renderFAggregator(){
   const today=todayStr();
-  // 周期任务 helper：从 monthly[12] 数组里挑第一个 >今天 的有效日期作为 effective due
-  // （解决 seed 静态 due 永远过期、所有周期任务都标「已逾期」的 bug）
-  function effectiveDue(t){
-    if(t.monthly && t.monthly.length===12){
-      const dates=t.monthly
-        .map(v=>(v||'').split('|')[0].trim())  // 拆掉客户/done 后缀
-        .filter(v=>/^\d{4}-\d{2}-\d{2}$/.test(v))
-        .filter(v=>v>today)  // 只看未来的
-        .sort();
-      if(dates.length) return dates[0];  // 取最早的下一个
-    }
-    return t.due||null;
-  }
+  // effectiveDue 和 PERIOD_SUBS 已提到模块顶层，renderToday 也共用
   // 1. 证书到期提醒：取 1 认证管理 + sub 范围证书/TC申请/GRS-GOTS认证 的 60 天窗口内到期项
   //    窗口 = [今天-60天, 今天+60天] 之外的一律不提醒（60 天以上过期的、或很久以后才到期的都隐藏）
   const _w=new Date(today);_w.setDate(_w.getDate()-60);
@@ -2104,28 +2117,25 @@ function renderFAggregator(){
       <div class="due ${s==='bad'?'over':''}">认证台账 · ${s==='bad'?'已过期':'60天内到期'} ${esc(a.expire||'')}</div></div>
     </div>`).join('')}</div>`:'';
 
-  // 3. 检测/演练计划：5 EHS安全应急演习（消防演习/应急演习）+ 7 检测校准管理（废水检测/仪器校准）
-  //    只显示 [今天-60天, 今天+60天] 窗口内的；超过 60 天的远期不提醒（避免 2030 年 4 月的校准塞进首页）
+  // 3. 检测/演练计划：5 EHS安全应急演习 + 7 检测校准管理
+  //    只显示 [今天-60天, 今天+60天] 窗口内的；超过 60 天的远期不提醒
   const detSubs=['消防演习','应急演习','废水检测','仪器校准','人员检测'];
   const detects=data.tasks.filter(x=>detSubs.includes(x.sub) && !x.done)
     .map(t=>Object.assign({},t,{due:effectiveDue(t)}))
     .filter(x=>x.due && x.due>=winS && x.due<=winE)
     .sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,12);
 
-  // 2. 验厂排期：2 客户验厂（社会责任/环境/质量）+ 6 本部门日常检查（同窗口过滤）
+  // 2. 验厂排期：2 客户验厂 + 6 本部门日常检查（同窗口过滤）
   const auditSubs=['社会责任','环境','质量','每周检查','季度检查'];
   const audits=data.tasks.filter(x=>auditSubs.includes(x.sub) && !x.done)
     .map(t=>Object.assign({},t,{due:effectiveDue(t)}))
     .filter(x=>x.due && x.due>=winS && x.due<=winE)
     .sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,12);
 
-  // 4. 待办清单：跨模块聚合 - 仅显示 1 认证/7 检测/8 会员/11 行程 等非常规周期外的「真·今日待办」
-  //    周期任务 (1 认证 + 5/6/7/8 全部 + 部分 2 客户验厂) 的 due 字段语义是「上次/下次应做时间」，
-  //    不该和"今日工作"混在一起。改：只挑 cat=2(客户验厂) 但 sub≠周期 + cat=3(平台上传) + cat=4(数据统计)
-  //    + cat=6(本部门检查) sub≠周期 + cat=9(EHS检查表) + cat=10(碳减排) + cat=11(行程报销)
-  //    简化：排除 cat=1/5/7/8/以及2类里的"社会责任/环境/质量"（这些是周期性的）
-  const periodSubSet=new Set([...certSubs,...detSubs,...auditSubs,'会员续费','系统账户']);
-  const todos=data.tasks.filter(x=>!x.done && x.due && x.due<=today && !periodSubSet.has(x.sub))
+  // 4. 待办清单：跨模块聚合 - 排除周期任务
+  const todos=data.tasks.filter(x=>!x.done && !PERIOD_SUBS.has(x.sub))
+    .map(t=>Object.assign({},t,{due:effectiveDue(t)}))
+    .filter(x=>x.due && x.due<=today)
     .sort((a,b)=>a.due.localeCompare(b.due)).slice(0,20);
 
   const renderList=(items,emptyText)=>items.length?
