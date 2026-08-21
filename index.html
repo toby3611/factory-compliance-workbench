@@ -777,11 +777,7 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
           <h2>填写证书信息（自动抓取的会预填，请核对）</h2>
           <form id="certForm" style="display:grid;gap:8px;margin:10px 0">
             <div class="row">
-              <select id="certType" style="flex:1;min-width:120px">
-                <option value="">请选择类型</option><option>GRS</option><option>GOTS</option><option>RCS</option><option>OCS</option>
-                <option>OEKO-TEX</option><option>Regenagri</option><option>BCI</option>
-                <option>RWS</option><option>RDS</option><option>Bluesign</option><option>其它</option>
-              </select>
+              <select id="certType" style="flex:1;min-width:120px"></select>
               <input id="certNo" placeholder="证书编号…" style="flex:2;min-width:140px">
             </div>
             <input id="certIssuer" placeholder="发证机构…">
@@ -2406,6 +2402,22 @@ function onCertFile(input){
     document.getElementById('certFormWrap').scrollIntoView({ behavior: 'smooth' });
   });
 }
+
+/* ===== 证书类型：单一数据源（下拉框与识别共用，杜绝选项漂移） ===== */
+const CERT_TYPES=[
+  'GOTS','GRS','RCS','OCS','OEKO-TEX','Regenagri','BCI','RWS','RDS','Bluesign',
+  'FSC','PEFC','ISO 9001','ISO 14001','ISO 45001','ISO 50001','SA8000','WRAP',
+  'Fairtrade','Higg','ZDHC','EU Ecolabel','其它'
+];
+function initCertTypeSelect(){
+  const sel=document.getElementById('certType'); if(!sel)return;
+  sel.innerHTML='<option value="">请选择类型</option>'+CERT_TYPES.map(t=>`<option>${t}</option>`).join('');
+}
+function ensureCertTypeOption(v){
+  if(!v)return; const sel=document.getElementById('certType'); if(!sel)return;
+  if(![...sel.options].some(o=>o.value===v)){const op=document.createElement('option');op.value=v;op.textContent=v;sel.appendChild(op);}
+}
+
 async function autoExtractPdf(src){
   try{
     if(!window.pdfjsLib){
@@ -2421,62 +2433,92 @@ async function autoExtractPdf(src){
 
     // 1. 发证机构（常见认证机构列表匹配，长名优先避免误判）
     const issuerList=[
-      [/(?:ECOCERT[\s\-]?Greenlife)/i,'ECOCERT Greenlife'],
-      [/(?:Control Union Certifications|Control Union Inspections|Control Union|Peterson Control Union|CU Inspections)/i,'Control Union'],
-      [/(?:Hohenstein Institute|Institute for Hygiene)/i,'OEKO-TEX / Hohenstein'],
+      [/(?:Control Union Certifications|Control Union Inspections|Peterson Control Union|CU Inspections|Control Union)/i,'Control Union'],
+      [/(?:ECOCERT[\s\-]?Greenlife|ECOCERT SA|Ecocert)/i,'ECOCERT'],
       [/(?:Istituto per la Certificazione Etica e Ambientale|\bICEA\b)/i,'ICEA'],
       [/(?:IMO Control|Institute for Market Ecology)/i,'IMO Control'],
-      [/GCL International/i,'GCL International'],
-      [/(?:TÜV\s?Rheinland|TUV\s?Rheinland|TÜV\s?SÜD|TUV\s?SUD)/i,'TÜV'],
+      [/(?:IDFL|International Down and Feather Laboratory)/i,'IDFL'],
+      [/(?:ETKO|ECO Textile Kft|Eco Textile)/i,'ETKO'],
+      [/(?:OneCert|OneCert International)/i,'OneCert'],
+      [/(?:Naturland)/i,'Naturland'],
+      [/(?:KRAV)/i,'KRAV'],
+      [/(?:Soil Association)/i,'Soil Association'],
+      [/(?:CERES Certification|ÇED)/i,'CERES'],
+      [/(?:CCPB)/i,'CCPB'],
+      [/(?:GCL International)/i,'GCL International'],
+      [/(?:Hohenstein Institute|Institute for Hygiene and Biotechnology|OEKO-TEX|ÖKO-TEX)/i,'OEKO-TEX / Hohenstein'],
+      [/(?:TÜV\s?Rheinland|TUV\s?Rheinland)/i,'TÜV Rheinland'],
+      [/(?:TÜV\s?SÜD|TUV\s?SUD)/i,'TÜV SÜD'],
+      [/(?:TÜV\s?NORD|TUV\s?NORD)/i,'TÜV NORD'],
       [/\bSGS\b/i,'SGS'],
       [/Bureau Veritas/i,'Bureau Veritas'],
       [/Intertek/i,'Intertek'],
+      [/Eurofins/i,'Eurofins'],
+      [/(?:DNV\s?GL|DNV Business Assurance|DNV)/i,'DNV'],
+      [/(?:LRQA|Lloyd's Register)/i,'LRQA'],
+      [/(?:Kiwa)/i,'Kiwa'],
+      [/(?:NSF International|NSF)/i,'NSF'],
+      [/(?:AFNOR)/i,'AFNOR'],
       [/(?:USDA|United States Department of Agriculture)/i,'USDA'],
-      [/(?:Fairtrade International|Fair Trade International)/i,'Fairtrade'],
-      [/Better Cotton Initiative/i,'BCI'],
-      [/ZDHC/i,'ZDHC']
+      [/(?:Fairtrade International|Fair Trade International|FLOCERT)/i,'Fairtrade / FLOCERT'],
+      [/(?:China Quality Certification Centre|\bCQC\b)/i,'CQC'],
+      [/(?:CNAS|China National Accreditation Service)/i,'CNAS'],
+      [/Textile Exchange/i,'Textile Exchange']
     ];
     for(const [re,name] of issuerList){if(re.test(txt)){setIfEmpty('certIssuer',name);break;}}
 
-    // 2. 证书类型（缩写优先 + 全称兜底；GOTS 排在 GRS 前，避免被 GRS 误中）
-    const typeList=[
-      [/\bGOTS\b/i,'GOTS'],
-      [/Global Organic Textile Standard/i,'GOTS'],
-      [/\bGRS\b/i,'GRS'],
-      [/Global Recycled Standard/i,'GRS'],
-      [/\bRCS\b/i,'RCS'],
-      [/Recycled Claim Standard/i,'RCS'],
-      [/\bOEKO[\-\s]?TEX\b/i,'OEKO-TEX'],
+    // 2. 证书类型（关键词 → 类型；ISO 特判具体编号；命中不在下拉框则动态补选项）
+    const typeKeywords=[
+      [/\bGOTS\b/i,'GOTS'],[/Global Organic Textile Standard/i,'GOTS'],
+      [/\bGRS\b/i,'GRS'],[/Global Recycled Standard/i,'GRS'],
+      [/\bRCS\b/i,'RCS'],[/Recycled Claim Standard/i,'RCS'],
+      [/\bOCS\b/i,'OCS'],[/Organic Content Standard/i,'OCS'],
       [/OEKO[\-\s]?TEX/i,'OEKO-TEX'],
-      [/\bRegenagri\b/i,'Regenagri'],
-      [/\bBCI\b|Better Cotton Initiative/i,'BCI'],
+      [/\bRegenagri\b/i,'Regenagri'],[/Regenerative Agriculture/i,'Regenagri'],
+      [/\bBCI\b|Better Cotton/i,'BCI'],
       [/\bRWS\b|Responsible Wool Standard/i,'RWS'],
       [/\bRDS\b|Responsible Down Standard/i,'RDS'],
-      [/bluesign|Bluesign/i,'Bluesign']
+      [/bluesign/i,'Bluesign'],
+      [/\bFSC\b|Forest Stewardship Council/i,'FSC'],
+      [/\bPEFC\b/i,'PEFC'],
+      [/Fairtrade|Fair Trade/i,'Fairtrade'],
+      [/\bHigg\b/i,'Higg'],
+      [/\bZDHC\b/i,'ZDHC'],
+      [/EU Ecolabel|EU Eco-?label/i,'EU Ecolabel'],
+      [/\bWRAP\b/i,'WRAP'],
+      [/SA8000|Social Accountability 8000/i,'SA8000']
     ];
-    for(const [re,name] of typeList){if(re.test(txt)){setIfEmpty('certType',name);break;}}
+    const isoM=txt.match(/ISO\s?(\d{4,5})/i);
+    if(isoM){const v='ISO '+isoM[1];ensureCertTypeOption(v);setIfEmpty('certType',v);}
+    for(const [re,name] of typeKeywords){if(re.test(txt)){ensureCertTypeOption(name);setIfEmpty('certType',name);break;}}
 
-    // 3. 有效期 + 4. 发证日期（关键词附近日期优先；过期证书也能识别）
-    const grabAfter=re=>{const m=txt.match(re);if(!m)return null;const d=m[1].match(/\d{4}[-/.](1[0-2]|0?[1-9])[-/.](3[01]|[12]\d|0?[1-9])/);return d?d[0].replace(/[\/.]/g,'-'):null;};
-    const expKey=grabAfter(/(?:Validity\s*to|Valid\s*(?:until|through)|Date\s*of\s*expiry|Expiry\s*date|Expires\s*on|Valid\s*up\s*to|Valid\s*to|有效期至|有效日期|有效期|Expiration\s*date)\s*[:：]?\s*([^\n]{1,30})/i)
+    // 3+4. 有效期 / 发证日期（支持「有效期：起 至 止」范围格式 + 关键词附近日期）
+    const normD=s=>{const m=s&&s.match(/(\d{4})[-/.](1[0-2]|0?[1-9])[-/.](3[01]|[12]\d|0?[1-9])/);return m?m[0].replace(/[\/.]/g,'-'):null;};
+    const grabAfter=re=>{const m=txt.match(re);return m?normD(m[1]):null;};
+    let expiry=null,issued=null;
+    const rangeM=txt.match(/(?:Period\s*of\s*validity|Valid(?:ity)?\s*(?:period)?|有效期|有效期间)\s*[:：]?\s*([^\n]{1,40}?)\s*(?:[\u2014—~～\-–至to]+)\s*([^\n]{1,30})/i);
+    if(rangeM){issued=normD(rangeM[1]);expiry=normD(rangeM[2]);}
+    const expKey=grabAfter(/(?:Validity\s*to|Valid\s*(?:until|through)|Date\s*of\s*expiry|Expiry\s*date|Expires\s*on|Valid\s*up\s*to|Valid\s*to|有效期至|有效日期|有效期|Expiration\s*date|截止日期|到期)\s*[:：]?\s*([^\n]{1,30})/i)
               ||grabAfter(/\bto\s*[:：]\s*([0-9\-\/\.\s]{6,12})/i);
-    const issKey=grabAfter(/(?:Issue\s*date|Date\s*of\s*issue|Issued\s*(?:on|date)|Valid\s*from|Valid\s*from\s*date|Start\s*date|发证日期|签发日期|签发于)\s*[:：]?\s*([^\n]{1,30})/i);
+    const issKey=grabAfter(/(?:Issue\s*date|Date\s*of\s*issue|Issued\s*(?:on|date)|Valid\s*from|Valid\s*from\s*date|Start\s*date|发证日期|签发日期|签发于|起始日期)\s*[:：]?\s*([^\n]{1,30})/i);
     const allDates=[...new Set([...txt.matchAll(/\b(20\d{2})[-/.](1[0-2]|0?[1-9])[-/.](3[01]|[12]\d|0?[1-9])\b/g)].map(m=>m[0].replace(/[\/.]/g,'-')))].sort();
-    const expiry=expKey||(allDates.length?allDates[allDates.length-1]:null);
-    const issued=issKey||(allDates.length?(allDates.filter(d=>d!==expiry&&d<=t).pop()||allDates[0]):null);
+    if(!expiry)expiry=expKey||(allDates.length?allDates[allDates.length-1]:null);
+    if(!issued)issued=issKey||(allDates.length?(allDates.filter(d=>d!==expiry&&d<=t).pop()||allDates[0]):null);
     if(expiry)setIfEmpty('certExpiry',expiry);
     if(issued)setIfEmpty('certIssued',issued);
 
-    // 5. 证书编号（多种写法都试）
+    // 5. 证书编号（覆盖 Cert No / Scope Cert / License / Registration / Ref / No. / 编号 / 注册号 等写法）
     const noPatterns=[
-      /(?:Scope\s*Cert(?:ificate)?\.?\s*(?:No|Number)|Cert(?:ificate)?\.?\s*(?:No|Number)|证书号|证书编号|编号)\s*[:#]?\s*([A-Z0-9][A-Z0-9\-_/]{5,50})/i,
-      /\bCert\s*No[.:]\s*([A-Z0-9][A-Z0-9\-]{5,50})/i,
-      /Scope\s*Cert\.?\s*No\.?\s*[:#]?\s*([A-Z0-9][A-Z0-9\-_/]{5,50})/i
+      /(?:证书号|证书编号|编号|证号|注册号|登记号|注册证书号)\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/]{4,55})/i,
+      /(?:Scope\s*Cert(?:ificate)?\.?\s*(?:No|Number|#)|Cert(?:ificate)?\.?\s*(?:No|Number|ID|#)|License\s*(?:No|Number)?|Registration\s*(?:No|Number)?|Reference|Ref|Certificate\s*ID)\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55})/i,
+      /\bCert(?:ificate)?\s*No\.?\s*([A-Za-z0-9][A-Za-z0-9\-]{4,55})/i,
+      /\bNo\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{5,55})/i,
+      /\bID\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55})/i
     ];
     for(const re of noPatterns){const m=txt.match(re);if(m&&m[1]){setIfEmpty('certNo',m[1].trim());break;}}
 
     // 6. 范围（取关键词后第一段有效文本）
-    const scopeM=txt.match(/(?:Scope\s*of\s*(?:Registration|Certification)|Product\s*Scope|Scope\s*:|范围\s*[:：])\s*([^\n.;。]{6,120})/i);
+    const scopeM=txt.match(/(?:Scope\s*of\s*(?:Registration|Certification)|Product\s*Scope|Scope\s*:|范围\s*[:：]|认证范围)\s*([^\n.;。]{6,140})/i);
     if(scopeM)setIfEmpty('certScope',scopeM[1].replace(/^[\s:：\-—]+/,'').trim());
 
     // DEBUG: 把识别后的字段值 dump 到 console + toast，方便排查
@@ -2670,6 +2712,7 @@ function doLogout(){clearSession();location.reload();}
 /* ============ 启动 ============ */
 async function _wbBoot(){
   document.getElementById('todayDate').textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
+  initCertTypeSelect();
 
   loadSyncCfg();
   if(sync.enabled){
