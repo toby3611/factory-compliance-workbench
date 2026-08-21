@@ -2415,11 +2415,63 @@ async function autoExtractPdf(src){
     const pdf=await window.pdfjsLib.getDocument({data:buf}).promise;
     let txt='';
     for(let i=1;i<=Math.min(pdf.numPages,3);i++){const p=await pdf.getPage(i);const c=await p.getTextContent();txt+=c.items.map(it=>it.str).join(' ')+' ';}
-    const dates=[...txt.matchAll(/\b(20\d{2})[-/.](1[0-2]|0?[1-9])[-/.](3[01]|[12]\d|0?[1-9])\b/g)].map(m=>m[0].replace(/\//g,'-'));
-    const future=dates.filter(d=>d>=todayStr()).sort();
-    if(future.length)document.getElementById('certExpiry').value=future[future.length-1];
-    const no=txt.match(/(?:No|Certificate|Cert|编号|No\.)\.?\s*[:#]?\s*([A-Z0-9][A-Z0-9\-]{5,})/i);
-    if(no)document.getElementById('certNo').value=no[1];
+    const t=todayStr();
+    const setIfEmpty=(id,v)=>{const el=document.getElementById(id);if(v && !el.value)el.value=v;};
+
+    // 1. 发证机构（常见认证机构列表匹配，长名优先避免误判）
+    const issuerList=[
+      [/(?:ECOCERT[\s\-]?Greenlife)/i,'ECOCERT Greenlife'],
+      [/(?:Control Union Certifications|Control Union Inspections|Control Union)/i,'Control Union'],
+      [/(?:Hohenstein Institute|Institute for Hygiene)/i,'OEKO-TEX / Hohenstein'],
+      [/(?:Istituto per la Certificazione Etica e Ambientale|\bICEA\b)/i,'ICEA'],
+      [/(?:IMO Control|Institute for Market Ecology)/i,'IMO Control'],
+      [/GCL International/i,'GCL International'],
+      [/(?:TÜV\s?Rheinland|TUV\s?Rheinland|TÜV\s?SÜD|TUV\s?SUD)/i,'TÜV'],
+      [/\bSGS\b/i,'SGS'],
+      [/Bureau Veritas/i,'Bureau Veritas'],
+      [/Intertek/i,'Intertek'],
+      [/(?:USDA|United States Department of Agriculture)/i,'USDA'],
+      [/(?:Fairtrade International|Fair Trade International)/i,'Fairtrade'],
+      [/Better Cotton Initiative/i,'BCI'],
+      [/ZDHC/i,'ZDHC']
+    ];
+    for(const [re,name] of issuerList){if(re.test(txt)){setIfEmpty('certIssuer',name);break;}}
+
+    // 2. 证书类型（关键词命中覆盖默认值）
+    const typeList=[
+      [/Global Organic Textile Standard/i,'GOTS'],
+      [/(?:Global Recycled Standard|GRS(?!\s*e))/i,'GRS'],
+      [/(?:Recycled Claim Standard|\bRCS\b)/i,'RCS'],
+      [/OEKO[\-\s]?TEX/i,'OEKO-TEX'],
+      [/Regenagri/i,'Regenagri'],
+      [/Better Cotton Initiative/i,'BCI'],
+      [/Responsible Wool Standard/i,'RWS'],
+      [/Responsible Down Standard/i,'RDS'],
+      [/bluesign|Bluesign/i,'Bluesign']
+    ];
+    for(const [re,name] of typeList){if(re.test(txt)){setIfEmpty('certType',name);break;}}
+
+    // 3. 有效期（PDF 中所有日期最晚的即为 expiry，过期证书也能识别）
+    const dates=[...txt.matchAll(/\b(20\d{2})[-/.](1[0-2]|0?[1-9])[-/.](3[01]|[12]\d|0?[1-9])\b/g)].map(m=>m[0].replace(/\//g,'-')).sort();
+    if(dates.length)setIfEmpty('certExpiry',dates[dates.length-1]);
+
+    // 4. 发证日期（排除 expiry，剩余中 ≤ today 最晚的一个）
+    const expVal=document.getElementById('certExpiry').value;
+    const issued=dates.filter(d=>d!==expVal && d<=t);
+    if(issued.length)setIfEmpty('certIssued',issued[issued.length-1]);
+
+    // 5. 证书编号（多种写法都试）
+    const noPatterns=[
+      /(?:Cert(?:ificate)?\.?\s*(?:No|Number|#)|证书号|证书编号|编号)\s*[:#]?\s*([A-Z0-9][A-Z0-9\-_/]{5,30})/i,
+      /\bCert\s*No[.:]\s*([A-Z0-9][A-Z0-9\-]{5,30})/i,
+      /Scope\s*Cert\.?\s*No\.?\s*[:#]?\s*([A-Z0-9][A-Z0-9\-]{5,30})/i
+    ];
+    for(const re of noPatterns){const m=txt.match(re);if(m&&m[1]){setIfEmpty('certNo',m[1].trim());break;}}
+
+    // 6. 范围（取关键词后第一段有效文本）
+    const scopeM=txt.match(/(?:Scope\s*of\s*(?:Registration|Certification)|Product\s*Scope|Scope\s*:|范围\s*[:：])\s*([^\n.;。]{6,120})/i);
+    if(scopeM)setIfEmpty('certScope',scopeM[1].trim());
+
     toast('已从 PDF 自动识别部分信息，请核对后保存');
   }catch(e){console.warn('pdf auto-extract skipped',e)}
 }
