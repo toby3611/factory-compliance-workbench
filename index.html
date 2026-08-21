@@ -2394,7 +2394,7 @@ function onCertFile(input){
     document.getElementById('certType').value = '';
     document.getElementById('certNo').value = '';
     document.getElementById('certIssuer').value = '';
-    document.getElementById('certIssued').value = todayStr();
+    document.getElementById('certIssued').value = '';
     document.getElementById('certExpiry').value = '';
     document.getElementById('certScope').value = '';
     // 从本地原文件提取 PDF 信息（仓库模式 file.data 为空，故用原文件 f0）
@@ -2550,7 +2550,7 @@ async function autoExtractPdf(src){
     for(const re of noPatterns){const m=txt.match(re);if(m&&m[1]){setIfEmpty('certNo',m[1].trim());break;}}
 
     // 6. 范围（取关键词后第一段有效文本）
-    const scopeM=txt.match(/(?:Scope\s*of\s*(?:Registration|Certification)|Product\s*Scope|Scope\s*:|范围\s*[:：]|认证范围)\s*([^\n.;。]{6,140})/i);
+    const scopeM=txt.match(/(?:Scope\s*of\s*(?:Registration|Certification)|Product\s*Scope|Scope\s*:|范围\s*[:：]|认证范围)\s*([^\n.;。]{6,140}?)(?=\s*(?:Certificate|No\.|Issued|Valid|Expiry|Registration|License|ID|$))/i);
     if(scopeM)setIfEmpty('certScope',scopeM[1].replace(/^[\s:：\-—]+/,'').trim());
 
     // DEBUG: 把识别后的字段值 dump 到 console + toast，方便排查
