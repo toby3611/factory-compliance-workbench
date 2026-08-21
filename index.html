@@ -2056,24 +2056,31 @@ function addSubTask(){
 /* ============ F 聚合视图 ============ */
 function renderFAggregator(){
   const today=todayStr();
-  // 1. 证书到期提醒：取 1 认证管理 + sub 范围证书/TC申请/GRS-GOTS认证 的未来 60 天到期项
+  // 1. 证书到期提醒：取 1 认证管理 + sub 范围证书/TC申请/GRS-GOTS认证 的 60 天窗口内到期项
+  //    窗口 = [今天-60天, 今天+60天] 之外的一律不提醒（60 天以上过期的、或很久以后才到期的都隐藏）
+  const _w=new Date(today);_w.setDate(_w.getDate()-60);
+  const winS=_w.toISOString().slice(0,10);
+  const _w2=new Date(today);_w2.setDate(_w2.getDate()+60);
+  const winE=_w2.toISOString().slice(0,10);
   const certSubs=['ISO体系','可持续认证','客户平台验证'];
-  const certs=data.tasks.filter(x=>x.cat==='1' && certSubs.includes(x.sub) && !x.done)
+  const certs=data.tasks.filter(x=>x.cat==='1' && certSubs.includes(x.sub) && !x.done && x.due && x.due>=winS && x.due<=winE)
     .sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).slice(0,12);
-  // 证书库里已上传的原件（按到期日聚合进提醒）
-  const heldCerts=(data.certs||[]).filter(c=>c.expiry).map(c=>{
-    const over=c.expiry<today;const soon=!over&&(new Date(c.expiry)-new Date(today))<=60*864e5;
+  // 证书库里已上传的原件（同窗口过滤）
+  const heldCerts=(data.certs||[]).filter(c=>c.expiry && c.expiry>=winS && c.expiry<=winE).map(c=>{
+    const over=c.expiry<today;
+    const soon=!over&&(new Date(c.expiry)-new Date(today))<=60*864e5;
     return {c,over,soon};
   }).sort((a,b)=>a.c.expiry.localeCompare(b.c.expiry)).slice(0,12);
   const heldHtml=heldCerts.length?`<div class="f-agg-list">${heldCerts.map(({c,over,soon})=>`
-    <div class="today-item ${over?'overdue':''}" onclick="showView('cert')">
-      <span class="tag P0">证</span>
+    <div class="today-item ${over?'overdue':''}" onclick="focusCert(${c.id})">
+      <span class="tag ${over?'P0':'P1'}">${over?'逾期':'临期'}</span>
       <div style="flex:1;min-width:0"><div style="font-size:13px">${esc(c.type||'证书')}${c.no?(' '+esc(c.no)):''} · ${esc(c.name||'')}</div>
       <div class="due ${over?'over':''}">证书库 · ${over?'已过期':'到期'} ${c.expiry}${soon?' · 60天内':''}</div></div>
     </div>`).join('')}</div>`:'';
 
-  // 认证台账里已过期 / 60 天内到期的认证（纳入同一条证书提醒）
+  // 认证台账里已过期 / 60 天内到期的认证（60 天以上过期的不提醒）
   const authReminds=(data.auths||[]).filter(a=>{const s=authStatus(a);return s==='bad'||s==='warn';})
+    .filter(a=>{if(!a.expire)return false;const d=(new Date(a.expire)-new Date(today))/864e5;return d>=-60;})
     .map(a=>({a,s:authStatus(a)})).sort((x,y)=>(x.a.expire||'9999').localeCompare(y.a.expire||'9999')).slice(0,12);
   const authHtml=authReminds.length?`<div class="f-agg-list">${authReminds.map(({a,s})=>`
     <div class="today-item ${s==='bad'?'overdue':''}" onclick="openSubModule('1')">
@@ -2585,19 +2592,102 @@ async function autoExtractPdf(src){
 }
 function saveCert(e){
   e.preventDefault();
-  if(!pendingCertFile){toast('请先选择文件');return;}
-  const maxId=data.certs.reduce((m,c)=>Math.max(m,c.id||0),0);
-  data.certs.push({id:maxId+1,type:document.getElementById('certType').value,no:document.getElementById('certNo').value.trim(),
+  const form=e.currentTarget;
+  const editId=form.dataset.editId?+form.dataset.editId:null;
+  if(!editId && !pendingCertFile){toast('请先选择文件');return;}
+  const fields={type:document.getElementById('certType').value,no:document.getElementById('certNo').value.trim(),
     issuer:document.getElementById('certIssuer').value.trim(),issued:document.getElementById('certIssued').value,
-    expiry:document.getElementById('certExpiry').value,scope:document.getElementById('certScope').value.trim(),
+    expiry:document.getElementById('certExpiry').value,scope:document.getElementById('certScope').value.trim()};
+  if(editId){
+    // 编辑模式：只改元数据，不动 PDF 二进制
+    const c=data.certs.find(x=>x.id===editId);if(!c){toast('证书不存在');return;}
+    Object.assign(c,fields);
+    form.dataset.editId='';
+    document.getElementById('certFormWrap').style.display='none';
+    pendingCertFile=null;
+    document.getElementById('certFileMeta').textContent='';
+    saveData();renderCerts();
+    if(typeof renderFView==='function')renderFView();
+    if(typeof renderToday==='function')renderToday();
+    toast('已更新该证书');
+    return;
+  }
+  const maxId=data.certs.reduce((m,c)=>Math.max(m,c.id||0),0);
+  data.certs.push({id:maxId+1,...fields,
     name:pendingCertFile.name,mime:pendingCertFile.mime,size:pendingCertFile.size,data:pendingCertFile.data,url:pendingCertFile.url,ts:Date.now()});
   pendingCertFile=null;
   document.getElementById('certFormWrap').style.display='none';
+  document.getElementById('certFileMeta').textContent='';
   saveData();renderCerts();toast('证书已保存');
 }
 function cancelCert(){pendingCertFile=null;document.getElementById('certFormWrap').style.display='none';document.getElementById('certFileMeta').textContent=''}
 function viewCert(id){const c=data.certs.find(x=>x.id==id);if(c)window.open(c.url||c.data,'_blank')}
 function delCert(id){if(!confirm('删除该证书？'))return;data.certs=data.certs.filter(c=>c.id!=id);saveData();renderCerts();toast('已删除')}
+// 快速修改到期日 - 只弹一个日期选择器，改一项即保存
+function quickEditCertExpiry(id){
+  const c=data.certs.find(x=>x.id==id);if(!c)return;
+  const cur=c.expiry||'';
+  // 用 prompt 不够友好（不能选日历），临时换成一个 inline date input
+  const old=document.getElementById('quickExp_'+id);
+  if(old){old.remove();return;}  // 再点一次收起
+  const span=document.getElementById('certExp_'+id);
+  if(!span)return;
+  const wrap=document.createElement('span');
+  wrap.id='quickExp_'+id;
+  wrap.style='display:inline-flex;gap:4px;align-items:center;margin-left:4px';
+  wrap.innerHTML=`<input type="date" value="${esc(cur)}" id="quickExpInput_${id}" style="font-size:12px;padding:2px 4px;border:1px solid var(--brand);border-radius:4px"><button class="mini" style="padding:2px 8px;font-size:11px;background:var(--brand);color:#fff" onclick="commitCertExpiry(${id})">保存</button><button class="mini" style="padding:2px 6px;font-size:11px" onclick="document.getElementById('quickExp_${id}').remove()">✕</button>`;
+  span.after(wrap);
+  const inp=document.getElementById('quickExpInput_'+id);
+  if(inp)inp.focus();
+}
+function commitCertExpiry(id){
+  const inp=document.getElementById('quickExpInput_'+id);if(!inp)return;
+  const v=inp.value;
+  if(!v){toast('请选择日期');return;}
+  const c=data.certs.find(x=>x.id==id);if(!c)return;
+  c.expiry=v;
+  saveData();
+  renderCerts();
+  // 同步刷新首页聚合提醒
+  if(typeof renderFView==='function')renderFView();
+  if(typeof renderToday==='function')renderToday();
+  toast('已更新到期日：'+v);
+}
+// 编辑证书 - 走完整表单（带 PDF + 类型 + 机构 + 范围）
+function editCert(id){
+  const c=data.certs.find(x=>x.id==id);if(!c)return;
+  document.getElementById('certFormWrap').style.display='block';
+  document.getElementById('certType').value=c.type||'';
+  document.getElementById('certNo').value=c.no||'';
+  document.getElementById('certIssuer').value=c.issuer||'';
+  document.getElementById('certIssued').value=c.issued||'';
+  document.getElementById('certExpiry').value=c.expiry||'';
+  document.getElementById('certScope').value=c.scope||'';
+  pendingCertFile=null;
+  document.getElementById('certFileMeta').textContent='编辑模式（不会替换已上传的 PDF，要替换请重新上传）';
+  // 把当前证书 id 暂存到表单 dataset，saveCert 时判断是新增还是更新
+  const form=document.getElementById('certForm');
+  form.dataset.editId=id;
+  document.getElementById('certFormWrap').scrollIntoView({behavior:'smooth',block:'center'});
+  toast('已载入该证书，点底部「保存证书」即可更新');
+}
+// 从提醒页点击跳转 → 跳到证书库 + 定位到该证书
+let pendingCertFocusId=null;
+function focusCert(id){
+  pendingCertFocusId=id;
+  showView('cert');
+  // 渲染后定位+高亮闪烁
+  setTimeout(()=>{
+    const el=document.querySelector('.cert-card[data-cert-id="'+id+'"]');
+    if(el){
+      el.scrollIntoView({behavior:'smooth',block:'center'});
+      el.style.transition='box-shadow .3s';
+      el.style.boxShadow='0 0 0 4px #ff7a45';
+      setTimeout(()=>{el.style.boxShadow='';},2500);
+    }
+    pendingCertFocusId=null;
+  },120);
+}
 function renderCerts(){
   normalizeData();
   const box=document.getElementById('certList');if(!box)return;
@@ -2609,18 +2699,20 @@ function renderCerts(){
     const thumb=c.mime&&c.mime.indexOf('image/')===0?
       `<img class="cert-thumb" src="${c.url||c.data}" onclick="viewCert(${c.id})" alt="">`:
       `<div class="cert-thumb" onclick="viewCert(${c.id})">PDF</div>`;
-    return `<div class="cert-card">
+    return `<div class="cert-card" data-cert-id="${c.id}">
       ${thumb}
       <div class="cert-main">
         <div class="cert-title"><span class="cert-badge">${esc(c.type||'证书')}</span>${esc(c.name||'未命名证书')}</div>
         <div class="cert-meta">
           ${c.no?('编号：'+esc(c.no)+'<br>'):''}
           ${c.issuer?('发证机构：'+esc(c.issuer)+'<br>'):''}
-          签发：${esc(c.issued||'—')} · 到期：<span class="${over||soon?'cert-expiry soon':''}">${esc(c.expiry||'—')}</span> ${over?'(已过期)':soon?'(60天内到期)':''}
+          签发：${esc(c.issued||'—')} · 到期：<span class="${over||soon?'cert-expiry soon':''}" id="certExp_${c.id}">${esc(c.expiry||'—')}</span> ${over?'(已过期)':soon?'(60天内到期)':''}
+          <button class="mini" style="margin-left:6px;padding:2px 8px;font-size:11px" onclick="quickEditCertExpiry(${c.id})" title="快速修改到期日">✎ 改到期</button>
           ${c.scope?('<br>范围：'+esc(c.scope)):''}
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px">
+        <button class="mini" onclick="editCert(${c.id})">编辑</button>
         <button class="mini" onclick="viewCert(${c.id})">查看</button>
         <button class="mini" onclick="delCert(${c.id})">删除</button>
       </div>
