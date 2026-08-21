@@ -778,9 +778,9 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
           <form id="certForm" style="display:grid;gap:8px;margin:10px 0">
             <div class="row">
               <select id="certType" style="flex:1;min-width:120px">
-                <option value="">请选择类型</option>
-                <option>GRS</option><option>GOTS</option><option>RCS</option><option>OCS</option>
-                <option>Oeko-tex</option><option>其它</option>
+                <option value="">请选择类型</option><option>GRS</option><option>GOTS</option><option>RCS</option><option>OCS</option>
+                <option>OEKO-TEX</option><option>Regenagri</option><option>BCI</option>
+                <option>RWS</option><option>RDS</option><option>Bluesign</option><option>其它</option>
               </select>
               <input id="certNo" placeholder="证书编号…" style="flex:2;min-width:140px">
             </div>
@@ -2422,7 +2422,7 @@ async function autoExtractPdf(src){
     // 1. 发证机构（常见认证机构列表匹配，长名优先避免误判）
     const issuerList=[
       [/(?:ECOCERT[\s\-]?Greenlife)/i,'ECOCERT Greenlife'],
-      [/(?:Control Union Certifications|Control Union Inspections|Control Union)/i,'Control Union'],
+      [/(?:Control Union Certifications|Control Union Inspections|Control Union|Peterson Control Union|CU Inspections)/i,'Control Union'],
       [/(?:Hohenstein Institute|Institute for Hygiene)/i,'OEKO-TEX / Hohenstein'],
       [/(?:Istituto per la Certificazione Etica e Ambientale|\bICEA\b)/i,'ICEA'],
       [/(?:IMO Control|Institute for Market Ecology)/i,'IMO Control'],
@@ -2469,8 +2469,8 @@ async function autoExtractPdf(src){
 
     // 5. 证书编号（多种写法都试）
     const noPatterns=[
-      /(?:Cert(?:ificate)?\.?\s*(?:No|Number|#)|证书号|证书编号|编号)\s*[:#]?\s*([A-Z0-9][A-Z0-9\-_/]{5,30})/i,
-      /\bCert\s*No[.:]\s*([A-Z0-9][A-Z0-9\-]{5,30})/i,
+      /(?:Scope\s*Cert(?:ificate)?\.?\s*(?:No|Number)|Cert(?:ificate)?\.?\s*(?:No|Number)|证书号|证书编号|编号)\s*[:#]?\s*([A-Z0-9][A-Z0-9\-_/]{5,50})/i,
+      /\bCert\s*No[.:]\s*([A-Z0-9][A-Z0-9\-]{5,50})/i,
       /Scope\s*Cert\.?\s*No\.?\s*[:#]?\s*([A-Z0-9][A-Z0-9\-]{5,30})/i
     ];
     for(const re of noPatterns){const m=txt.match(re);if(m&&m[1]){setIfEmpty('certNo',m[1].trim());break;}}
