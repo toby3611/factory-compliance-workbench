@@ -2607,12 +2607,6 @@ async function autoExtractPdf(src){
     const scopeM=txt.match(/(?:Scope\s*of\s*(?:Registration|Certification)|Product\s*Scope|Scope\s*:|范围\s*[:：]|认证范围)\s*([^\n.;。]{6,140}?)(?=\s*(?:Certificate|No\.|Issued|Valid|Expiry|Registration|License|ID|$))/i);
     if(scopeM)setIfEmpty('certScope',scopeM[1].replace(/^[\s:：\-—]+/,'').trim());
 
-    // DEBUG: 把识别后的字段值 dump 到 console + toast，方便排查
-    const dump=`type=${document.getElementById('certType').value} | issuer=${document.getElementById('certIssuer').value} | issued=${document.getElementById('certIssued').value} | expiry=${document.getElementById('certExpiry').value} | no=${document.getElementById('certNo').value} | txt=${txt.length}字符`;
-    console.log('[cert-parse]',dump);
-    console.log('[cert-txt-first]',txt.slice(0,400));
-    toast('已识别：类型='+document.getElementById('certType').value+' 文本长度='+txt.length);
-
     toast('已从 PDF 自动识别部分信息，请核对后保存');
   }catch(e){console.warn('pdf auto-extract skipped',e)}
 }
@@ -2698,9 +2692,7 @@ function editCert(id){
   toast('已载入该证书，点底部「保存证书」即可更新');
 }
 // 从提醒页点击跳转 → 跳到证书库 + 定位到该证书
-let pendingCertFocusId=null;
 function focusCert(id){
-  pendingCertFocusId=id;
   showView('cert');
   // 渲染后定位+高亮闪烁
   setTimeout(()=>{
@@ -2711,7 +2703,6 @@ function focusCert(id){
       el.style.boxShadow='0 0 0 4px #ff7a45';
       setTimeout(()=>{el.style.boxShadow='';},2500);
     }
-    pendingCertFocusId=null;
   },120);
 }
 function renderCerts(){
