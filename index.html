@@ -487,12 +487,64 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .auth-person{display:inline-flex;align-items:center;gap:5px;margin-right:2px;margin-bottom:2px}
 .auth-person .av{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:600;flex:0 0 22px}
 .auth-person .pn{font-size:12px;color:var(--text)}
-.auth-rownote{opacity:0;transition:.15s;display:flex;gap:4px;justify-content:flex-end}
+.auth-rownote{opacity:1;transition:.15s;display:flex;gap:4px;justify-content:flex-end}
 .auth-card-tbl tbody tr:hover .auth-rownote{opacity:1}
 .auth-rownote button{background:transparent;border:0;cursor:pointer;padding:4px 6px;border-radius:4px;color:var(--muted);font-size:14px}
 .auth-rownote button:hover{background:var(--bg);color:var(--text)}
 .auth-empty{padding:30px;text-align:center;color:var(--muted);font-size:13px}
 .auth-foot{color:var(--muted);font-size:12px;margin-top:8px;text-align:center}
+/* 认证实施计划进度（四阶段 / 明细确认项） */
+.phase-row td{background:#f7f9fc;padding:0}
+.phase-inner{padding:12px 16px}
+.phase-panel{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.phase-block{border:1px solid #e3e8ef;border-radius:10px;padding:10px 12px;background:#fff}
+.phase-hd{display:flex;justify-content:space-between;align-items:center}
+.phase-name{font-weight:600;font-size:13px;color:#2c2c2a}
+.phase-prog{font-size:12px;color:#185fa5;font-weight:600}
+.phase-bar{height:6px;background:#eef1f6;border-radius:4px;margin:8px 0;overflow:hidden}
+.phase-bar i{display:block;height:100%;background:#185fa5;border-radius:4px;transition:width .3s}
+.phase-items{display:flex;flex-direction:column;gap:3px}
+.pi{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;cursor:pointer;font-size:13px;color:#2c2c2a;position:relative}
+.pi:hover{background:#f1f5fb}
+.pi[draggable=true]{cursor:grab}
+.pi.drag-ov{background:#e7f0ff;outline:2px dashed #185fa5}
+.pi.done .pi-name{color:#0f6e56}
+.pi-name{flex:1;min-width:0}
+.chk{width:16px;height:16px;border-radius:50%;border:1.5px solid #b4b2a9;flex:0 0 16px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;line-height:1}
+.pi.done .chk{background:#0f6e56;border-color:#0f6e56}
+.pi-lead{font-size:11px;color:#5f5e5a;flex:0 0 auto}
+.pi-date{font-size:11px;color:#0f6e56;flex:0 0 auto}
+.pi-date.pi-warn{color:#ba7517}
+.pi-mv{font-size:9px;line-height:1;color:#9aa3af;cursor:pointer;padding:0 1px;user-select:none;flex:0 0 auto}
+.pi-mv:hover{color:#185fa5}
+.pi-cam{font-size:14px;cursor:pointer;opacity:.6;flex:0 0 auto}
+.pi-cam:hover{opacity:1}
+.pi-photo{width:32px;height:32px;object-fit:cover;border-radius:6px;cursor:pointer;flex:0 0 auto;border:1px solid #e3e8ef}
+.pi.add{color:#185fa5;font-size:12px;justify-content:flex-start;opacity:.85;font-weight:500}
+.pi.add:hover{opacity:1;background:#eef4fb}
+.pi.add.import{color:#854f0b;background:#fef6e7}
+.pi.add.import:hover{background:#fdeccb}
+.prog-cell{display:flex;align-items:center;gap:6px}
+.prog-num{font-size:12px;font-weight:600;color:#2c2c2a;white-space:nowrap}
+.mini-bar{width:46px;height:6px;background:#eef1f6;border-radius:4px;overflow:hidden;display:inline-block}
+.mini-bar i{display:block;height:100%;background:#185fa5;border-radius:4px}
+.prog-none{color:#5f5e5a;font-size:12px}
+.phase-empty{padding:16px;color:#5f5e5a;font-size:13px}
+@media(max-width:680px){.phase-panel{grid-template-columns:1fr}}
+/* 实施计划打印 / 照片预览 */
+@media print{body>*:not(#printArea){display:none!important}#printArea{display:block!important;padding:0;color:#000}}
+#printArea{font-family:-apple-system,"Microsoft YaHei",sans-serif;color:#1a1a1a;max-width:760px;margin:0 auto}
+#printArea h1{font-size:20px;margin:0 0 4px}
+#printArea .sub{color:#666;font-size:12px;margin-bottom:12px}
+#printArea table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:10px}
+#printArea th,#printArea td{border:1px solid #ccc;padding:5px 7px;text-align:left;vertical-align:top}
+#printArea th{background:#f2f5f9}
+#printArea .ph{background:#eef3fa;font-weight:600}
+#printArea .st{font-weight:700;color:#0f6e56}
+#printArea .photo{width:84px;height:84px;object-fit:cover;border-radius:4px;display:block}
+#printArea .foot{margin-top:14px;color:#999;font-size:11px}
+#photoModal{display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);z-index:200;padding:20px}
+#photoModal img{max-width:92vw;max-height:86vh;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
 /* 抽屉（复用 .mask） */
 .drawer{position:fixed;top:0;right:0;height:100vh;width:520px;max-width:92vw;background:#fff;box-shadow:-8px 0 24px rgba(0,0,0,.08);transform:translateX(100%);transition:.25s;z-index:121;display:flex;flex-direction:column}
 .drawer.on{transform:translateX(0)}
@@ -1131,6 +1183,23 @@ function defaultAuths(){
     {id:9,name:'Oeko-tex 100 国际标准认证',sub:'认证管理',period:'1年',first:'2021-10-15',expire:'2024-10-15',plan:['确认合同付款','准备测试样品','审核机构检测','通过后出证'],org:'TESTEX AG',lead:'武氏早原',sup:['黎氏庄'],conf:'黄海海',note:'有效期已过，需尽快续证'}
   ];
 }
+// 固定四阶段实施计划模板（确认合同/款项、准备审核资料、现场审核、不符合整改）
+// 每项明细：{name, lead, date, done} —— 完成一项点圈确认一项（两态 ○/✓）
+function defaultPhases(){
+  return [
+    {name:'确认合同 / 款项', items:[
+      {name:'审批表确认',done:false},
+      {name:'合同确认',done:false},
+      {name:'发票确认',done:false},
+      {name:'完成付款',done:false}
+    ]},
+    {name:'准备审核资料', items:[]},
+    {name:'现场审核', items:[
+      {name:'完成现场审核',done:false}
+    ]},
+    {name:'不符合整改', items:[]}
+  ];
+}
 
 /* ============ 存储 / 云端同步 ============ */
 const KEY="wb_factory_v2";
@@ -1544,6 +1613,7 @@ let subViewMode='list';  // 'list'=通用表格，'monthly'=按月排期
 let authTab='table';
 let authFilter='all';
 let authKeyword='';
+let openPhases=new Set();
 
 function openSubModule(catId,subName){
   currentSubCat=catId;
@@ -1568,6 +1638,12 @@ function renderSubModule(){
   // F 聚合视图
   if(c.isAggregator){
     body.innerHTML=renderFAggregator();
+    return;
+  }
+
+  // 认证管理（分类 1）使用认证台账视图（含实施计划进度四阶段明细）
+  if(c.id==='1'){
+    renderAuthView();
     return;
   }
 
@@ -2076,7 +2152,12 @@ function renderAuthTbodyHTML(){
     const sup=(a.sup||[]).map(n=>`<span class="auth-person"><span class="av" style="background:${personColor(n)}">${esc(n.slice(0,1))}</span><span class="pn">${esc(n)}</span></span>`).join('');
     const lead=`<span class="auth-person"><span class="av" style="background:${personColor(a.lead)}">${esc((a.lead||'').slice(0,1))}</span><span class="pn">${esc(a.lead||'')}</span></span>`;
     const conf=`<span class="auth-person"><span class="av" style="background:${personColor(a.conf)}">${esc((a.conf||'').slice(0,1))}</span><span class="pn">${esc(a.conf||'')}</span></span>`;
-    return `<tr onclick="openAuthDrawer(${a.id})">
+    const allItems=(a.phases||[]).flatMap(p=>p.items||[]);
+    const doneN=allItems.filter(i=>i.done).length;
+    const totN=allItems.length;
+    const pct=totN?Math.round(doneN/totN*100):0;
+    const progCell=totN?`<div class="prog-cell"><span class="prog-num">${doneN}/${totN}</span><span class="mini-bar"><i style="width:${pct}%"></i></span></div>`:'<span class="prog-none">—</span>';
+    const mainRow=`<tr onclick="openAuthDrawer(${a.id})">
       <td class="num">${i+1}</td>
       <td><div class="nm"><span class="tag">认证</span>${esc(a.name)}</div></td>
       <td>${esc(a.period||'')}</td>
@@ -2087,20 +2168,94 @@ function renderAuthTbodyHTML(){
       <td>${lead}</td>
       <td>${sup}</td>
       <td>${conf}</td>
-      <td><div class="auth-rownote">
+      <td>${progCell}</td>
+      <td>      <div class="auth-rownote">
+        <button title="展开实施计划进度" onclick="event.stopPropagation();togglePhaseRow(${a.id})">▾ 计划</button>
+        <button title="导出实施计划 PDF" onclick="event.stopPropagation();exportPhasePDF(${a.id})">📄</button>
         <button title="编辑" onclick="event.stopPropagation();openAuthDrawer(${a.id})">✎</button>
         <button title="删除" onclick="event.stopPropagation();delAuth(${a.id})">🗑</button>
       </div></td>
     </tr>`;
+    const phaseRow=`<tr class="phase-row" id="pr-${a.id}" style="display:${openPhases.has(a.id)?'':'none'}"><td colspan="12"><div class="phase-inner">${renderPhasePanel(a)}</div></td></tr>`;
+    return mainRow+phaseRow;
   }).join('');
   return `<div class="auth-card-tbl"><table>
     <thead><tr>
       <th class="num">序号</th><th>项目分类</th><th class="sm">审核周期</th>
       <th class="sm">首次发证</th><th class="sm">有效期</th><th>实施计划</th>
-      <th>对接机构</th><th>担当</th><th>协力</th><th>确认</th><th style="text-align:right">操作</th>
+      <th>对接机构</th><th>担当</th><th>协力</th><th>确认</th><th>进度</th><th style="text-align:right">操作</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table></div>`;
+}
+// ===== 认证实施计划进度（四阶段 / 明细确认项）=====
+function renderPhasePanel(a){
+  const phases=a.phases||[];
+  if(!phases.length) return `<div class="phase-empty">该认证暂无实施计划，点「＋ 新增阶段」或编辑认证补充。</div>`;
+  return `<div class="phase-panel">
+    ${phases.map((p,pi)=>{
+      const total=p.items.length;
+      const done=p.items.filter(i=>i.done).length;
+      const pct=total?Math.round(done/total*100):0;
+      return `<div class="phase-block">
+        <div class="phase-hd">
+          <span class="phase-name">${esc(p.name)}</span>
+          <span class="phase-prog">${done}/${total}</span>
+        </div>
+        <div class="phase-bar"><i style="width:${pct}%"></i></div>
+        <div class="phase-items">
+          ${p.items.map((it,ii)=>`
+          <div class="pi ${it.done?'done':''}" draggable="true"
+               ondragstart="pdragstart(event,${a.id},${pi},${ii})"
+               ondragover="event.preventDefault();event.currentTarget.classList.add('drag-ov')"
+               ondragleave="event.currentTarget.classList.remove('drag-ov')"
+               ondrop="pdrop(event,${a.id},${pi},${ii})"
+               onclick="togglePhaseItem(${a.id},${pi},${ii})">
+            <span class="pi-mv" title="上移" onclick="event.stopPropagation();movePhaseItem(${a.id},${pi},${ii},-1)">▲</span>
+            <span class="pi-mv" title="下移" onclick="event.stopPropagation();movePhaseItem(${a.id},${pi},${ii},1)">▼</span>
+            <span class="chk">${it.done?'✓':''}</span>
+            <span class="pi-name">${esc(it.name)}</span>
+            ${it.lead?`<span class="pi-lead">${esc(it.lead)}</span>`:''}
+            ${it.date?`<span class="pi-date ${it.done?'':'pi-warn'}">${esc(it.date)}</span>`:''}
+            ${it.photo?`<img class="pi-photo" src="${it.photo}" alt="取证照片" onclick="event.stopPropagation();viewPhoto(this)">`:''}
+            <span class="pi-cam" title="拍照取证" onclick="event.stopPropagation();phasePhoto(${a.id},${pi},${ii})">📷</span>
+          </div>`).join('')}
+          <div class="pi add" onclick="addPhaseItem(${a.id},${pi})">＋ 添加项</div>
+          ${p.name==='准备审核资料'?`<div class="pi add import" onclick="importPhaseFiles(${a.id},${pi})">📥 从 Excel 批量导入文件清单</div>`:''}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+function refreshAuthTbody(){const w=document.getElementById('authTblWrap');if(w)w.innerHTML=renderAuthTbodyHTML();}
+function togglePhaseRow(id){
+  if(openPhases.has(id))openPhases.delete(id);else openPhases.add(id);
+  refreshAuthTbody();
+}
+function togglePhaseItem(id,pi,ii){
+  const a=(data.auths||[]).find(x=>x.id==id);if(!a||!a.phases[pi])return;
+  const it=a.phases[pi].items[ii];if(!it)return;
+  it.done=!it.done;
+  if(it.done && !it.date) it.date=todayStr();
+  saveData();refreshAuthTbody();
+}
+function addPhaseItem(id,pi){
+  const a=(data.auths||[]).find(x=>x.id==id);if(!a||!a.phases[pi])return;
+  const nm=prompt('添加「'+a.phases[pi].name+'」下的确认项名称：');if(!nm)return;
+  const name=nm.trim();if(!name)return;
+  a.phases[pi].items.push({name,done:false});
+  saveData();refreshAuthTbody();
+}
+function importPhaseFiles(id,pi){
+  const a=(data.auths||[]).find(x=>x.id==id);if(!a||!a.phases[pi])return;
+  const lines=prompt('把 Excel 中「文件名」一列粘贴到这里（每行一个文件名）：');if(!lines)return;
+  const names=lines.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  if(!names.length)return;
+  const dup=new Set(a.phases[pi].items.map(i=>i.name));
+  let added=0;
+  names.forEach(n=>{ if(!dup.has(n)){a.phases[pi].items.push({name:n,done:false});added++;} });
+  saveData();refreshAuthTbody();
+  toast('已导入 '+added+' 份文件到「'+a.phases[pi].name+'」'+(names.length-added?'（'+(names.length-added)+' 份重复已跳过）':''));
 }
 function ensureAuthDrawer(){
   if(document.getElementById('authMask'))return;
@@ -2154,7 +2309,7 @@ function saveAuth(){
     if(a)Object.assign(a,obj);
   }else{
     const maxId=(data.auths||[]).reduce((m,x)=>Math.max(m,x.id||0),0);
-    obj.id=maxId+1;(data.auths=data.auths||[]).push(obj);
+    obj.id=maxId+1;obj.phases=defaultPhases();(data.auths=data.auths||[]).push(obj);
   }
   saveData();closeAuthDrawer();renderAuthView();toast(id?'已保存':'已新增认证');
 }
@@ -2162,6 +2317,93 @@ function addAuth(){window._authEditId=null;openAuthDrawer(null);}
 function delAuth(id){
   if(!confirm('确定删除该认证？'))return;
   data.auths=data.auths.filter(x=>x.id!=id);saveData();closeAuthDrawer();renderAuthView();toast('已删除');
+}
+function findAuth(id){return (data.auths||[]).find(x=>x.id==id)}
+/* —— 整改项拍照取证 —— */
+function ensurePhotoModal(){
+  if(document.getElementById('photoModal'))return;
+  const m=document.createElement('div');
+  m.className='mask hidden';m.id='photoModal';
+  m.onclick=()=>m.classList.add('hidden');
+  m.innerHTML='<img id="photoImg" onclick="event.stopPropagation()">';
+  document.body.appendChild(m);
+}
+function viewPhoto(imgEl){ensurePhotoModal();document.getElementById('photoImg').src=imgEl.src;document.getElementById('photoModal').classList.remove('hidden');}
+function compressImg(dataUrl,maxW,q,cb){
+  const img=new Image();
+  img.onload=()=>{
+    let w=img.width,h=img.height;
+    if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+    const c=document.createElement('canvas');c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    cb(c.toDataURL('image/jpeg',q));
+  };
+  img.src=dataUrl;
+}
+function phasePhoto(id,pi,ii){
+  const a=findAuth(id);if(!a||!a.phases[pi])return;
+  const it=a.phases[pi].items[ii];if(!it)return;
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='image/*';inp.capture='environment';
+  inp.onchange=()=>{
+    const f=inp.files[0];if(!f)return;
+    const rd=new FileReader();
+    rd.onload=()=>compressImg(rd.result,800,0.7,d=>{it.photo=d;saveData();refreshAuthTbody();toast('已留存取证照片');});
+    rd.readAsDataURL(f);
+  };
+  inp.click();
+}
+/* —— 子任务排序（拖拽 + 上移下移）—— */
+function movePhaseItem(id,pi,ii,dir){
+  const a=findAuth(id);if(!a||!a.phases[pi])return;
+  const arr=a.phases[pi].items;const j=ii+dir;
+  if(j<0||j>=arr.length)return;
+  const t=arr[ii];arr[ii]=arr[j];arr[j]=t;
+  saveData();refreshAuthTbody();
+}
+function pdragstart(e,id,pi,ii){e.dataTransfer.setData('text/plain',String(ii));e.dataTransfer.effectAllowed='move';}
+function pdrop(e,id,pi,ii){
+  e.preventDefault();e.currentTarget.classList.remove('drag-ov');
+  const a=findAuth(id);if(!a||!a.phases[pi])return;
+  const from=parseInt(e.dataTransfer.getData('text/plain'),10);if(isNaN(from)||from===ii)return;
+  const arr=a.phases[pi].items;const t=arr.splice(from,1)[0];arr.splice(ii,0,t);
+  saveData();refreshAuthTbody();
+}
+/* —— 导出该认证实施计划 PDF —— */
+function exportPhasePDF(id){
+  const a=findAuth(id);if(!a)return;
+  const phases=a.phases||[];
+  const allItems=phases.flatMap(p=>p.items||[]);
+  const doneN=allItems.filter(i=>i.done).length,totN=allItems.length;
+  const pct=totN?Math.round(doneN/totN*100):0;
+  let rows='';
+  phases.forEach(p=>{
+    const tt=p.items.length,dd=p.items.filter(i=>i.done).length;
+    rows+=`<tr class="ph"><td colspan="4">${esc(p.name)}　（${dd}/${tt}）${tt?('　完成率 '+Math.round(dd/tt*100)+'%'):''}</td></tr>`;
+    if(!tt){rows+=`<tr><td colspan="4" style="color:#999">— 暂无明细项 —</td></tr>`;return;}
+    p.items.forEach(it=>{
+      const st=it.done?'<span class="st">✓ 已完成'+(it.date?(' '+it.date):'')+'</span>':'<span style="color:#ba7517">○ 待完成</span>';
+      rows+=`<tr>
+        <td style="width:34%">${esc(it.name)}</td>
+        <td style="width:18%">${st}</td>
+        <td style="width:14%">${it.lead?esc(it.lead):''}</td>
+        <td style="width:34%">${it.photo?'<img class="photo" src="'+it.photo+'">':'<span style="color:#bbb">无取证照片</span>'}</td>
+      </tr>`;
+    });
+  });
+  const area=document.createElement('div');area.id='printArea';
+  area.innerHTML=`<h1>${esc(a.name)} · 实施计划进度表</h1>
+    <div class="sub">对接机构：${esc(a.org||'—')}　|　担当：${esc(a.lead||'—')}　|　有效期：${esc(a.expire||'—')}　|　导出日期：${todayStr()}</div>
+    <table>
+      <thead><tr><th style="width:34%">实施明细项</th><th style="width:18%">状态</th><th style="width:14%">担当</th><th style="width:34%">取证照片</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="foot">总体进度：${doneN}/${totN}（${pct}%）　·　由「综合工作台」生成　·　本表含整改项拍照取证记录</div>`;
+  document.body.appendChild(area);
+  const rm=()=>{const el=document.getElementById('printArea');if(el)el.remove();};
+  window.addEventListener('afterprint',rm,{once:true});
+  toast('已调起打印，请在对话框选择「另存为 PDF」');
+  setTimeout(()=>window.print(),120);
 }
 function exportAuths(){
   const list=data.auths||[];
@@ -2498,6 +2740,7 @@ function normalizeData(){
   }
   if(!Array.isArray(data.certs))data.certs=[];
   if(!Array.isArray(data.auths))data.auths=defaultAuths();
+  (data.auths||[]).forEach(a=>{ if(!Array.isArray(a.phases)) a.phases=defaultPhases(); });
   if(!Array.isArray(data.kb))data.kb=[];
 }
 
