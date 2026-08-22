@@ -332,6 +332,25 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .modal{background:#fff;border-radius:18px;padding:20px;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
 .modal h3{font-size:17px;margin-bottom:6px}
 .modal p{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6}
+/* 批量导入文件清单弹窗（多行 textarea 替换 prompt 单行） */
+.import-box{background:#fff;border-radius:18px;padding:0;width:100%;max-width:560px;max-height:88vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden}
+.imp-hd{padding:18px 22px 14px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;border-bottom:1px solid #ecf0f5}
+.imp-hd h3{font-size:17px;font-weight:600;color:#2c2c2a;margin-bottom:4px}
+.imp-hd p{font-size:12.5px;color:var(--muted);line-height:1.55;margin:0}
+.imp-hd .x{background:transparent;border:0;font-size:22px;color:var(--muted);cursor:pointer;line-height:1;flex:0 0 auto}
+.import-box textarea{flex:1;min-height:200px;max-height:50vh;margin:14px 22px 0;border:1.5px solid #d8e0e8;border-radius:10px;padding:12px 14px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;line-height:1.6;color:#2c2c2a;background:#fafbfc;resize:vertical;outline:0}
+.import-box textarea:focus{border-color:#10b981;background:#fff;box-shadow:0 0 0 3px rgba(16,185,129,.12)}
+.imp-stat{padding:8px 22px 0;font-size:13px;color:#374151;line-height:1.5}
+.imp-stat b{color:#10b981;font-weight:700;font-size:15px}
+.imp-stat .imp-dup{color:#ba7517}
+.imp-stat .imp-zero{color:#9aa3af;font-size:12.5px}
+.imp-tip{padding:4px 22px 12px;font-size:11.5px;color:#9aa3af;line-height:1.5}
+.imp-ft{padding:12px 22px 16px;border-top:1px solid #ecf0f5;display:flex;gap:8px;justify-content:flex-end;background:#fafbfc}
+.imp-ft .btn{padding:8px 18px;border-radius:8px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:14px;font-weight:500;color:#374151}
+.imp-ft .btn:hover{background:#f1f5fb}
+.imp-ft .btn.primary{background:#10b981;border-color:#10b981;color:#fff}
+.imp-ft .btn.primary:hover{background:#059669;border-color:#059669}
+@media(max-width:680px){.import-box{max-width:100%}.imp-hd,.imp-stat,.imp-tip,.imp-ft{padding-left:16px;padding-right:16px}.import-box textarea{margin-left:16px;margin-right:16px;min-height:160px}}
 .modal .field{margin-bottom:12px}
 .modal label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600}
 .modal .row{display:flex;gap:8px;margin-top:6px}
@@ -2291,14 +2310,45 @@ function addPhaseItem(id,pi){
 }
 function importPhaseFiles(id,pi){
   const a=(data.auths||[]).find(x=>x.id==id);if(!a||!a.phases[pi])return;
-  const lines=prompt('把 Excel 中「文件名」一列粘贴到这里（每行一个文件名）：');if(!lines)return;
-  const names=lines.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
-  if(!names.length)return;
-  const dup=new Set(a.phases[pi].items.map(i=>i.name));
-  let added=0;
-  names.forEach(n=>{ if(!dup.has(n)){a.phases[pi].items.push({name:n,done:false});added++;} });
-  saveData();refreshAuthTbody();
-  toast('已导入 '+added+' 份文件到「'+a.phases[pi].name+'」'+(names.length-added?'（'+(names.length-added)+' 份重复已跳过）':''));
+  const existing=new Set(a.phases[pi].items.map(i=>i.name));
+  // 弹出一个 textarea 弹窗，浏览器原生 prompt 是单行会丢行
+  const mask=document.createElement('div');mask.className='mask';mask.id='importMask';
+  const box=document.createElement('div');box.className='import-box';
+  box.innerHTML=`
+    <div class="imp-hd">
+      <div><h3>📥 批量导入文件清单</h3><p>把 Excel 中「文件名」一列整列粘贴到下方（每行一个文件名，可带后缀）</p></div>
+      <button class="x" id="impX">×</button>
+    </div>
+    <textarea id="impTA" placeholder="示例：&#10;质量手册-2026版.docx&#10;程序文件汇编（受控版）.pdf&#10;ISO 9001:2015 标准全文.pdf&#10;质量目标达成统计表.xlsx&#10;…"></textarea>
+    <div class="imp-stat" id="impStat">解析中…</div>
+    <div class="imp-tip">支持 .doc/.docx/.pdf/.xlsx 等任意文件；空行自动忽略；与现有项同名自动跳过</div>
+    <div class="imp-ft"><button class="btn" id="impCancel">取消</button><button class="btn primary" id="impOK">确定导入</button></div>
+  `;
+  mask.appendChild(box);document.body.appendChild(mask);
+  const ta=box.querySelector('#impTA'),stat=box.querySelector('#impStat');
+  const upd=()=>{
+    const lines=ta.value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+    const dupN=lines.filter(n=>existing.has(n)).length;
+    const newN=lines.length-dupN;
+    if(!lines.length){stat.innerHTML='<span class="imp-zero">粘贴后这里会显示将导入的数量</span>';return;}
+    stat.innerHTML=`<b>${newN}</b> 份将导入`+(dupN?` · <span class="imp-dup">${dupN} 份重复跳过</span>`:'')+` · 总计解析 <b>${lines.length}</b> 行`;
+  };
+  ta.addEventListener('input',upd);upd();
+  const close=()=>{mask.remove();ta.value='';};
+  box.querySelector('#impX').onclick=close;
+  box.querySelector('#impCancel').onclick=close;
+  mask.onclick=e=>{if(e.target===mask)close();};
+  box.onclick=e=>e.stopPropagation();
+  setTimeout(()=>ta.focus(),50);
+  box.querySelector('#impOK').onclick=()=>{
+    const lines=ta.value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+    if(!lines.length){toast('没有可导入的行');return;}
+    let added=0;
+    lines.forEach(n=>{if(!existing.has(n)){a.phases[pi].items.push({name:n,done:false});existing.add(n);added++;}});
+    saveData();refreshAuthTbody();
+    toast('已导入 '+added+' 份到「'+a.phases[pi].name+'」'+(lines.length-added?' · 跳过 '+(lines.length-added)+' 份重复':''));
+    close();
+  };
 }
 function ensureAuthDrawer(){
   if(document.getElementById('authMask'))return;
