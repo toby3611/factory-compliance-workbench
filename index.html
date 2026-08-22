@@ -2286,6 +2286,10 @@ function openAuthDrawer(id){
       <div class="field"><label>项目分类</label><input id="ad_sub" value="${esc(v('sub','认证管理'))}"></div>
       <div class="field"><label>审核周期</label><input id="ad_period" value="${esc(v('period'))}" placeholder="如 1年"></div>
     </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="field"><label>首次发证 📅</label><input id="ad_first" type="date" value="${esc(v('first'))}" title="首次发证日期"></div>
+      <div class="field"><label>有效期 📅</label><input id="ad_expire" type="date" value="${esc(v('expire'))}" title="到期日期（续证时改这里）"></div>
+    </div>
     <div class="field"><label>对接机构</label><input id="ad_org" value="${esc(v('org'))}"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
       <div class="field"><label>担当</label><input id="ad_lead" value="${esc(v('lead'))}"></div>
@@ -2310,8 +2314,8 @@ function saveAuth(){
   if(!name){toast('请填写认证名称');return;}
   const plan=(get('ad_plan')||'').split('\n').map(s=>s.trim()).filter(Boolean);
   const sup=(get('ad_sup')||'').split(/[，,、\n]/).map(s=>s.trim()).filter(Boolean);
-  const obj={name,sub:get('ad_sub')||'认证管理',period:get('ad_period'),
-    org:get('ad_org'),lead:get('ad_lead'),sup,conf:get('ad_conf'),plan,note:get('ad_note')};
+  const obj={name,sub:get('ad_sub')||'认证管理',period:get('ad_period'),first:get('ad_first'),
+    expire:get('ad_expire'),org:get('ad_org'),lead:get('ad_lead'),sup,conf:get('ad_conf'),plan,note:get('ad_note')};
   if(id){
     const a=(data.auths||[]).find(x=>x.id==id);
     if(a)Object.assign(a,obj);
