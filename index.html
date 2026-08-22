@@ -524,6 +524,8 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .pi-mv:hover{color:#185fa5}
 .pi-cam{font-size:14px;cursor:pointer;opacity:.6;flex:0 0 auto}
 .pi-cam:hover{opacity:1}
+.pi-del{font-size:13px;cursor:pointer;opacity:.4;flex:0 0 auto;padding:0 4px;line-height:1;color:#c0392b}
+.pi-del:hover{opacity:1;color:#e0243b}
 .pi-photo{width:32px;height:32px;object-fit:cover;border-radius:6px;cursor:pointer;flex:0 0 auto;border:1px solid #e3e8ef}
 .pi.add{color:#185fa5;font-size:12px;justify-content:flex-start;opacity:.85;font-weight:500}
 .pi.add:hover{opacity:1;background:#eef4fb}
@@ -2224,6 +2226,7 @@ function renderPhasePanel(a){
             ${it.date?`<span class="pi-date ${it.done?'':'pi-warn'}">${esc(it.date)}</span>`:''}
             ${it.photo?`<img class="pi-photo" src="${it.photo}" alt="取证照片" onclick="event.stopPropagation();viewPhoto(this)">`:''}
             <span class="pi-cam" title="拍照取证" onclick="event.stopPropagation();phasePhoto(${a.id},${pi},${ii})">📷</span>
+            <span class="pi-del" title="删除此项" onclick="event.stopPropagation();delPhaseItem(${a.id},${pi},${ii})">🗑</span>
           </div>`).join('')}
           <div class="pi add" onclick="addPhaseItem(${a.id},${pi})">＋ 添加项</div>
           ${p.name==='准备审核资料'?`<div class="pi add import" onclick="importPhaseFiles(${a.id},${pi})">📥 从 Excel 批量导入文件清单</div>`:''}
@@ -2365,6 +2368,13 @@ function movePhaseItem(id,pi,ii,dir){
   if(j<0||j>=arr.length)return;
   const t=arr[ii];arr[ii]=arr[j];arr[j]=t;
   saveData();refreshAuthTbody();
+}
+function delPhaseItem(id,pi,ii){
+  const a=findAuth(id);if(!a||!a.phases[pi]||!a.phases[pi].items[ii])return;
+  const it=a.phases[pi].items[ii];
+  if(!confirm('确定删除「'+it.name+'」？\n（该步骤的所有信息，包括照片，将一并清除）'))return;
+  a.phases[pi].items.splice(ii,1);
+  saveData();refreshAuthTbody();toast('已删除');
 }
 function pdragstart(e,id,pi,ii){e.dataTransfer.setData('text/plain',String(ii));e.dataTransfer.effectAllowed='move';}
 function pdrop(e,id,pi,ii){
