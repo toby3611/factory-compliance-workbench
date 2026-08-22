@@ -498,16 +498,35 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .auth-rownote button:hover{background:var(--bg);color:var(--text)}
 .auth-empty{padding:30px;text-align:center;color:var(--muted);font-size:13px}
 .auth-foot{color:var(--muted);font-size:12px;margin-top:8px;text-align:center}
-/* 认证实施计划进度（四阶段 / 明细确认项） */
-.phase-row td{background:#f7f9fc;padding:0}
+/* 认证表格「实施计划」列：绿色计划明细按钮 */
+.auth-plan-btn{display:inline-flex;align-items:center;gap:4px;background:#ecfdf5;color:#047857;border:1px solid #bbf7d0;padding:4px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-weight:600;white-space:nowrap}
+.auth-plan-btn:hover{background:#d1fae5;color:#065f46}
+.auth-plan-btn.on{background:#047857;color:#fff;border-color:#047857}
+.auth-plan-btn .arr{display:inline-block;transition:transform .15s}
+.auth-plan-btn.on .arr{transform:rotate(90deg)}
+/* 认证实施计划进度（四阶段 / 明细确认项）·绿色主题 */
+.phase-row td{background:#f0fdf4;padding:0}
 .phase-inner{padding:12px 16px}
+.phase-overview{border:1px solid #bbf7d0;background:linear-gradient(135deg,#f0fdf4 0%,#ecfdf5 100%);border-radius:10px;padding:12px 14px;margin-bottom:12px}
+.phase-overview-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.phase-overview-title{font-size:13px;font-weight:700;color:#065f46;display:flex;align-items:center;gap:6px}
+.phase-overview-title .ic{width:18px;height:18px;background:#10b981;color:#fff;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:11px}
+.phase-overview-total{font-size:12px;font-weight:600;color:#047857}
+.phase-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.phase-chip{display:inline-flex;align-items:center;gap:4px;background:#fff;border:1px solid #bbf7d0;color:#065f46;padding:4px 10px;border-radius:14px;font-size:12px;font-weight:600}
+.phase-chip .num{width:16px;height:16px;background:#10b981;color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.phase-chip .done{color:#047857}
+.phase-chip .ct{font-size:11px;color:#5f5e5a;font-weight:500;margin-left:4px}
+.phase-overview-bar{height:6px;background:#d1fae5;border-radius:4px;overflow:hidden}
+.phase-overview-bar i{display:block;height:100%;background:linear-gradient(90deg,#10b981,#059669);border-radius:4px;transition:width .3s}
 .phase-panel{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.phase-block{border:1px solid #e3e8ef;border-radius:10px;padding:10px 12px;background:#fff}
-.phase-hd{display:flex;justify-content:space-between;align-items:center}
-.phase-name{font-weight:600;font-size:13px;color:#2c2c2a}
-.phase-prog{font-size:12px;color:#185fa5;font-weight:600}
-.phase-bar{height:6px;background:#eef1f6;border-radius:4px;margin:8px 0;overflow:hidden}
-.phase-bar i{display:block;height:100%;background:#185fa5;border-radius:4px;transition:width .3s}
+.phase-block{border:1px solid #bbf7d0;border-radius:10px;padding:10px 12px;background:#fff;box-shadow:0 1px 2px rgba(16,185,129,.04)}
+.phase-hd{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px;margin-bottom:8px;border-bottom:1px dashed #bbf7d0}
+.phase-name{font-weight:700;font-size:13px;color:#065f46;display:flex;align-items:center;gap:6px}
+.phase-name .n{width:18px;height:18px;background:#10b981;color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.phase-prog{font-size:12px;color:#047857;font-weight:700;background:#ecfdf5;padding:2px 8px;border-radius:10px;border:1px solid #bbf7d0}
+.phase-bar{height:6px;background:#d1fae5;border-radius:4px;margin:0 0 8px;overflow:hidden}
+.phase-bar i{display:block;height:100%;background:linear-gradient(90deg,#10b981,#059669);border-radius:4px;transition:width .3s}
 .phase-items{display:flex;flex-direction:column;gap:3px}
 .pi{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;cursor:pointer;font-size:13px;color:#2c2c2a;position:relative}
 .pi:hover{background:#f1f5fb}
@@ -2155,35 +2174,34 @@ function renderAuthTbodyHTML(){
   const rows=list.map((a,i)=>{
     const s=authStatus(a);
     const badge=s==='ok'?'<span class="auth-badge ok"><span class="bd"></span>有效</span>':s==='warn'?'<span class="auth-badge warn"><span class="bd"></span>60天内</span>':'<span class="auth-badge bad"><span class="bd"></span>已过期</span>';
-    const plan=(a.plan||[]).map((p,j)=>`<span class="p"><b>${'①②③④⑤⑥'.charAt(j)}</b>${esc(p)}</span>`).join('');
+    const allItems=(a.phases||[]).flatMap(p=>p.items||[]);
+    const allDone=allItems.filter(i=>i.done).length;
+    const allTot=allItems.length;
+    const isOpen=openPhases.has(a.id);
     const sup=(a.sup||[]).map(n=>`<span class="auth-person"><span class="av" style="background:${personColor(n)}">${esc(n.slice(0,1))}</span><span class="pn">${esc(n)}</span></span>`).join('');
     const lead=`<span class="auth-person"><span class="av" style="background:${personColor(a.lead)}">${esc((a.lead||'').slice(0,1))}</span><span class="pn">${esc(a.lead||'')}</span></span>`;
     const conf=`<span class="auth-person"><span class="av" style="background:${personColor(a.conf)}">${esc((a.conf||'').slice(0,1))}</span><span class="pn">${esc(a.conf||'')}</span></span>`;
-    const allItems=(a.phases||[]).flatMap(p=>p.items||[]);
-    const doneN=allItems.filter(i=>i.done).length;
-    const totN=allItems.length;
-    const pct=totN?Math.round(doneN/totN*100):0;
-    const progCell=totN?`<div class="prog-cell"><span class="prog-num">${doneN}/${totN}</span><span class="mini-bar"><i style="width:${pct}%"></i></span></div>`:'<span class="prog-none">—</span>';
+    const progCell=(allTot||isOpen)?`<div class="prog-cell"><span class="prog-num">${allDone}/${allTot}</span><span class="mini-bar"><i style="width:${allTot?Math.round(allDone/allTot*100):0}%;background:linear-gradient(90deg,#10b981,#059669)"></i></span></div>`:'<span class="prog-none">—</span>';
+    const planBtn=allTot?`<button class="auth-plan-btn ${isOpen?'on':''}" onclick="event.stopPropagation();togglePhaseRow(${a.id})" title="展开/收起实施计划明细"><span class="arr">▸</span> 计划明细 <span style="opacity:.8">${allDone}/${allTot}</span></button>`:'<button class="auth-plan-btn" onclick="event.stopPropagation();togglePhaseRow(${a.id})" title="展开框架"><span class="arr">▸</span> 计划明细</button>';
     const mainRow=`<tr onclick="openAuthDrawer(${a.id})">
       <td class="num">${i+1}</td>
       <td><div class="nm"><span class="tag">认证</span>${esc(a.name)}</div></td>
       <td>${esc(a.period||'')}</td>
       <td>${esc(a.first||'')}</td>
       <td>${esc(a.expire||'')} ${badge}</td>
-      <td><div class="auth-plan">${plan}</div></td>
+      <td>${planBtn}</td>
       <td class="auth-org">${esc(a.org||'')}</td>
       <td>${lead}</td>
       <td>${sup}</td>
       <td>${conf}</td>
       <td>${progCell}</td>
       <td>      <div class="auth-rownote">
-        <button title="展开实施计划进度" onclick="event.stopPropagation();togglePhaseRow(${a.id})">▾ 计划</button>
         <button title="导出实施计划 PDF" onclick="event.stopPropagation();exportPhasePDF(${a.id})">📄</button>
         <button title="编辑" onclick="event.stopPropagation();openAuthDrawer(${a.id})">✎</button>
         <button title="删除" onclick="event.stopPropagation();delAuth(${a.id})">🗑</button>
       </div></td>
     </tr>`;
-    const phaseRow=`<tr class="phase-row" id="pr-${a.id}" style="display:${openPhases.has(a.id)?'':'none'}"><td colspan="12"><div class="phase-inner">${renderPhasePanel(a)}</div></td></tr>`;
+    const phaseRow=`<tr class="phase-row" id="pr-${a.id}" style="display:${isOpen?'':'none'}"><td colspan="12"><div class="phase-inner">${renderPhasePanel(a)}</div></td></tr>`;
     return mainRow+phaseRow;
   }).join('');
   return `<div class="auth-card-tbl"><table>
@@ -2199,14 +2217,31 @@ function renderAuthTbodyHTML(){
 function renderPhasePanel(a){
   const phases=a.phases||[];
   if(!phases.length) return `<div class="phase-empty">该认证暂无实施计划，点「＋ 新增阶段」或编辑认证补充。</div>`;
-  return `<div class="phase-panel">
+  const allItems=phases.flatMap(p=>p.items||[]);
+  const totalAll=allItems.length;
+  const doneAll=allItems.filter(i=>i.done).length;
+  const pctAll=totalAll?Math.round(doneAll/totalAll*100):0;
+  const chipsHtml=phases.map((p,pi)=>{
+    const dn=p.items.filter(i=>i.done).length;
+    const tn=p.items.length;
+    return `<span class="phase-chip"><span class="num">${pi+1}</span>${esc(p.name)}<span class="ct">${dn}/${tn}</span></span>`;
+  }).join('');
+  const overview=`<div class="phase-overview">
+    <div class="phase-overview-hd">
+      <div class="phase-overview-title"><span class="ic">🗂</span>实施计划进度 · ${phases.length} 阶段</div>
+      <div class="phase-overview-total">已完成 ${doneAll}/${totalAll}（${pctAll}%）</div>
+    </div>
+    <div class="phase-chips">${chipsHtml}</div>
+    <div class="phase-overview-bar"><i style="width:${pctAll}%"></i></div>
+  </div>`;
+  return overview+`<div class="phase-panel">
     ${phases.map((p,pi)=>{
       const total=p.items.length;
       const done=p.items.filter(i=>i.done).length;
       const pct=total?Math.round(done/total*100):0;
       return `<div class="phase-block">
         <div class="phase-hd">
-          <span class="phase-name">${esc(p.name)}</span>
+          <span class="phase-name"><span class="n">${pi+1}</span>${esc(p.name)}</span>
           <span class="phase-prog">${done}/${total}</span>
         </div>
         <div class="phase-bar"><i style="width:${pct}%"></i></div>
