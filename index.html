@@ -275,7 +275,7 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 
 /* ============ AI 助手悬浮按钮 ============ */
 .ai-fab{
-  position:fixed;bottom:24px;right:24px;z-index:80;
+  position:fixed;bottom:24px;left:24px;z-index:80;
   width:64px;height:64px;border-radius:50%;
   background:linear-gradient(135deg,#3b8aff,#5fa1ff);
   color:#fff;border:none;cursor:pointer;
@@ -416,6 +416,8 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
   .today-item .tag{font-size:10px;padding:2px 6px}
   /* 底部 tabbar 启用 */
   .mobile-tabbar{display:flex}
+  /* FAB 移到左下角，手机端需浮在 tabbar 之上，避免挡住"首页" tab */
+  .ai-fab{bottom:78px;left:16px;width:56px;height:56px}
   /* 通用 card 紧凑 */
   .card{padding:13px}
   .card h2{font-size:15px}
