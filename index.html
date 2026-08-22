@@ -286,6 +286,9 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 }
 .ai-fab:hover{transform:scale(1.05)}
 .ai-fab svg{margin-bottom:1px}
+/* 抽屉打开时自动隐藏 FAB，避免挡住抽屉底部的保存/关闭按钮 */
+body:has(.drawer.on) .ai-fab,
+body:has(.mask:not(.hidden)) .ai-fab{display:none}
 
 /* ============ 报告中心 / 知识库 / 备忘录视图 ============ */
 .view{display:none}
@@ -2297,13 +2300,13 @@ function closeAuthDrawer(){
 }
 function saveAuth(){
   const id=window._authEditId;
-  const get=id2=>document.getElementById(id2).value.trim();
+  const get=id2=>{const el=document.getElementById(id2);return el?(el.value||'').trim():'';};
   const name=get('ad_name');
   if(!name){toast('请填写认证名称');return;}
   const plan=(get('ad_plan')||'').split('\n').map(s=>s.trim()).filter(Boolean);
   const sup=(get('ad_sup')||'').split(/[，,、\n]/).map(s=>s.trim()).filter(Boolean);
-  const obj={name,sub:get('ad_sub')||'认证管理',period:get('ad_period'),first:get('ad_first'),
-    expire:get('ad_expire'),org:get('ad_org'),lead:get('ad_lead'),sup,conf:get('ad_conf'),plan,note:get('ad_note')};
+  const obj={name,sub:get('ad_sub')||'认证管理',period:get('ad_period'),
+    org:get('ad_org'),lead:get('ad_lead'),sup,conf:get('ad_conf'),plan,note:get('ad_note')};
   if(id){
     const a=(data.auths||[]).find(x=>x.id==id);
     if(a)Object.assign(a,obj);
