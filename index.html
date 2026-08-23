@@ -526,6 +526,11 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 /* 认证实施计划进度（四阶段 / 明细确认项）·绿色主题 */
 .phase-row td{background:#f0fdf4;padding:0}
 .phase-inner{padding:12px 16px}
+.task-phase-row{background:#f0fdf4;border-top:1px solid #bbf7d0;margin:8px 0 0 0;border-radius:0 0 10px 10px;padding:0 4px}
+.task-phase-row .phase-inner{padding:12px 8px}
+/* 验厂任务卡的「计划明细」按钮（与认证管理绿底深绿字同款） */
+.phase-btn{font-size:12px;padding:3px 10px;border-radius:14px;background:#ecfdf5;color:#047857;border:1px solid #bbf7d0;cursor:pointer;white-space:nowrap;margin-left:4px}
+.phase-btn:hover{background:#d1fae5;border-color:#6ee7b7}
 .phase-overview{border:1px solid #bbf7d0;background:linear-gradient(135deg,#f0fdf4 0%,#ecfdf5 100%);border-radius:10px;padding:12px 14px;margin-bottom:12px}
 .phase-overview-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .phase-overview-title{font-size:13px;font-weight:700;color:#065f46;display:flex;align-items:center;gap:6px}
@@ -1659,6 +1664,7 @@ let authTab='table';
 let authFilter='all';
 let authKeyword='';
 let openPhases=new Set();
+let openTaskPhases=new Set();
 
 function openSubModule(catId,subName){
   currentSubCat=catId;
@@ -1745,6 +1751,14 @@ function renderCatTasksHTML(){
       const startD=x.start||'未设定';
       const endD=x.end||x.due||'未设定';
       const overdueDays=(isOver && x.due)?Math.round((new Date(today)-new Date(x.due))/86400000):0;
+      // 验厂（cat=2）任务专用：实施计划 4 阶段 进度统计
+      const isYc=currentSubCat==='2';
+      const tPhases=(isYc && Array.isArray(x.phases))?x.phases:[];
+      const tAllItems=tPhases.flatMap(p=>p.items||[]);
+      const tDoneN=tAllItems.length?tAllItems.filter(i=>i.done).length:0;
+      const tTotN=tAllItems.length;
+      const tIsOpen=isYc && openTaskPhases.has(x.id);
+      const phaseBtn=isYc?`<button class="phase-btn" onclick="event.stopPropagation();toggleTaskPhaseRow(${x.id})" title="展开实施计划进度">${tIsOpen?'▾':'▸'} 计划明细 ${tDoneN}/${tTotN||0}</button>`:'';
       return `<div class="sub-task ${x.done?'done':''}">
         <div class="chk" onclick="subToggle(${x.id})">${x.done?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M5 12l4 4L19 7"/></svg>':''}</div>
         <div class="main">
@@ -1757,8 +1771,10 @@ function renderCatTasksHTML(){
                   <option value="P1" ${x.prio==='P1'?'selected':''}>P1</option>
                   <option value="P2" ${x.prio==='P2'?'selected':''}>P2</option>
                 </select>
+                ${isYc?`<button class="edit" onclick="event.stopPropagation();exportPhasePDF(${x.id})" title="导出实施计划 PDF">📄</button>`:''}
                 <button class="edit" onclick="openTaskDrawer(${x.id})" title="详情/编辑">📝</button>
                 <button class="del" onclick="del(${x.id})" title="删除"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
+                ${phaseBtn}
               </div>
             </div>
             <div class="prog-wrap">
@@ -1781,6 +1797,7 @@ function renderCatTasksHTML(){
           </div>
           ${lastNote?`<div class="note" title="最新进度记录（点击标题查看全部）">📝 ${esc(lastNote.slice(0,80))}${lastNote.length>80?'…':''}</div>`:''}
         </div>
+        ${isYc && tIsOpen?`<div class="task-phase-row"><div class="phase-inner">${renderPhasePanel(x)}</div></div>`:''}
       </div>`;
     }).join('') || '<p class="empty-mini">该子功能暂无任务，可在上方添加</p>'}</div>
   </div>`;
@@ -1887,6 +1904,13 @@ function renderModuleTableHTML(){
     const note=t.note||'';
     const doneCls=t.done?'row-done':'';
     const monthly=(t.monthly && t.monthly.length===12)?t.monthly:new Array(12).fill('');
+    // 验厂（cat=2）任务：实施计划 4 阶段进度
+    const isYc=currentSubCat==='2';
+    const tPhases=(isYc && Array.isArray(t.phases))?t.phases:[];
+    const tAllItems=tPhases.flatMap(p=>p.items||[]);
+    const tDoneN=tAllItems.length?tAllItems.filter(i=>i.done).length:0;
+    const tTotN=tAllItems.length;
+    const tIsOpen=isYc && openTaskPhases.has(t.id);
     const tdHTML=cols.map(col=>{
       const [k]=col;
       if(k==='num')return `<td class="num">${i+1}</td>`;
@@ -1915,14 +1939,17 @@ function renderModuleTableHTML(){
       }).join('');
       return `<td>—</td>`;
     }).join('');
+    // 验厂任务的「计划明细」按钮：插入到"操作"列前面
+    const planBtn=isYc?`<button class="phase-btn" onclick="event.stopPropagation();toggleTaskPhaseRow(${t.id})" title="展开实施计划进度">${tIsOpen?'▾':'▸'} 计划明细 ${tDoneN}/${tTotN||0}</button>`:'';
     return `<tr class="${doneCls}" onclick="openModuleEdit(${t.id})" title="单击编辑详情">
       ${tdHTML}
       <td class="td-ops" onclick="event.stopPropagation()">
+        ${planBtn}
         <button title="${t.done?'标记未完成':'标记完成'}" onclick="toggleTaskDone(${t.id})" style="${t.done?'color:var(--green)':'color:var(--muted)'}">${t.done?'✓':'○'}</button>
         <button title="编辑" onclick="openModuleEdit(${t.id})">✎</button>
         <button title="删除" onclick="del(${t.id})">🗑</button>
       </td>
-    </tr>`;
+    </tr>${isYc && tIsOpen?`<tr class="phase-row" id="pr-t-${t.id}"><td colspan="${colCount}"><div class="phase-inner">${renderPhasePanel(t)}</div></td></tr>`:''}`;
   }).join('');
 
   return `${chips}<div class="mt-wrap">
@@ -1931,7 +1958,7 @@ function renderModuleTableHTML(){
       <tbody>${rows||`<tr><td colspan="${colCount}" class="mt-empty">暂无条目，点右上「＋ 添加条目」或导入数据</td></tr>`}</tbody>
     </table>
   </div>
-  <div class="auth-foot">💡 单击任意一行可查看详情 / 编辑；月份格点击可切换完成状态；数据自动同步至云端 Gist，电脑手机一致。</div>`;
+  <div class="auth-foot">💡 单击任意一行可查看详情 / 编辑；月份格点击可切换完成状态；验厂任务可点「▸ 计划明细」展开 4 阶段实施计划面板；数据自动同步至云端 Gist，电脑手机一致。</div>`;
 }
 function bindModuleTable(){ /* 预留 */ }
 
@@ -2294,23 +2321,28 @@ function togglePhaseRow(id){
   if(openPhases.has(id))openPhases.delete(id);else openPhases.add(id);
   refreshAuthTbody();
 }
+// 验厂任务 phases 行的展开/收起（用 openTaskPhases 集合）
+function toggleTaskPhaseRow(id){
+  if(openTaskPhases.has(id))openTaskPhases.delete(id);else openTaskPhases.add(id);
+  renderSubModule();
+}
 function togglePhaseItem(id,pi,ii){
-  const a=(data.auths||[]).find(x=>x.id==id);if(!a||!a.phases[pi])return;
-  const it=a.phases[pi].items[ii];if(!it)return;
+  const src=findPhaseSrc(id);if(!src||!src.phases[pi])return;
+  const it=src.phases[pi].items[ii];if(!it)return;
   it.done=!it.done;
   if(it.done && !it.date) it.date=todayStr();
-  saveData();refreshAuthTbody();
+  saveData();refreshPhaseContext(id);
 }
 function addPhaseItem(id,pi){
-  const a=(data.auths||[]).find(x=>x.id==id);if(!a||!a.phases[pi])return;
-  const nm=prompt('添加「'+a.phases[pi].name+'」下的确认项名称：');if(!nm)return;
+  const src=findPhaseSrc(id);if(!src||!src.phases[pi])return;
+  const nm=prompt('添加「'+src.phases[pi].name+'」下的确认项名称：');if(!nm)return;
   const name=nm.trim();if(!name)return;
-  a.phases[pi].items.push({name,done:false});
-  saveData();refreshAuthTbody();
+  src.phases[pi].items.push({name,done:false});
+  saveData();refreshPhaseContext(id);
 }
 function importPhaseFiles(id,pi){
-  const a=(data.auths||[]).find(x=>x.id==id);if(!a||!a.phases[pi])return;
-  const existing=new Set(a.phases[pi].items.map(i=>i.name));
+  const src=findPhaseSrc(id);if(!src||!src.phases[pi])return;
+  const existing=new Set(src.phases[pi].items.map(i=>i.name));
   // 弹出一个 textarea 弹窗，浏览器原生 prompt 是单行会丢行
   const mask=document.createElement('div');mask.className='mask';mask.id='importMask';
   const box=document.createElement('div');box.className='import-box';
@@ -2344,9 +2376,9 @@ function importPhaseFiles(id,pi){
     const lines=ta.value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
     if(!lines.length){toast('没有可导入的行');return;}
     let added=0;
-    lines.forEach(n=>{if(!existing.has(n)){a.phases[pi].items.push({name:n,done:false});existing.add(n);added++;}});
-    saveData();refreshAuthTbody();
-    toast('已导入 '+added+' 份到「'+a.phases[pi].name+'」'+(lines.length-added?' · 跳过 '+(lines.length-added)+' 份重复':''));
+    lines.forEach(n=>{if(!existing.has(n)){src.phases[pi].items.push({name:n,done:false});existing.add(n);added++;}});
+    saveData();refreshPhaseContext(id);
+    toast('已导入 '+added+' 份到「'+src.phases[pi].name+'」'+(lines.length-added?' · 跳过 '+(lines.length-added)+' 份重复':''));
     close();
   };
 }
@@ -2416,6 +2448,16 @@ function delAuth(id){
   data.auths=data.auths.filter(x=>x.id!=id);saveData();closeAuthDrawer();renderAuthView();toast('已删除');
 }
 function findAuth(id){return (data.auths||[]).find(x=>x.id==id)}
+function findTask(id){return (data.tasks||[]).find(x=>x.id==id)}
+// 通用查找阶段源（认证 or 验厂任务）
+function findPhaseSrc(id){
+  return findAuth(id) || findTask(id);
+}
+// 刷新当前所在列表（认证台账 或 任务子模块）
+function refreshPhaseContext(id){
+  if(findAuth(id)) refreshAuthTbody();
+  if(findTask(id) && currentSubCat) renderSubModule();
+}
 /* —— 整改项拍照取证 —— */
 function ensurePhotoModal(){
   if(document.getElementById('photoModal'))return;
@@ -2438,45 +2480,46 @@ function compressImg(dataUrl,maxW,q,cb){
   img.src=dataUrl;
 }
 function phasePhoto(id,pi,ii){
-  const a=findAuth(id);if(!a||!a.phases[pi])return;
-  const it=a.phases[pi].items[ii];if(!it)return;
+  const src=findPhaseSrc(id);if(!src||!src.phases[pi])return;
+  const it=src.phases[pi].items[ii];if(!it)return;
   const inp=document.createElement('input');
   inp.type='file';inp.accept='image/*';inp.capture='environment';
   inp.onchange=()=>{
     const f=inp.files[0];if(!f)return;
     const rd=new FileReader();
-    rd.onload=()=>compressImg(rd.result,800,0.7,d=>{it.photo=d;saveData();refreshAuthTbody();toast('已留存取证照片');});
+    rd.onload=()=>compressImg(rd.result,800,0.7,d=>{it.photo=d;saveData();refreshPhaseContext(id);toast('已留存取证照片');});
     rd.readAsDataURL(f);
   };
   inp.click();
 }
 /* —— 子任务排序（拖拽 + 上移下移）—— */
 function movePhaseItem(id,pi,ii,dir){
-  const a=findAuth(id);if(!a||!a.phases[pi])return;
-  const arr=a.phases[pi].items;const j=ii+dir;
+  const src=findPhaseSrc(id);if(!src||!src.phases[pi])return;
+  const arr=src.phases[pi].items;const j=ii+dir;
   if(j<0||j>=arr.length)return;
   const t=arr[ii];arr[ii]=arr[j];arr[j]=t;
-  saveData();refreshAuthTbody();
+  saveData();refreshPhaseContext(id);
 }
 function delPhaseItem(id,pi,ii){
-  const a=findAuth(id);if(!a||!a.phases[pi]||!a.phases[pi].items[ii])return;
-  const it=a.phases[pi].items[ii];
+  const src=findPhaseSrc(id);if(!src||!src.phases[pi]||!src.phases[pi].items[ii])return;
+  const it=src.phases[pi].items[ii];
   if(!confirm('确定删除「'+it.name+'」？\n（该步骤的所有信息，包括照片，将一并清除）'))return;
-  a.phases[pi].items.splice(ii,1);
-  saveData();refreshAuthTbody();toast('已删除');
+  src.phases[pi].items.splice(ii,1);
+  saveData();refreshPhaseContext(id);toast('已删除');
 }
 function pdragstart(e,id,pi,ii){e.dataTransfer.setData('text/plain',String(ii));e.dataTransfer.effectAllowed='move';}
 function pdrop(e,id,pi,ii){
   e.preventDefault();e.currentTarget.classList.remove('drag-ov');
-  const a=findAuth(id);if(!a||!a.phases[pi])return;
+  const src=findPhaseSrc(id);if(!src||!src.phases[pi])return;
   const from=parseInt(e.dataTransfer.getData('text/plain'),10);if(isNaN(from)||from===ii)return;
-  const arr=a.phases[pi].items;const t=arr.splice(from,1)[0];arr.splice(ii,0,t);
-  saveData();refreshAuthTbody();
+  const arr=src.phases[pi].items;const t=arr.splice(from,1)[0];arr.splice(ii,0,t);
+  saveData();refreshPhaseContext(id);
 }
-/* —— 导出该认证实施计划 PDF —— */
+/* —— 导出该认证/任务实施计划 PDF —— */
 function exportPhasePDF(id){
-  const a=findAuth(id);if(!a)return;
-  const phases=a.phases||[];
+  const src=findPhaseSrc(id);if(!src)return;
+  const title=src.name||src.title||'实施计划';
+  const phases=src.phases||[];
   const allItems=phases.flatMap(p=>p.items||[]);
   const doneN=allItems.filter(i=>i.done).length,totN=allItems.length;
   const pct=totN?Math.round(doneN/totN*100):0;
@@ -2496,8 +2539,8 @@ function exportPhasePDF(id){
     });
   });
   const area=document.createElement('div');area.id='printArea';
-  area.innerHTML=`<h1>${esc(a.name)} · 实施计划进度表</h1>
-    <div class="sub">对接机构：${esc(a.org||'—')}　|　担当：${esc(a.lead||'—')}　|　有效期：${esc(a.expire||'—')}　|　导出日期：${todayStr()}</div>
+  area.innerHTML=`<h1>${esc(title)} · 实施计划进度表</h1>
+    <div class="sub">对接机构：${esc(src.org||'—')}　|　担当：${esc(src.lead||'—')}　|　有效期：${esc(src.expire||src.due||'—')}　|　导出日期：${todayStr()}</div>
     <table>
       <thead><tr><th style="width:34%">实施明细项</th><th style="width:18%">状态</th><th style="width:14%">担当</th><th style="width:34%">取证照片</th></tr></thead>
       <tbody>${rows}</tbody>
@@ -2845,6 +2888,8 @@ function normalizeData(){
   if(!Array.isArray(data.certs))data.certs=[];
   if(!Array.isArray(data.auths))data.auths=defaultAuths();
   (data.auths||[]).forEach(a=>{ if(!Array.isArray(a.phases)) a.phases=defaultPhases(); });
+  // 验厂（cat=2）任务也注入 4 阶段默认模板（与认证管理一致）
+  if(Array.isArray(data.tasks))(data.tasks||[]).filter(t=>t.cat==='2' && !Array.isArray(t.phases)).forEach(t=>{t.phases=defaultPhases();});
   if(!Array.isArray(data.kb))data.kb=[];
 }
 
