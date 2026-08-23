@@ -1902,7 +1902,7 @@ function renderModuleTableHTML(){
     const first=t.firstCert||'';
     const exp=t.expire||'';
     const expBadge=exp?(t.expireStatus==='bad'?'<span class="exp-bd bad">已过期</span>':t.expireStatus==='warn'?'<span class="exp-bd warn">即将到期</span>':'<span class="exp-bd ok">有效</span>'):'';
-    const plan=(t.plan||[]).map((p,j)=>`<span class="plan-pill"><b>${'①②③④⑤⑥'.charAt(j)}</b>${esc(p)}</span>`).join('');
+    // 不在表格视图显示 plan pill（验厂任务已用「计划明细」按钮 + 4 阶段面板承载，cat=1 也只有按钮；plan 字段保留在数据层、抽屉可编辑）
     const org=t.org||'';
     const lead=t.lead||'';
     const supports=(t.supports||[]).map(n=>`<span class="mt-person">${esc(n)}</span>`).join('');
@@ -1933,7 +1933,7 @@ function renderModuleTableHTML(){
       }
       if(k==='startDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.startDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'startDate',this.value)"></td>`;
       if(k==='endDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.endDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'endDate',this.value)"></td>`;
-      if(k==='plan')return `<td class="td-plan"><div class="td-plan-grp"><div class="plan-pills">${plan||'—'}</div>${planBtn}</div></td>`;
+      if(k==='plan')return `<td class="td-plan"><div class="td-plan-grp">${planBtn||'—'}</div></td>`;
       if(k==='org')return `<td class="td-org">${esc(org)||'—'}</td>`;
       if(k==='lead')return `<td>${lead?`<span class="mt-person lead">${esc(lead)}</span>`:'—'}</td>`;
       if(k==='sup')return `<td class="td-sup">${(t.supports||[]).map(n=>`<span class="mt-person stack">${esc(n)}</span>`).join('')||'—'}</td>`;
