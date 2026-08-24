@@ -1080,7 +1080,7 @@ const CATS=[
   {id:'8',name:'会员会费管理',color:'c-pink',short:'会员会费管理',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12M12 22v-6M2 7h20v5H2zM12 7V3M8 3h8"/></svg>',
    subs:['会员续费','系统账户'],
-   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['startTime','开始时间'],['expire','有效期'],['month','1月-12月'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['startTime','开始时间'],['expire','有效期'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
   {id:'9',name:'EHS检查表存档',color:'c-orange',short:'EHS检查表存档',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M9 13h6M9 17h6"/></svg>',
    subs:['点检记录','检查记录','统计记录'],
@@ -1879,7 +1879,7 @@ function renderModuleTableHTML(){
     <button class="btn primary" onclick="openModuleAdd()" style="padding:5px 12px;font-size:12px">＋ 添加条目</button>
   </div>`;
 
-  if(subViewMode==='monthly'){
+  if(subViewMode==='monthly' && c.cols && c.cols.some(col=>col[0]==='month')){
     return chips + renderMonthlyViewHTML(filterItems);
   }
 
