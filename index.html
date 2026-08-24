@@ -706,28 +706,28 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .dash-r2{grid-template-columns:1.4fr 1fr 1fr}
 @media(max-width:1100px){.dash-r1,.dash-r2{grid-template-columns:1fr 1fr}.dash-r1 .d-card:nth-child(2){grid-column:1/-1;order:-1}}
 @media(max-width:680px){.dash-r1,.dash-r2{grid-template-columns:1fr}.dash-r1 .d-card:nth-child(2){grid-column:auto;order:0}}
-.d-card{background:rgba(13,33,69,.7);border:1px solid rgba(56,138,221,.25);border-radius:10px;padding:14px;position:relative}
+.d-card{background:rgba(13,33,69,.7);border:1px solid rgba(56,138,221,.25);border-radius:10px;padding:14px;position:relative;display:flex;flex-direction:column}
 .d-card::before{content:"";position:absolute;top:0;left:10px;right:10px;height:1px;background:linear-gradient(90deg,transparent,#5ec3ff,transparent)}
 .d-ctitle{font-size:13px;color:#7fb6e8;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
 .d-ctitle::before{content:"";width:3px;height:12px;background:#5ec3ff;border-radius:1px}
-.d-kpi-list{display:flex;flex-direction:column;gap:8px;height:100%;justify-content:center}
+.d-kpi-list{display:flex;flex-direction:column;gap:8px;flex:1;justify-content:space-between;margin-top:2px}
 .d-kpi{display:flex;align-items:center;justify-content:space-between;background:rgba(8,22,52,.5);border-radius:7px;padding:11px 13px;border:1px solid rgba(56,138,221,.15)}
 .d-kpi-l{font-size:12px;color:#7fb6e8}
 .d-kpi-n{font-size:26px;font-weight:700;color:#5ec3ff;line-height:1}
 .d-kpi.warn .d-kpi-n{color:#e24b4a}
 .d-kpi.ok .d-kpi-n{color:#1d9e75}
-.d-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:300px}
+.d-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:280px}
 .d-donut-wrap{position:relative}
 .d-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
-.d-donut-num{font-size:52px;font-weight:800;background:linear-gradient(180deg,#5ec3ff,#185fa5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.d-donut-num{font-size:66px;font-weight:800;background:linear-gradient(180deg,#7fd0ff,#185fa5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
 .d-donut-pct{font-size:15px;color:#7fb6e8;margin-top:2px}
 .d-donut-sub{font-size:11px;color:#7fb6e8;margin-top:6px}
-.d-legend{display:grid;grid-template-columns:repeat(2,1fr);gap:5px 16px;margin-top:14px;font-size:11px;color:#cfe0ff}
+.d-legend{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 16px;margin-top:14px;font-size:12px;color:#dbe9ff}
 .d-lg{display:flex;align-items:center;gap:6px}
 .d-lg-dot{width:9px;height:9px;border-radius:2px;flex:none}
 .d-lg-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .d-lg-n{color:#5ec3ff;font-family:ui-monospace,monospace;font-size:11px}
-.d-cert-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed rgba(56,138,221,.15);font-size:11.5px}
+.d-cert-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed rgba(56,138,221,.15);font-size:11.5px;flex:1}
 .d-cert-row:last-child{border-bottom:none}
 .d-cert-n{color:#cfe0ff;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .d-cert-d{font-family:ui-monospace,monospace;font-size:10px;padding:1px 6px;border-radius:3px;margin-left:6px;white-space:nowrap}
@@ -735,11 +735,11 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .d-b-amb{background:#ef9f27;color:#fff}
 .d-b-grn{background:#1d9e75;color:#fff}
 .d-bar-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:11.5px}
-.d-bar-n{width:62px;color:#cfe0ff;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d-bar-n{width:84px;color:#cfe0ff;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
 .d-bar-tr{height:13px;background:rgba(56,138,221,.12);border-radius:3px;flex:1;overflow:hidden}
 .d-bar-fi{height:100%;border-radius:3px}
-.d-bar-s{width:38px;text-align:right;color:#5ec3ff;font-family:ui-monospace,monospace;font-size:10px;flex:none}
-.d-note{font-size:10px;color:#7fb6e8;margin-top:8px;line-height:1.5}
+.d-bar-s{width:60px;text-align:right;color:#5ec3ff;font-family:ui-monospace,monospace;font-size:10px;flex:none}
+.d-note{font-size:11px;color:#9fc4e8;margin-top:8px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -1648,7 +1648,7 @@ function renderDashboard(){
     <div class="dash-row dash-r2">
       <div class="d-card">
         <div class="d-ctitle">11 大类完成率（已完成 / 总数）</div>
-        ${cats.map(r=>`<div class="d-bar-row"><span class="d-bar-n" title="${esc(r.c.name)}">${esc(r.c.short||r.c.name)}</span><div class="d-bar-tr"><div class="d-bar-fi" style="width:${r.pct}%;background:${DASH_COLOR[r.c.id]||'#185fa5'}"></div></div><span class="d-bar-s">${r.done}/${r.total}</span></div>`).join('')}
+        ${cats.map(r=>`<div class="d-bar-row"><span class="d-bar-n" title="${esc(r.c.name)}">${esc(r.c.short||r.c.name)}</span><div class="d-bar-tr"><div class="d-bar-fi" style="width:${r.pct}%;background:${DASH_COLOR[r.c.id]||'#185fa5'}"></div></div><span class="d-bar-s">${r.pct}%<span style="opacity:.5;font-size:9px"> ${r.done}/${r.total}</span></span></div>`).join('')}
       </div>
       <div class="d-card">
         <div class="d-ctitle">逾期 / 临期任务</div>
@@ -1656,7 +1656,7 @@ function renderDashboard(){
       </div>
       <div class="d-card">
         <div class="d-ctitle">担当工作量分布</div>
-        ${leads.map(([n,v])=>`<div class="d-bar-row"><span class="d-bar-n">${esc(n)}</span><div class="d-bar-tr"><div class="d-bar-fi" style="width:${Math.round(v/leadMax*100)}%;background:#185fa5"></div></div><span class="d-bar-s">${v}</span></div>`).join('')}
+        ${leads.map(([n,v],i)=>`<div class="d-bar-row"><span class="d-bar-n">${esc(n)}</span><div class="d-bar-tr"><div class="d-bar-fi" style="width:${Math.round(v/leadMax*100)}%;background:${i===0?'linear-gradient(90deg,#fbbf24,#f59e0b)':'#185fa5'}"></div></div><span class="d-bar-s">${v}<span style="opacity:.5;font-size:9px"> ${Math.round(v/total*100)}%</span></span></div>`).join('')}
       </div>
     </div>
   </div>`;
