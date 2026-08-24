@@ -1080,7 +1080,7 @@ const CATS=[
   {id:'8',name:'会员会费管理',color:'c-pink',short:'会员会费管理',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12M12 22v-6M2 7h20v5H2zM12 7V3M8 3h8"/></svg>',
    subs:['会员续费','系统账户'],
-   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['expire','有效期'],['month','1月-12月'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['startTime','开始时间'],['expire','有效期'],['month','1月-12月'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
   {id:'9',name:'EHS检查表存档',color:'c-orange',short:'EHS检查表存档',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M9 13h6M9 17h6"/></svg>',
    subs:['点检记录','检查记录','统计记录'],
@@ -1757,8 +1757,8 @@ function renderCatTasksHTML(){
       const startD=x.start||'未设定';
       const endD=x.end||x.due||'未设定';
       const overdueDays=(isOver && x.due)?Math.round((new Date(today)-new Date(x.due))/86400000):0;
-      // 验厂（cat=2）任务专用：实施计划 4 阶段 进度统计
-      const isYc=currentSubCat==='2';
+      // 验厂（cat=2）/ 会员会费（cat=8）任务专用：实施计划 4 / 1 阶段 进度统计
+      const isYc=currentSubCat==='2'||currentSubCat==='8';
       const tPhases=(isYc && Array.isArray(x.phases))?x.phases:[];
       const tAllItems=tPhases.flatMap(p=>p.items||[]);
       const tDoneN=tAllItems.length?tAllItems.filter(i=>i.done).length:0;
@@ -1910,8 +1910,8 @@ function renderModuleTableHTML(){
     const note=t.note||'';
     const doneCls=t.done?'row-done':'';
     const monthly=(t.monthly && t.monthly.length===12)?t.monthly:new Array(12).fill('');
-    // 验厂（cat=2）任务：实施计划 4 阶段进度
-    const isYc=currentSubCat==='2';
+    // 验厂（cat=2）/ 会员会费（cat=8）任务：实施计划 4 / 1 阶段进度
+    const isYc=currentSubCat==='2'||currentSubCat==='8';
     const tPhases=(isYc && Array.isArray(t.phases))?t.phases:[];
     const tAllItems=tPhases.flatMap(p=>p.items||[]);
     const tDoneN=tAllItems.length?tAllItems.filter(i=>i.done).length:0;
@@ -1931,7 +1931,7 @@ function renderModuleTableHTML(){
         const bdg=st==='bad'?'<span class="exp-bd bad">已过期</span>':st==='warn'?'<span class="exp-bd warn">即将到期</span>':st==='ok'?'<span class="exp-bd ok">有效</span>':'';
         return `<td class="sm"><div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><input type="date" class="cell-date" value="${esc(exp)}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'expire',this.value)" title="点击日历修改有效期（续证时改）">${bdg}</div></td>`;
       }
-      if(k==='startDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.startDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'startDate',this.value)"></td>`;
+      if(k==='startDate'||k==='startTime')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.startDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'startDate',this.value)"></td>`;
       if(k==='endDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.endDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'endDate',this.value)"></td>`;
       if(k==='plan')return `<td class="td-plan"><div class="td-plan-grp">${planBtn||'—'}</div></td>`;
       if(k==='org')return `<td class="td-org">${esc(org)||'—'}</td>`;
@@ -1963,7 +1963,7 @@ function renderModuleTableHTML(){
       <tbody>${rows||`<tr><td colspan="${colCount}" class="mt-empty">暂无条目，点右上「＋ 添加条目」或导入数据</td></tr>`}</tbody>
     </table>
   </div>
-  <div class="auth-foot">💡 单击任意一行可查看详情 / 编辑；月份格点击可切换完成状态；验厂任务可点「▸ 计划明细」展开 4 阶段实施计划面板；数据自动同步至云端 Gist，电脑手机一致。</div>`;
+  <div class="auth-foot">💡 单击任意一行可查看详情 / 编辑；月份格点击可切换完成状态；验厂/会员会费任务可点「▸ 计划明细」展开实施计划面板；数据自动同步至云端 Gist，电脑手机一致。</div>`;
 }
 function bindModuleTable(){ /* 预留 */ }
 
@@ -2893,8 +2893,13 @@ function normalizeData(){
   if(!Array.isArray(data.certs))data.certs=[];
   if(!Array.isArray(data.auths))data.auths=defaultAuths();
   (data.auths||[]).forEach(a=>{ if(!Array.isArray(a.phases)) a.phases=defaultPhases(); });
-  // 验厂（cat=2）任务也注入 4 阶段默认模板（与认证管理一致）
-  if(Array.isArray(data.tasks))(data.tasks||[]).filter(t=>t.cat==='2' && !Array.isArray(t.phases)).forEach(t=>{t.phases=defaultPhases();});
+  // 验厂（cat=2）任务注入 4 阶段默认模板；会员会费（cat=8）任务注入「确认合同/款项」1 阶段
+  if(Array.isArray(data.tasks))(data.tasks||[]).forEach(t=>{
+    if(!Array.isArray(t.phases)){
+      if(t.cat==='2') t.phases=defaultPhases();
+      else if(t.cat==='8') t.phases=[defaultPhases()[0]];
+    }
+  });
   if(!Array.isArray(data.kb))data.kb=[];
 }
 
