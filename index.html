@@ -605,7 +605,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rb-print-tbl tbody td.left{text-align:left;padding-left:6px}
 .rb-print-tbl tbody td.num{text-align:right;padding-right:6px;font-variant-numeric:tabular-nums}
 .rb-print-tbl tbody tfoot td,.rb-print-tbl tfoot td{background:#d6f0d6;font-weight:700;color:#0c1f44}
-.rb-print-tbl .empty-row td{background:#f8fdf6;color:#94a3b8}
+.rb-print-tbl .empty-row td{background:#f8fdf6}
 .rb-print-note{display:flex;font-size:11.5px;line-height:1.6;border-top:2px solid #1a2540;padding-top:8px;margin-top:6px}
 .rb-print-note .label{flex:0 0 150px;font-weight:700;color:#0c1f44}
 .rb-print-note .label .vi{display:block;font-style:italic;font-weight:600;font-size:11px;color:#334155}
@@ -621,19 +621,26 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rb-print-actions .btn-print:hover{background:#059669}
 .rb-print-actions .btn-close{background:#64748b;color:#fff;border:0;padding:9px 18px;border-radius:6px;cursor:pointer;font-size:13px}
 .rb-print-actions .btn-close:hover{background:#475569}
-.rb-print-actions .tip{font-size:12px;color:#e0f2fe;align-self:center}
-/* 打印模式下：去掉 dark 背景遮罩与圆角阴影、A4 横向 */
-@media print{
-  body>*:not(#rb-modal){display:none!important}
-  #rb-modal{position:static!important;background:#fff!important;padding:0!important;inset:auto!important}
-  .rb-modal .rb-box{box-shadow:none!important;border-radius:0!important;max-width:none!important;max-height:none!important}
-  .rb-modal .rb-head,.rb-modal .rb-tabs,.rb-modal .rb-foot,.rb-print-actions,.no-print{display:none!important}
-  .rb-modal .rb-pane.edit-pane{display:none!important}
-  .rb-modal .rb-pane.print-pane{display:block!important;background:#fff!important;padding:0!important;overflow:visible!important}
-  .rb-print{max-width:100%!important;box-shadow:none!important;padding:8px 10px!important}
-  .rb-print-tbl tbody tr{break-inside:avoid}
-  @page{size:A4 landscape;margin:8mm}
-}
+.rb-print-actions .btn-orient{background:#1e5bbf;color:#fff;border:0;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
+.rb-print-actions .btn-orient:hover{background:#1849a0}
+.rb-print-actions .btn-orient .now{background:rgba(255,255,255,.22);padding:1px 7px;border-radius:10px;font-size:10px;margin-left:2px}
+.rb-print-actions .tip{color:#fff;font-size:11px;opacity:.85;margin-left:6px}
+/* LOGO 真实图片 */
+.rb-print-logo-img{height:62px;width:auto;display:block}
+/* 打印模板表格可编辑单元 */
+.rb-print-tbl td[contenteditable="true"]{cursor:text;position:relative;transition:background .15s}
+.rb-print-tbl td[contenteditable="true"]:hover{background:#fffbeb!important;box-shadow:inset 0 0 0 1px #fcd34d}
+.rb-print-tbl td[contenteditable="true"]:focus{background:#fff7d6!important;outline:2px solid #10b981;outline-offset:-2px}
+.rb-print-tbl td[contenteditable="true"].num{text-align:right;padding-right:6px}
+.rb-print-tbl td.derived{background:repeating-linear-gradient(135deg,#e3f3e1 0 6px,#d6f0d6 6px 12px);color:#475569;font-style:italic}
+/* 签名三栏（做成与主表格同款） */
+.rb-print-sign-tbl{width:100%;border-collapse:collapse;margin-top:18px;table-layout:fixed}
+.rb-print-sign-tbl th{background:#d6f0d6;color:#0c1f44;border:1px solid #1a2540;padding:6px 4px;text-align:center;font-weight:700;line-height:1.2;width:33.33%}
+.rb-print-sign-tbl th .vi{display:block;font-style:italic;font-weight:600;font-size:10px;color:#334155}
+.rb-print-sign-tbl th .zh{display:block;font-weight:700;font-size:13px;color:#0c1f44;letter-spacing:2px}
+.rb-print-sign-tbl td{border:1px solid #1a2540;height:120px;vertical-align:bottom;text-align:center;padding-bottom:8px;color:#1a2540}
+.rb-print-sign-tbl td .sign-hint{color:#cbd5e1;font-size:11px;font-style:italic}
+@media print{body>*:not(#rb-modal){display:none!important}#rb-modal{position:static!important;background:#fff!important;padding:0!important;inset:auto!important}.rb-modal .rb-box{box-shadow:none!important;border-radius:0!important;max-width:none!important;max-height:none!important}.rb-modal .rb-head,.rb-modal .rb-tabs,.rb-modal .rb-foot,.rb-print-actions,.no-print{display:none!important}.rb-modal .rb-pane.edit-pane{display:none!important}.rb-modal .rb-pane.print-pane{display:block!important;background:#fff!important;padding:0!important;overflow:visible!important}.rb-print{max-width:100%!important;box-shadow:none!important;padding:8px 10px!important}.rb-print-tbl tbody tr{break-inside:avoid}.rb-print-tbl td[contenteditable="true"]:focus{outline:none}.rb-print-sign-tbl td{height:130px}@page{margin:8mm}}
 .phase-btn.on .arr{transform:rotate(90deg)}
 /* 验厂任务行的「实施计划」列：pill 在上、计划明细按钮在下（与 cat=1 认证管理同款视觉） */
 .td-plan-grp{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
@@ -2252,8 +2259,9 @@ function renderReimbursementModal(t){
         <div class="rb-print" id="rb-print-box">${renderRbPrintHtml(t,rb)}</div>
         <div class="rb-print-actions no-print">
           <button type="button" class="btn-print" onclick="rbPrintNow()">🖨️ 打印 / 导出 PDF</button>
+          <button type="button" class="btn-orient" id="rb-orient-btn" onclick="rbToggleOrientation()">🔄 版式切换<span class="now">横版</span></button>
           <button type="button" class="btn-close" onclick="closeReimbursementModal()">关闭</button>
-          <span class="tip">提示：浏览器打印对话框选「另存为 PDF」即可保存报销单</span>
+          <span class="tip">提示：表格可直接编辑；点「版式切换」可选横版/竖版再打印</span>
         </div>
       </div>
     </div>
@@ -2272,6 +2280,20 @@ function rbSwitchPane(pane){
     p.classList.toggle('on',p.classList.contains(pane+'-pane'));
   });
 }
+/* 打印版式（横版/竖版）动态切换：通过独立 @page 样式控制，默认横版 A4 */
+let rbPrintOrientation='landscape';
+function rbApplyOrientation(){
+  let s=document.getElementById('rb-orient-css');
+  if(!s){ s=document.createElement('style'); s.id='rb-orient-css'; document.head.appendChild(s); }
+  s.textContent='@page{size:A4 '+rbPrintOrientation+'}';
+}
+function rbToggleOrientation(){
+  rbPrintOrientation = (rbPrintOrientation==='landscape')?'portrait':'landscape';
+  rbApplyOrientation();
+  const btn=document.getElementById('rb-orient-btn');
+  if(btn){ const n=btn.querySelector('.now'); if(n)n.textContent=(rbPrintOrientation==='landscape'?'横版':'竖版'); }
+}
+rbApplyOrientation();
 /* 触发浏览器原生打印（Ctrl+P / 菜单"另存为 PDF"） */
 function rbPrintNow(){
   const box=document.getElementById('rb-modal');
@@ -2309,6 +2331,8 @@ const RB_PRINT_COLS=[
   ['total','Cộng chi phí','总费用',66],
   ['vnd','VND','越南盾',90]
 ];
+/* PROSPERITY TEXTILE 真实 LOGO（dataURL 嵌入） */
+const RB_LOGO_DATAURL='data:image/png;base64,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';
 function rbPrintCellVal(r,k){
   if(k==='period')return [(r.startTime||''),(r.endTime||'')].filter(Boolean).join(' ~ ')||(r.startTime||r.endTime||'');
   return r[k]||'';
@@ -2332,22 +2356,19 @@ function renderRbPrintHtml(t,rb){
     const isEmpty=!r.name;
     const tds=RB_PRINT_COLS.map(c=>{
       const k=c[0];
-      if(k==='total')return `<td class="num">${tot?'¥'+tot.toFixed(2):''}</td>`;
-      if(k==='vnd')return `<td class="num">${vnd?fmtVND(vnd):''}</td>`;
+      if(k==='total')return `<td class="num derived">${tot?'¥'+tot.toFixed(2):''}</td>`;
+      if(k==='vnd')return `<td class="num derived">${vnd?fmtVND(vnd):''}</td>`;
       const v=isEmpty?'':rbPrintCellVal(r,k);
       const numKeys=['transport','room','meal','hospitality','fuel','other'];
       const cls=(numKeys.includes(k))?'num':'left';
-      return `<td class="${cls}">${esc(v)}</td>`;
+      return `<td class="${cls}" contenteditable="true">${esc(v)}</td>`;
     }).join('');
     return `<tr${isEmpty?' class="empty-row"':''}>${tds}</tr>`;
   }).join('');
   return `
     <div class="rb-print-hd">
       <div class="rb-print-logo">
-        <div class="rb-print-logo-inner">
-          <span class="prosp">PR<span class="o">O</span>SPERITY</span>
-          <span class="textile">TEXTILE</span>
-        </div>
+        <img class="rb-print-logo-img" src="${RB_LOGO_DATAURL}" alt="PROSPERITY TEXTILE">
       </div>
       <div class="rb-print-company">
         <b>北江纺织（越南）有限公司</b><br>
@@ -2381,20 +2402,18 @@ function renderRbPrintHtml(t,rb){
         <span class="vi">Các khoản kế toán chỉ là dự toán, trong vòng 7 ngày sau khi kết thúc đợt công tác phải tập hợp chứng từ, báo cáo chủ quản bộ phận phê duyệt chi phí thực tế, chuyển phòng tài vụ thanh toán. 以上款项为预算费用，实际费用须于出差完成 7 天内呈，递部门主管核准后向财务部报销。</span>
       </div>
     </div>
-    <div class="rb-print-sign">
-      <div class="col">
-        <span class="zh">报销人</span>
-        <span class="vi">Người viết đơn</span>
-      </div>
-      <div class="col">
-        <span class="zh">部门审核</span>
-        <span class="vi">Bộ phận đánh giá</span>
-      </div>
-      <div class="col">
-        <span class="zh">领导批准</span>
-        <span class="vi">Lãnh đạo phê duyệt</span>
-      </div>
-    </div>
+    <table class="rb-print-sign-tbl">
+      <thead><tr>
+        <th><span class="vi">Người viết đơn</span><span class="zh">报销人</span></th>
+        <th><span class="vi">Bộ phận đánh giá</span><span class="zh">部门审核</span></th>
+        <th><span class="vi">Lãnh đạo phê duyệt</span><span class="zh">领导批准</span></th>
+      </tr></thead>
+      <tbody><tr>
+        <td><span class="sign-hint">（签名 / Ký tên）</span></td>
+        <td><span class="sign-hint">（签名 / Ký tên）</span></td>
+        <td><span class="sign-hint">（签名 / Ký tên）</span></td>
+      </tr></tbody>
+    </table>
   `;
 }
 function rbAddRow(taskId){
