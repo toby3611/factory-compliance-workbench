@@ -533,6 +533,40 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .phase-btn:hover{background:#d1fae5;color:#065f46}
 .phase-btn.on{background:#047857;color:#fff;border-color:#047857}
 .phase-btn .arr{display:inline-block;transition:transform .15s}
+
+/* 出差报销单 modal（中越双语 16 列） */
+.rb-modal{position:fixed;inset:0;background:rgba(13,33,69,.55);z-index:900;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}
+.rb-box{background:#fff;border-radius:12px;width:100%;max-width:1500px;box-shadow:0 12px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:calc(100vh - 48px);overflow:hidden}
+.rb-head{display:flex;align-items:center;gap:14px;padding:14px 18px;background:linear-gradient(135deg,#1e3a8a 0%,#0c4a6e 100%);color:#fff;position:relative;flex-wrap:wrap}
+.rb-title{font-size:18px;font-weight:700;letter-spacing:.5px}
+.rb-sub{font-size:11px;font-weight:400;color:#cfe0ff;margin-left:6px}
+.rb-rate{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px}
+.rb-rate label{color:#cfe0ff}
+.rb-rate-unit{color:#ffd;opacity:.85;font-size:11px;margin:0 2px}
+.rb-rate input{width:120px;padding:5px 8px;border-radius:6px;border:1px solid #93c5fd;background:#fff;color:#0c4a6e;font-weight:600;font-size:14px}
+.rb-close{position:absolute;top:8px;right:12px;background:rgba(255,255,255,.15);border:0;color:#fff;font-size:18px;width:32px;height:32px;border-radius:50%;cursor:pointer;line-height:1}
+.rb-close:hover{background:rgba(255,255,255,.3)}
+.rb-meta{padding:8px 18px;font-size:12px;color:#475569;background:#f8fafc;border-bottom:1px solid #e2e8f0}
+.rb-tbl-wrap{flex:1;overflow:auto;background:#fff}
+.rb-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
+.rb-tbl thead th{position:sticky;top:0;background:#1e3a8a;color:#fff;padding:8px 6px;font-weight:600;text-align:center;white-space:nowrap;border-right:1px solid #1e40af}
+.rb-tbl tbody td{border-bottom:1px solid #e2e8f0;border-right:1px solid #f1f5f9;padding:3px 4px;vertical-align:middle}
+.rb-tbl tbody tr:hover{background:#f8fafc}
+.rb-tbl tfoot td{background:#f1f5f9;border-top:2px solid #1e3a8a;padding:10px 8px;font-size:13px}
+.rb-inp{width:100%;border:0;background:transparent;padding:4px 2px;font-size:12px;outline:none;font-family:inherit}
+.rb-inp:focus{background:#dbeafe;border-radius:3px}
+.rb-num{text-align:right}
+.rb-empty{text-align:center;color:#94a3b8;padding:30px 0;font-style:italic}
+.rb-del-cell{text-align:center;width:40px}
+.rb-del{background:transparent;border:0;color:#dc2626;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px}
+.rb-del:hover{background:#fee2e2}
+.rb-foot{display:flex;align-items:center;gap:12px;padding:10px 18px;background:#f8fafc;border-top:1px solid #e2e8f0;flex-wrap:wrap}
+.rb-add{background:#3b82f6;color:#fff;border:0;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
+.rb-add:hover{background:#2563eb}
+.rb-tip{font-size:11px;color:#64748b;flex:1;line-height:1.5}
+.rb-save{background:#10b981;color:#fff;border:0;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
+.rb-save:hover{background:#059669}
+@media (max-width:768px){.rb-modal{padding:8px 4px}.rb-head{padding:10px 12px}.rb-rate{width:100%;margin-left:0;justify-content:space-between}.rb-rate input{width:90px}.rb-tbl{font-size:11px}.rb-tbl thead th,.rb-tbl tbody td{padding:4px 3px}}
 .phase-btn.on .arr{transform:rotate(90deg)}
 /* 验厂任务行的「实施计划」列：pill 在上、计划明细按钮在下（与 cat=1 认证管理同款视觉） */
 .td-plan-grp{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
@@ -1671,6 +1705,7 @@ let authFilter='all';
 let authKeyword='';
 let openPhases=new Set();
 let openTaskPhases=new Set();
+let openReimbursementSet=new Set();
 
 function openSubModule(catId,subName){
   currentSubCat=catId;
@@ -1933,7 +1968,17 @@ function renderModuleTableHTML(){
       }
       if(k==='startDate'||k==='startTime')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.startDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'startDate',this.value)"></td>`;
       if(k==='endDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.endDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'endDate',this.value)"></td>`;
-      if(k==='plan')return `<td class="td-plan"><div class="td-plan-grp">${planBtn||'—'}</div></td>`;
+      if(k==='plan'){
+        // 报销类任务（cat=11 + 标题含「报销」）：显示「报销单」按钮
+        if(t.cat==='11' && (t.title||'').indexOf('报销')>=0){
+          const rb=t.reimbursement||{rate:0,rows:[]};
+          const rbN=rb.rows.length;
+          const rbSum=(rb.rows||[]).reduce((s,r)=>s+((+r.transport||0)+(+r.room||0)+(+r.meal||0)+(+r.hospitality||0)+(+r.fuel||0)+(+r.other||0)),0);
+          const rbOpen=(typeof openReimbursementSet!=='undefined')&&openReimbursementSet.has(t.id);
+          return `<td class="td-plan"><div class="td-plan-grp"><button class="phase-btn ${rbOpen?'on':''}" onclick="event.stopPropagation();openReimbursement(${t.id})" title="打开出差报销单"><span class="arr">${rbOpen?'▾':'▸'}</span> 报销单 ${rbN}行/¥${rbSum.toFixed(2)}</button></div></td>`;
+        }
+        return `<td class="td-plan"><div class="td-plan-grp">${planBtn||'—'}</div></td>`;
+      }
       if(k==='org')return `<td class="td-org">${esc(org)||'—'}</td>`;
       if(k==='lead')return `<td>${lead?`<span class="mt-person lead">${esc(lead)}</span>`:'—'}</td>`;
       if(k==='sup')return `<td class="td-sup">${(t.supports||[]).map(n=>`<span class="mt-person stack">${esc(n)}</span>`).join('')||'—'}</td>`;
@@ -2047,6 +2092,187 @@ function updateTaskField(taskId,field,value){
   t[field]=value;
   saveData();
   toast('已保存');
+}
+
+/* ============== 出差报销单（cat=11「中方报销」任务）============== */
+// 16 列结构（中越双语）：姓名|部门|申请日期|起止时间|出差天数|目的|目的地|交通费|住宿费|餐费|接待费|汽油费|其他费用|总费用(CNY)|汇率(CNY/VND)|越南盾
+const RB_COLS=[
+  ['name','姓名',80],['dept','部门',80],['applyDate','申请日期',110],['startTime','起时间',80],['endTime','止时间',80],['days','天数',50],
+  ['purpose','目的',140],['destination','目的地',110],['transport','交通费',80],['room','住宿费',80],['meal','餐费',70],
+  ['hospitality','接待费',80],['fuel','汽油费',70],['other','其他费用',80],['total','总费用(CNY)',110],['vnd','越南盾',120]
+];
+function rbRowTotal(r){
+  return (+r.transport||0)+(+r.room||0)+(+r.meal||0)+(+r.hospitality||0)+(+r.fuel||0)+(+r.other||0);
+}
+function rbRowVnd(r,rate){
+  return rbRowTotal(r) * (+rate||0);
+}
+function rbGrandTotal(rows){return (rows||[]).reduce((s,r)=>s+rbRowTotal(r),0);}
+function rbGrandVnd(rows,rate){return rbGrandTotal(rows) * (+rate||0);}
+
+function openReimbursement(taskId){
+  if(openReimbursementSet.has(taskId)){openReimbursementSet.delete(taskId);closeReimbursementModal();renderSubModule();return;}
+  const t=data.tasks.find(x=>x.id===taskId);
+  if(!t)return;
+  if(!t.reimbursement)t.reimbursement={rate:3952.7,rows:[]};
+  openReimbursementSet.add(taskId);
+  renderReimbursementModal(t);
+}
+function closeReimbursementModal(){
+  const m=document.getElementById('rb-modal');
+  if(m)m.remove();
+}
+function renderReimbursementModal(t){
+  closeReimbursementModal();
+  const rb=t.reimbursement||{rate:3952.7,rows:[]};
+  if(!Array.isArray(rb.rows))rb.rows=[];
+  const grandCNY=rbGrandTotal(rb.rows);
+  const grandVND=rbGrandVnd(rb.rows,rb.rate);
+  const thHTML=RB_COLS.map(c=>`<th style="min-width:${c[2]}px">${c[1]}</th>`).join('');
+  const rowsHTML=rb.rows.map((r,i)=>{
+    const tot=rbRowTotal(r);
+    const vnd=rbRowVnd(r,rb.rate);
+    return `<tr>
+      ${RB_COLS.map(c=>{
+        const k=c[0];
+        if(k==='total')return `<td style="text-align:right;font-weight:600">¥${tot.toFixed(2)}</td>`;
+        if(k==='vnd')return `<td style="text-align:right;font-weight:600;color:#047857">${vnd.toLocaleString('vi-VN',{maximumFractionDigits:0})}</td>`;
+        const v=r[k]||'';
+        if(k==='days')return `<td><input type="number" min="0" step="0.5" class="rb-inp rb-num" value="${esc(v)}" onchange="rbUpdate(${t.id},${i},'${k}',this.value)" oninput="rbUpdateLive(${t.id},${i},'${k}',this.value)"></td>`;
+        if(['transport','room','meal','hospitality','fuel','other'].includes(k))return `<td><input type="number" min="0" step="0.01" class="rb-inp rb-num" value="${esc(v)}" onchange="rbUpdate(${t.id},${i},'${k}',this.value)" oninput="rbUpdateLive(${t.id},${i},'${k}',this.value)"></td>`;
+        if(k==='applyDate')return `<td><input type="date" class="rb-inp" value="${esc(v)}" onchange="rbUpdate(${t.id},${i},'${k}',this.value)"></td>`;
+        return `<td><input type="text" class="rb-inp" value="${esc(v)}" onchange="rbUpdate(${t.id},${i},'${k}',this.value)" placeholder="—"></td>`;
+      }).join('')}
+      <td class="rb-del-cell"><button class="rb-del" onclick="rbDelRow(${t.id},${i})" title="删除该行">🗑</button></td>
+    </tr>`;
+  }).join('')||`<tr><td colspan="${RB_COLS.length+1}" class="rb-empty">暂无报销条目，点下方「＋ 添加行」开始录入</td></tr>`;
+
+  const html=`<div id="rb-modal" class="rb-modal" onclick="if(event.target===this)closeReimbursementModal()">
+    <div class="rb-box">
+      <div class="rb-head">
+        <div class="rb-title">📋 出差报销单 <span class="rb-sub">GIẤY THANH TOÁN CÔNG TÁC PHÍ</span></div>
+        <div class="rb-rate">
+          <label>汇率 <span class="rb-rate-unit">CNY/VND</span>（每月手动更新）：</label>
+          <input type="number" min="0" step="0.0001" id="rb-rate-${t.id}" value="${rb.rate||0}" onchange="rbUpdateRate(${t.id})" oninput="rbUpdateRate(${t.id})">
+        </div>
+        <button class="rb-close" onclick="closeReimbursementModal()" title="关闭">✕</button>
+      </div>
+      <div class="rb-meta">任务：<b>${esc(t.title||t.workDetail||'')}</b> · 担当：<b>${esc(t.lead||'—')}</b></div>
+      <div class="rb-tbl-wrap">
+        <table class="rb-tbl">
+          <thead><tr>${thHTML}<th style="min-width:40px"></th></tr></thead>
+          <tbody>${rowsHTML}</tbody>
+          <tfoot><tr class="rb-grand">
+            <td colspan="14" style="text-align:right;font-weight:600">合计 Tổng cộng：</td>
+            <td style="text-align:right;font-weight:700">¥${grandCNY.toFixed(2)}</td>
+            <td style="text-align:right;font-weight:700;color:#047857">${grandVND.toLocaleString('vi-VN',{maximumFractionDigits:0})}</td>
+            <td></td>
+          </tr></tfoot>
+        </table>
+      </div>
+      <div class="rb-foot">
+        <button class="rb-add" onclick="rbAddRow(${t.id})">＋ 添加行</button>
+        <span class="rb-tip">说明：人民币总额 = 交通费+住宿费+餐费+接待费+汽油费+其他费用；越南盾 = 人民币总额 × 当月汇率</span>
+        <button class="rb-save" onclick="rbSaveClose(${t.id})">保存并关闭</button>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function rbAddRow(taskId){
+  const t=data.tasks.find(x=>x.id===taskId);
+  if(!t||!t.reimbursement)return;
+  t.reimbursement.rows.push({name:'',dept:'',applyDate:'',startTime:'',endTime:'',days:'',purpose:'',destination:'',transport:'',room:'',meal:'',hospitality:'',fuel:'',other:''});
+  renderReimbursementModal(t);
+}
+function rbDelRow(taskId,rowIdx){
+  const t=data.tasks.find(x=>x.id===taskId);
+  if(!t||!t.reimbursement)return;
+  if(!confirm('确定删除该报销行？'))return;
+  t.reimbursement.rows.splice(rowIdx,1);
+  renderReimbursementModal(t);
+}
+function rbUpdate(taskId,rowIdx,key,value){
+  const t=data.tasks.find(x=>x.id===taskId);
+  if(!t||!t.reimbursement)return;
+  t.reimbursement.rows[rowIdx][key]=value;
+  saveData();
+  // 不重渲染整 modal（保留焦点），只更新当前行的 total/vnd + 合计
+  const row=t.reimbursement.rows[rowIdx];
+  const tot=rbRowTotal(row);
+  const vnd=rbRowVnd(row,t.reimbursement.rate);
+  const modal=document.getElementById('rb-modal');
+  if(!modal)return;
+  const trs=modal.querySelectorAll('tbody tr');
+  if(trs[rowIdx]){
+    const tds=trs[rowIdx].querySelectorAll('td');
+    // 倒数第 2 是 total, 倒数第 3 是 vnd
+    const totalTd=tds[tds.length-3], vndTd=tds[tds.length-2];
+    if(totalTd)totalTd.innerHTML=`¥${tot.toFixed(2)}`;
+    if(vndTd)vndTd.innerHTML=vnd.toLocaleString('vi-VN',{maximumFractionDigits:0});
+  }
+  // 合计
+  const foot=modal.querySelector('tfoot tr');
+  if(foot){
+    const ftd=foot.querySelectorAll('td');
+    ftd[ftd.length-2].innerHTML=`<b>¥${rbGrandTotal(t.reimbursement.rows).toFixed(2)}</b>`;
+    ftd[ftd.length-1].innerHTML=`<b style="color:#047857">${rbGrandVnd(t.reimbursement.rows,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
+  }
+}
+function rbUpdateLive(taskId,rowIdx,key,value){
+  // 实时刷新 total/vnd（不调 saveData，避免频繁落库）
+  const t=data.tasks.find(x=>x.id===taskId);
+  if(!t||!t.reimbursement)return;
+  t.reimbursement.rows[rowIdx][key]=value;
+  const row=t.reimbursement.rows[rowIdx];
+  const tot=rbRowTotal(row);
+  const vnd=rbRowVnd(row,t.reimbursement.rate);
+  const modal=document.getElementById('rb-modal');
+  if(!modal)return;
+  const trs=modal.querySelectorAll('tbody tr');
+  if(trs[rowIdx]){
+    const tds=trs[rowIdx].querySelectorAll('td');
+    const totalTd=tds[tds.length-3], vndTd=tds[tds.length-2];
+    if(totalTd)totalTd.innerHTML=`¥${tot.toFixed(2)}`;
+    if(vndTd)vndTd.innerHTML=vnd.toLocaleString('vi-VN',{maximumFractionDigits:0});
+  }
+  const foot=modal.querySelector('tfoot tr');
+  if(foot){
+    const ftd=foot.querySelectorAll('td');
+    ftd[ftd.length-2].innerHTML=`<b>¥${rbGrandTotal(t.reimbursement.rows).toFixed(2)}</b>`;
+    ftd[ftd.length-1].innerHTML=`<b style="color:#047857">${rbGrandVnd(t.reimbursement.rows,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
+  }
+}
+function rbUpdateRate(taskId){
+  const t=data.tasks.find(x=>x.id===taskId);
+  if(!t||!t.reimbursement)return;
+  const inp=document.getElementById('rb-rate-'+taskId);
+  if(!inp)return;
+  t.reimbursement.rate=parseFloat(inp.value)||0;
+  saveData();
+  // 重算所有行 vnd + 合计
+  const modal=document.getElementById('rb-modal');
+  if(!modal)return;
+  const trs=modal.querySelectorAll('tbody tr');
+  trs.forEach((tr,i)=>{
+    const r=t.reimbursement.rows[i];
+    if(!r)return;
+    const tds=tr.querySelectorAll('td');
+    const vndTd=tds[tds.length-2];
+    if(vndTd)vndTd.innerHTML=rbRowVnd(r,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0});
+  });
+  const foot=modal.querySelector('tfoot tr');
+  if(foot){
+    const ftd=foot.querySelectorAll('td');
+    ftd[ftd.length-1].innerHTML=`<b style="color:#047857">${rbGrandVnd(t.reimbursement.rows,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
+  }
+}
+function rbSaveClose(taskId){
+  saveData();
+  openReimbursementSet.delete(taskId);
+  closeReimbursementModal();
+  toast('报销单已保存');
+  renderSubModule();
 }
 function toggleTaskDone(taskId){
   const t=data.tasks.find(x=>x.id==taskId);
@@ -2898,6 +3124,12 @@ function normalizeData(){
     if(!Array.isArray(t.phases)){
       if(t.cat==='2') t.phases=defaultPhases();
       else if(t.cat==='8') t.phases=[defaultPhases()[0]];
+    }
+  });
+  // 报销类任务（cat=11 + 标题含「报销」）：自动初始化报销单数据结构
+  if(Array.isArray(data.tasks))(data.tasks||[]).forEach(t=>{
+    if(t.cat==='11' && (t.title||'').indexOf('报销')>=0 && !t.reimbursement){
+      t.reimbursement={rate:3952.7, rows:[]};
     }
   });
   if(!Array.isArray(data.kb))data.kb=[];
