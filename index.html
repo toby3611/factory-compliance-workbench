@@ -567,6 +567,73 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rb-save{background:#10b981;color:#fff;border:0;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
 .rb-save:hover{background:#059669}
 @media (max-width:768px){.rb-modal{padding:8px 4px}.rb-head{padding:10px 12px}.rb-rate{width:100%;margin-left:0;justify-content:space-between}.rb-rate input{width:90px}.rb-tbl{font-size:11px}.rb-tbl thead th,.rb-tbl tbody td{padding:4px 3px}}
+/* 报销单 modal：编辑 / 打印 tab 切换 */
+.rb-tabs{display:flex;gap:0;background:#f1f5f9;border-bottom:1px solid #e2e8f0;padding:0 18px}
+.rb-tab{background:transparent;border:0;padding:10px 18px;cursor:pointer;font-size:13px;font-weight:600;color:#64748b;border-bottom:3px solid transparent;transition:.15s}
+.rb-tab:hover{color:#0c4a6e;background:#e0f2fe}
+.rb-tab.on{color:#0c4a6e;border-bottom-color:#0c4a6e;background:#fff}
+.rb-tab .ic{margin-right:5px}
+.rb-pane{display:none}
+.rb-pane.on{display:block}
+.rb-pane.print-pane.on{flex:1;overflow:auto;background:#475569;padding:18px}
+/* 报销单打印模板（A4 横向布局） */
+.rb-print{background:#fff;max-width:1280px;margin:0 auto;padding:18px 22px;color:#1a2540;font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.rb-print-hd{display:flex;align-items:flex-start;border-bottom:2px solid #1a2540;padding-bottom:8px;margin-bottom:6px}
+.rb-print-logo{flex:0 0 auto;margin-right:auto}
+.rb-print-logo-inner{background:#1e5bbf;color:#fff;padding:7px 14px 5px;border-radius:5px;display:inline-block;line-height:1;text-align:center;box-shadow:inset 0 -3px 0 rgba(255,255,255,.15)}
+.rb-print-logo-inner .prosp{font-family:Arial Black,"Helvetica Neue",sans-serif;font-size:24px;font-weight:900;letter-spacing:1px;display:block}
+.rb-print-logo-inner .prosp .o{color:#7dd3fc}
+.rb-print-logo-inner .textile{margin-top:4px;font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:5px;border-top:1px solid rgba(255,255,255,.45);padding-top:3px;display:block}
+.rb-print-company{font-size:13px;text-align:right;color:#1a2540;line-height:1.5;flex:0 0 auto;margin-left:auto}
+.rb-print-company b{font-size:14px;color:#0c1f44}
+.rb-print-company .vi{font-style:italic;color:#475569;font-size:12px}
+.rb-print-title{text-align:center;margin:14px 0 8px}
+.rb-print-title .vi{font-size:22px;font-weight:700;letter-spacing:2px;color:#0c1f44;text-transform:uppercase}
+.rb-print-title .zh{font-size:16px;font-weight:700;color:#1a2540;margin-top:4px;letter-spacing:4px}
+.rb-print-rate{display:flex;justify-content:flex-end;align-items:center;gap:8px;font-size:13px;margin:6px 0 8px;padding-bottom:6px;border-bottom:1px dashed #94a3b8}
+.rb-print-rate b{color:#0c1f44;font-size:15px;background:#fff7d6;padding:2px 8px;border-radius:4px;border:1px solid #facc15}
+.rb-print-rate .label{color:#475569}
+.rb-print-rate .lbl-vi{font-style:italic;color:#64748b;font-size:12px}
+.rb-print-tbl{width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:6px}
+.rb-print-tbl th,.rb-print-tbl td{border:1px solid #1a2540;padding:5px 4px;text-align:center;vertical-align:middle}
+.rb-print-tbl thead th{background:#d6f0d6;color:#1a2540;font-weight:700;line-height:1.2}
+.rb-print-tbl thead th .vi{display:block;font-style:italic;font-weight:600;font-size:10px;color:#334155;margin-bottom:1px}
+.rb-print-tbl thead th .zh{display:block;font-weight:700;font-size:11.5px;color:#0c1f44}
+.rb-print-tbl tbody tr:nth-child(odd){background:#ffffff}
+.rb-print-tbl tbody tr:nth-child(even){background:#e3f3e1}
+.rb-print-tbl tbody td{color:#1a2540;height:24px}
+.rb-print-tbl tbody td.left{text-align:left;padding-left:6px}
+.rb-print-tbl tbody td.num{text-align:right;padding-right:6px;font-variant-numeric:tabular-nums}
+.rb-print-tbl tbody tfoot td,.rb-print-tbl tfoot td{background:#d6f0d6;font-weight:700;color:#0c1f44}
+.rb-print-tbl .empty-row td{background:#f8fdf6;color:#94a3b8}
+.rb-print-note{display:flex;font-size:11.5px;line-height:1.6;border-top:2px solid #1a2540;padding-top:8px;margin-top:6px}
+.rb-print-note .label{flex:0 0 150px;font-weight:700;color:#0c1f44}
+.rb-print-note .label .vi{display:block;font-style:italic;font-weight:600;font-size:11px;color:#334155}
+.rb-print-note .label .zh{display:block;font-weight:700;font-size:12px;color:#0c1f44}
+.rb-print-note .body{flex:1;padding-left:10px;text-indent:2em;color:#1a2540}
+.rb-print-note .body .vi{display:block;font-style:italic;color:#334155;margin-bottom:4px}
+.rb-print-sign{display:flex;gap:14px;margin-top:18px;padding-top:4px}
+.rb-print-sign .col{flex:1;text-align:center;border-top:1px solid #1a2540;padding-top:36px;font-size:12px;color:#0c1f44;position:relative}
+.rb-print-sign .col .zh{font-weight:700;font-size:13px;letter-spacing:3px}
+.rb-print-sign .col .vi{font-style:italic;font-size:11.5px;color:#334155;margin-top:3px;display:block}
+.rb-print-actions{display:flex;justify-content:center;gap:10px;padding:14px;background:transparent}
+.rb-print-actions .btn-print{background:#10b981;color:#fff;border:0;padding:9px 22px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.rb-print-actions .btn-print:hover{background:#059669}
+.rb-print-actions .btn-close{background:#64748b;color:#fff;border:0;padding:9px 18px;border-radius:6px;cursor:pointer;font-size:13px}
+.rb-print-actions .btn-close:hover{background:#475569}
+.rb-print-actions .tip{font-size:12px;color:#e0f2fe;align-self:center}
+/* 打印模式下：去掉 dark 背景遮罩与圆角阴影、A4 横向 */
+@media print{
+  body>*:not(#rb-modal){display:none!important}
+  #rb-modal{position:static!important;background:#fff!important;padding:0!important;inset:auto!important}
+  .rb-modal .rb-box{box-shadow:none!important;border-radius:0!important;max-width:none!important;max-height:none!important}
+  .rb-modal .rb-head,.rb-modal .rb-tabs,.rb-modal .rb-foot,.rb-print-actions,.no-print{display:none!important}
+  .rb-modal .rb-pane.edit-pane{display:none!important}
+  .rb-modal .rb-pane.print-pane{display:block!important;background:#fff!important;padding:0!important;overflow:visible!important}
+  .rb-print{max-width:100%!important;box-shadow:none!important;padding:8px 10px!important}
+  .rb-print-tbl tbody tr{break-inside:avoid}
+  @page{size:A4 landscape;margin:8mm}
+}
 .phase-btn.on .arr{transform:rotate(90deg)}
 /* 验厂任务行的「实施计划」列：pill 在上、计划明细按钮在下（与 cat=1 认证管理同款视觉） */
 .td-plan-grp{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
@@ -1298,7 +1365,7 @@ const GIST_FILE="workbench.json";
 let data;
 let sync={enabled:false,gistId:null,token:null};
 
-function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function todayStr(){return fmtDate(new Date())}
 function setStatus(kind){
@@ -2157,27 +2224,178 @@ function renderReimbursementModal(t){
         </div>
         <button class="rb-close" onclick="closeReimbursementModal()" title="关闭">✕</button>
       </div>
-      <div class="rb-meta">任务：<b>${esc(t.title||t.workDetail||'')}</b> · 担当：<b>${esc(t.lead||'—')}</b></div>
-      <div class="rb-tbl-wrap">
-        <table class="rb-tbl">
-          <thead><tr>${thHTML}<th style="min-width:40px"></th></tr></thead>
-          <tbody>${rowsHTML}</tbody>
-          <tfoot><tr class="rb-grand">
-            <td colspan="14" style="text-align:right;font-weight:600">合计 Tổng cộng：</td>
-            <td style="text-align:right;font-weight:700">¥${grandCNY.toFixed(2)}</td>
-            <td style="text-align:right;font-weight:700;color:#047857">${grandVND.toLocaleString('vi-VN',{maximumFractionDigits:0})}</td>
-            <td></td>
-          </tr></tfoot>
-        </table>
+      <div class="rb-tabs no-print">
+        <button type="button" class="rb-tab on" data-pane="edit" onclick="rbSwitchPane('edit')"><span class="ic">✏️</span>编辑录入</button>
+        <button type="button" class="rb-tab" data-pane="print" onclick="rbSwitchPane('print')"><span class="ic">🖨️</span>打印导出</button>
       </div>
-      <div class="rb-foot">
-        <button class="rb-add" onclick="rbAddRow(${t.id})">＋ 添加行</button>
-        <span class="rb-tip">说明：人民币总额 = 交通费+住宿费+餐费+接待费+汽油费+其他费用；越南盾 = 人民币总额 × 当月汇率</span>
-        <button class="rb-save" onclick="rbSaveClose(${t.id})">保存并关闭</button>
+      <div class="rb-pane edit-pane on">
+        <div class="rb-meta">任务：<b>${esc(t.title||t.workDetail||'')}</b> · 担当：<b>${esc(t.lead||'—')}</b></div>
+        <div class="rb-tbl-wrap">
+          <table class="rb-tbl">
+            <thead><tr>${thHTML}<th style="min-width:40px"></th></tr></thead>
+            <tbody>${rowsHTML}</tbody>
+            <tfoot><tr class="rb-grand">
+              <td colspan="14" style="text-align:right;font-weight:600">合计 Tổng cộng：</td>
+              <td style="text-align:right;font-weight:700">¥${grandCNY.toFixed(2)}</td>
+              <td style="text-align:right;font-weight:700;color:#047857">${grandVND.toLocaleString('vi-VN',{maximumFractionDigits:0})}</td>
+              <td></td>
+            </tr></tfoot>
+          </table>
+        </div>
+        <div class="rb-foot">
+          <button class="rb-add" onclick="rbAddRow(${t.id})">＋ 添加行</button>
+          <span class="rb-tip">说明：人民币总额 = 交通费+住宿费+餐费+接待费+汽油费+其他费用；越南盾 = 人民币总额 × 当月汇率</span>
+          <button class="rb-save" onclick="rbSaveClose(${t.id})">保存并关闭</button>
+        </div>
+      </div>
+      <div class="rb-pane print-pane">
+        <div class="rb-print" id="rb-print-box">${renderRbPrintHtml(t,rb)}</div>
+        <div class="rb-print-actions no-print">
+          <button type="button" class="btn-print" onclick="rbPrintNow()">🖨️ 打印 / 导出 PDF</button>
+          <button type="button" class="btn-close" onclick="closeReimbursementModal()">关闭</button>
+          <span class="tip">提示：浏览器打印对话框选「另存为 PDF」即可保存报销单</span>
+        </div>
       </div>
     </div>
   </div>`;
   document.body.insertAdjacentHTML('beforeend',html);
+}
+
+/* 编辑 / 打印 tab 切换 */
+function rbSwitchPane(pane){
+  const box=document.getElementById('rb-modal');
+  if(!box)return;
+  box.querySelectorAll('.rb-tab').forEach(b=>{
+    b.classList.toggle('on',b.getAttribute('data-pane')===pane);
+  });
+  box.querySelectorAll('.rb-pane').forEach(p=>{
+    p.classList.toggle('on',p.classList.contains(pane+'-pane'));
+  });
+}
+/* 触发浏览器原生打印（Ctrl+P / 菜单"另存为 PDF"） */
+function rbPrintNow(){
+  const box=document.getElementById('rb-modal');
+  if(!box)return;
+  if(!box.querySelector('.print-pane.on')){
+    rbSwitchPane('print');
+  }
+  // 等渲染一帧再打印
+  setTimeout(()=>{try{window.print();}catch(e){toast('请使用浏览器 Ctrl+P 打印');}},60);
+}
+// Ctrl+P 全局兜底：报销单打开时按打印，自动切到打印模板（避免把编辑面板也打出来）
+window.addEventListener('beforeprint',()=>{
+  const box=document.getElementById('rb-modal');
+  if(!box)return;
+  if(!box.querySelector('.print-pane.on')){
+    box.querySelectorAll('.rb-tab').forEach(b=>b.classList.toggle('on',b.getAttribute('data-pane')==='print'));
+    box.querySelectorAll('.rb-pane').forEach(p=>p.classList.toggle('on',p.classList.contains('print-pane')));
+  }
+});
+/* 打印模板的列定义（中越双语表头 + 字段 key + 列宽，key 与 RB_COLS 一致） */
+const RB_PRINT_COLS=[
+  ['name','Họ Và Tên','出差人姓名',68],
+  ['dept','Bộ phận','部门',56],
+  ['applyDate','Ngày viết','申请日期',72],
+  ['period','Thời gian','时间',72],
+  ['days','Số ngày','出差天数',40],
+  ['purpose','Mục đích','目的',88],
+  ['destination','Nơi đến công tác','目的地',72],
+  ['transport','Phí giao thông','交通费',62],
+  ['room','Phòng ở','住宿费',58],
+  ['meal','Tiền ăn','餐费',56],
+  ['hospitality','Tiền ăn nhẹ','接待费',62],
+  ['fuel','Phí tiếp khách','汽油费',58],
+  ['other','Khác','其他费用',58],
+  ['total','Cộng chi phí','总费用',66],
+  ['vnd','VND','越南盾',90]
+];
+function rbPrintCellVal(r,k){
+  if(k==='period')return [(r.startTime||''),(r.endTime||'')].filter(Boolean).join(' ~ ')||(r.startTime||r.endTime||'');
+  return r[k]||'';
+}
+function renderRbPrintHtml(t,rb){
+  const rows=Array.isArray(rb.rows)?rb.rows:[];
+  const month=new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long'});
+  const grandCNY=rbGrandTotal(rows);
+  const grandVND=rbGrandVnd(rows,rb.rate);
+  const fmtVND=v=>v.toLocaleString('vi-VN',{maximumFractionDigits:0});
+  const thHTML=RB_PRINT_COLS.map(c=>`<th style="min-width:${c[3]}px"><span class="vi">${c[1]}</span><span class="zh">${c[2]}</span></th>`).join('');
+  // 行模板：至少 10 行（不足补空，便于打印留白）
+  const minRows=10;
+  const bodyRows=rows.slice(0,Math.max(minRows,rows.length));
+  const fillCount=Math.max(0,minRows-rows.length);
+  const fillArr=Array.from({length:fillCount},()=>({}));
+  const allRows=bodyRows.concat(fillArr);
+  const rowsHTML=allRows.map((r,i)=>{
+    const tot=rbRowTotal(r);
+    const vnd=rbRowVnd(r,rb.rate);
+    const isEmpty=!r.name;
+    const tds=RB_PRINT_COLS.map(c=>{
+      const k=c[0];
+      if(k==='total')return `<td class="num">${tot?'¥'+tot.toFixed(2):''}</td>`;
+      if(k==='vnd')return `<td class="num">${vnd?fmtVND(vnd):''}</td>`;
+      const v=isEmpty?'':rbPrintCellVal(r,k);
+      const numKeys=['transport','room','meal','hospitality','fuel','other'];
+      const cls=(numKeys.includes(k))?'num':'left';
+      return `<td class="${cls}">${esc(v)}</td>`;
+    }).join('');
+    return `<tr${isEmpty?' class="empty-row"':''}>${tds}</tr>`;
+  }).join('');
+  return `
+    <div class="rb-print-hd">
+      <div class="rb-print-logo">
+        <div class="rb-print-logo-inner">
+          <span class="prosp">PR<span class="o">O</span>SPERITY</span>
+          <span class="textile">TEXTILE</span>
+        </div>
+      </div>
+      <div class="rb-print-company">
+        <b>北江纺织（越南）有限公司</b><br>
+        <span class="vi">Công ty TNHH Dệt may Bắc Giang Việt Nam</span>
+      </div>
+    </div>
+    <div class="rb-print-title">
+      <div class="vi">GIẤY THANH TOÁN CÔNG TÁC PHÍ</div>
+      <div class="zh">出差报销单</div>
+    </div>
+    <div class="rb-print-rate">
+      <span class="lbl-vi">Tỷ giá （${month}）</span>
+      <span class="label">汇率（当月）：</span>
+      <b>CNY/VND:&nbsp;${(+rb.rate||0).toFixed(2)}</b>
+    </div>
+    <table class="rb-print-tbl">
+      <thead><tr>${thHTML}</tr></thead>
+      <tbody>${rowsHTML}</tbody>
+      <tfoot><tr>
+        <td colspan="13" class="left">合计 Tổng cộng</td>
+        <td class="num">¥${grandCNY.toFixed(2)}</td>
+        <td class="num">${fmtVND(grandVND)}</td>
+      </tr></tfoot>
+    </table>
+    <div class="rb-print-note">
+      <div class="label">
+        <span class="vi">Khoản mục thanh toán</span>
+        <span class="zh">支付款项说明</span>
+      </div>
+      <div class="body">
+        <span class="vi">Các khoản kế toán chỉ là dự toán, trong vòng 7 ngày sau khi kết thúc đợt công tác phải tập hợp chứng từ, báo cáo chủ quản bộ phận phê duyệt chi phí thực tế, chuyển phòng tài vụ thanh toán. 以上款项为预算费用，实际费用须于出差完成 7 天内呈，递部门主管核准后向财务部报销。</span>
+      </div>
+    </div>
+    <div class="rb-print-sign">
+      <div class="col">
+        <span class="zh">报销人</span>
+        <span class="vi">Người viết đơn</span>
+      </div>
+      <div class="col">
+        <span class="zh">部门审核</span>
+        <span class="vi">Bộ phận đánh giá</span>
+      </div>
+      <div class="col">
+        <span class="zh">领导批准</span>
+        <span class="vi">Lãnh đạo phê duyệt</span>
+      </div>
+    </div>
+  `;
 }
 function rbAddRow(taskId){
   const t=data.tasks.find(x=>x.id===taskId);
