@@ -575,8 +575,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rb-tab .ic{margin-right:5px}
 .rb-pane{display:none}
 .rb-pane.on{display:block}
-.rb-pane.print-pane.on{flex:1;overflow:auto;background:#475569;padding:18px}
-/* 报销单打印模板（A4 横向布局） */
+/* 报销单 Excel 预览面板 */
 .rb-print{background:#fff;max-width:1280px;margin:0 auto;padding:18px 22px;color:#1a2540;font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.18)}
 .rb-print-hd{display:flex;align-items:flex-start;border-bottom:2px solid #1a2540;padding-bottom:8px;margin-bottom:6px}
 .rb-print-logo{flex:0 0 auto;margin-right:auto}
@@ -616,15 +615,13 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rb-print-sign .col{flex:1;text-align:center;border-top:1px solid #1a2540;padding-top:36px;font-size:12px;color:#0c1f44;position:relative}
 .rb-print-sign .col .zh{font-weight:700;font-size:13px;letter-spacing:3px}
 .rb-print-sign .col .vi{font-style:italic;font-size:11.5px;color:#334155;margin-top:3px;display:block}
-.rb-print-actions{display:flex;justify-content:center;gap:10px;padding:14px;background:transparent}
-.rb-print-actions .btn-print{background:#10b981;color:#fff;border:0;padding:9px 22px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
-.rb-print-actions .btn-print:hover{background:#059669}
-.rb-print-actions .btn-close{background:#64748b;color:#fff;border:0;padding:9px 18px;border-radius:6px;cursor:pointer;font-size:13px}
-.rb-print-actions .btn-close:hover{background:#475569}
-.rb-print-actions .btn-orient{background:#1e5bbf;color:#fff;border:0;padding:8px 14px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:5px}
-.rb-print-actions .btn-orient:hover{background:#1849a0}
-.rb-print-actions .btn-orient .now{background:rgba(255,255,255,.22);padding:1px 7px;border-radius:10px;font-size:10px;margin-left:2px}
-.rb-print-actions .tip{color:#fff;font-size:11px;opacity:.85;margin-left:6px}
+.rb-export-actions{display:flex;justify-content:center;align-items:center;gap:12px;padding:18px;background:transparent;flex-wrap:wrap}
+.rb-export-actions .btn-export{background:#2563eb;color:#fff;border:0;padding:11px 34px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(37,99,235,.22);transition:.18s}
+.rb-export-actions .btn-export:hover{background:#1d4ed8;box-shadow:0 6px 16px rgba(37,99,235,.32);transform:translateY(-1px)}
+.rb-export-actions .btn-export:active{transform:translateY(0)}
+.rb-export-actions .btn-close{background:#64748b;color:#fff;border:0;padding:11px 22px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+.rb-export-actions .btn-close:hover{background:#475569}
+.rb-export-actions .tip{color:#fff;font-size:12px;opacity:.92;margin-left:6px}
 /* LOGO 真实图片 */
 .rb-print-logo-img{height:62px;width:auto;display:block}
 /* 打印模板表格可编辑单元 */
@@ -640,7 +637,6 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rb-print-sign-tbl th .zh{display:block;font-weight:700;font-size:13px;color:#0c1f44;letter-spacing:2px}
 .rb-print-sign-tbl td{border:1px solid #1a2540;height:120px;vertical-align:bottom;text-align:center;padding-bottom:8px;color:#1a2540}
 .rb-print-sign-tbl td .sign-hint{color:#cbd5e1;font-size:11px;font-style:italic}
-@media print{body>*:not(#rb-modal){display:none!important}#rb-modal{position:static!important;background:#fff!important;padding:0!important;inset:auto!important}.rb-modal .rb-box{box-shadow:none!important;border-radius:0!important;max-width:none!important;max-height:none!important}.rb-modal .rb-head,.rb-modal .rb-tabs,.rb-modal .rb-foot,.rb-print-actions,.no-print{display:none!important}.rb-modal .rb-pane.edit-pane{display:none!important}.rb-modal .rb-pane.print-pane{display:block!important;background:#fff!important;padding:0!important;overflow:visible!important}.rb-print{max-width:100%!important;box-shadow:none!important;padding:8px 10px!important}.rb-print-tbl tbody tr{break-inside:avoid}.rb-print-tbl td[contenteditable="true"]:focus{outline:none}.rb-print-sign-tbl td{height:130px}@page{margin:8mm}}
 .phase-btn.on .arr{transform:rotate(90deg)}
 /* 验厂任务行的「实施计划」列：pill 在上、计划明细按钮在下（与 cat=1 认证管理同款视觉） */
 .td-plan-grp{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
@@ -2233,7 +2229,7 @@ function renderReimbursementModal(t){
       </div>
       <div class="rb-tabs no-print">
         <button type="button" class="rb-tab on" data-pane="edit" onclick="rbSwitchPane('edit')"><span class="ic">✏️</span>编辑录入</button>
-        <button type="button" class="rb-tab" data-pane="print" onclick="rbSwitchPane('print')"><span class="ic">🖨️</span>打印导出</button>
+        <button type="button" class="rb-tab" data-pane="excel" onclick="rbSwitchPane('excel')"><span class="ic">📤</span>导出 Excel</button>
       </div>
       <div class="rb-pane edit-pane on">
         <div class="rb-meta">任务：<b>${esc(t.title||t.workDetail||'')}</b> · 担当：<b>${esc(t.lead||'—')}</b></div>
@@ -2255,13 +2251,12 @@ function renderReimbursementModal(t){
           <button class="rb-save" onclick="rbSaveClose(${t.id})">保存并关闭</button>
         </div>
       </div>
-      <div class="rb-pane print-pane">
-        <div class="rb-print" id="rb-print-box">${renderRbPrintHtml(t,rb)}</div>
-        <div class="rb-print-actions no-print">
-          <button type="button" class="btn-print" onclick="rbPrintNow()">🖨️ 打印 / 导出 PDF</button>
-          <button type="button" class="btn-orient" id="rb-orient-btn" onclick="rbToggleOrientation()">🔄 版式切换<span class="now">横版</span></button>
+      <div class="rb-pane excel-pane">
+        <div class="rb-print" id="rb-print-box">${renderRbExcelPreview(t,rb)}</div>
+        <div class="rb-export-actions no-print">
+          <button type="button" class="btn-export" id="rb-export-btn" onclick="rbExportExcel(${t.id})">📤 导出 Excel</button>
           <button type="button" class="btn-close" onclick="closeReimbursementModal()">关闭</button>
-          <span class="tip">提示：表格可直接编辑；点「版式切换」可选横版/竖版再打印</span>
+          <span class="tip">提示：表格可直接编辑；点「导出 Excel」下载当前预览为 .xlsx 文件</span>
         </div>
       </div>
     </div>
@@ -2280,39 +2275,71 @@ function rbSwitchPane(pane){
     p.classList.toggle('on',p.classList.contains(pane+'-pane'));
   });
 }
-/* 打印版式（横版/竖版）动态切换：通过独立 @page 样式控制，默认横版 A4 */
-let rbPrintOrientation='landscape';
-function rbApplyOrientation(){
-  let s=document.getElementById('rb-orient-css');
-  if(!s){ s=document.createElement('style'); s.id='rb-orient-css'; document.head.appendChild(s); }
-  s.textContent='@page{size:A4 '+rbPrintOrientation+'}';
-}
-function rbToggleOrientation(){
-  rbPrintOrientation = (rbPrintOrientation==='landscape')?'portrait':'landscape';
-  rbApplyOrientation();
-  const btn=document.getElementById('rb-orient-btn');
-  if(btn){ const n=btn.querySelector('.now'); if(n)n.textContent=(rbPrintOrientation==='landscape'?'横版':'竖版'); }
-}
-rbApplyOrientation();
-/* 触发浏览器原生打印（Ctrl+P / 菜单"另存为 PDF"） */
-function rbPrintNow(){
-  const box=document.getElementById('rb-modal');
-  if(!box)return;
-  if(!box.querySelector('.print-pane.on')){
-    rbSwitchPane('print');
+/* 报销单导出 Excel：先把预览格改动回写 → buildRbXlsx 生成 .xlsx → 触发下载 */
+async function rbExportExcel(taskId){
+  const btn=document.getElementById('rb-export-btn');
+  if(btn){ btn.disabled=true; btn.innerHTML='⏳ 正在生成 Excel…'; }
+  try{
+    await new Promise(r=>setTimeout(r,30));
+    const t=data.tasks.find(x=>x.id===taskId);
+    if(!t){toast('找不到任务');return;}
+    // 把预览面板的可编辑格内容同步回 t.reimbursement.rows
+    rbReadPreviewIntoTask(taskId);
+    const rb=t.reimbursement||{rate:0,rows:[]};
+    // 生成 xlsx blob
+    const blob=buildRbXlsx(t,rb);
+    // 触发下载
+    const name=rbMakeFilename(t,rb);
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=name; a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{URL.revokeObjectURL(url); a.remove();},1800);
+    toast('✅ 已导出 '+name);
+  }catch(err){
+    console.error('[rbExportExcel]',err);
+    toast('导出失败：'+(err&&err.message?err.message:err));
+  }finally{
+    if(btn){ btn.disabled=false; btn.innerHTML='📤 导出 Excel'; }
   }
-  // 等渲染一帧再打印
-  setTimeout(()=>{try{window.print();}catch(e){toast('请使用浏览器 Ctrl+P 打印');}},60);
 }
-// Ctrl+P 全局兜底：报销单打开时按打印，自动切到打印模板（避免把编辑面板也打出来）
-window.addEventListener('beforeprint',()=>{
-  const box=document.getElementById('rb-modal');
-  if(!box)return;
-  if(!box.querySelector('.print-pane.on')){
-    box.querySelectorAll('.rb-tab').forEach(b=>b.classList.toggle('on',b.getAttribute('data-pane')==='print'));
-    box.querySelectorAll('.rb-pane').forEach(p=>p.classList.toggle('on',p.classList.contains('print-pane')));
-  }
-});
+/* 把预览面板的 td[contenteditable] 内容回写到 t.reimbursement.rows（按 RB_PRINT_COLS 的 key 顺序） */
+function rbReadPreviewIntoTask(taskId){
+  const t=data.tasks.find(x=>x.id===taskId);
+  if(!t)return;
+  const rb=t.reimbursement||(t.reimbursement={rate:0,rows:[]});
+  const trs=document.querySelectorAll('#rb-modal .rb-print-tbl tbody tr');
+  const newRows=[];
+  const numKeys=new Set(['transport','room','meal','hospitality','fuel','other','days']);
+  trs.forEach(tr=>{
+    const cells=tr.querySelectorAll('td[contenteditable="true"]');
+    if(!cells.length)return;
+    const row={};
+    RB_PRINT_COLS.forEach((col,i)=>{
+      const cell=cells[i];
+      const raw=cell?(cell.textContent||'').replace(/[\r\n]+/g,' ').trim():'';
+      if(numKeys.has(col[0])){
+        row[col[0]] = raw===''?0:(parseFloat(raw.replace(/[^\d.\-]/g,''))||0);
+      }else{
+        row[col[0]] = raw;
+      }
+    });
+    newRows.push(row);
+  });
+  rb.rows=newRows;
+  data._dirty=data._dirty||new Date().toISOString();
+}
+/* 文件名：Beijiang_RB_{姓名}_{YYYY-MM-DD}.xlsx（无姓名退化为「报销单」） */
+function rbMakeFilename(t,rb){
+  const first=(rb.rows&&rb.rows[0]&&rb.rows[0].name)?rb.rows[0].name.trim():'';
+  const safe=first?first.replace(/[\\/:*?"<>|\s]/g,'_'):'报销单';
+  const d=new Date();
+  const yyyy=d.getFullYear();
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const dd=String(d.getDate()).padStart(2,'0');
+  return `Beijiang_RB_${safe}_${yyyy}${mm}${dd}.xlsx`;
+}
 /* 打印模板的列定义（中越双语表头 + 字段 key + 列宽，key 与 RB_COLS 一致） */
 const RB_PRINT_COLS=[
   ['name','Họ Và Tên','出差人姓名',68],
@@ -2333,11 +2360,424 @@ const RB_PRINT_COLS=[
 ];
 /* PROSPERITY TEXTILE 真实 LOGO（dataURL 嵌入） */
 const RB_LOGO_DATAURL='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIwAAAAwCAYAAADDyJIwAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAXNUlEQVR4nO2cd3hURffHP7O76aQnJCEJhBSBBClBWoCAEDrSBAERBBFBiigWFAFBeEUFQREUXvClKGDB0FEIYqSE3rsklAAJJKSH9L3z+2OTTTbZTUEQ39+b7/PcZ++UM3Pm3HPnzJw5d4WUUsEQApCFv5RzX15ZZetVtQwj6dK8V5ZOGCl7EJTm2VSfpsb4V1GZ9h5K/0IIoSm6L9FYecyUVKaSvyXrG7uvqKxk+6X7Lvotr6w8GBNU6V9T/FQWpugrK5u/isq091D6V2Fc4JXRwIf5ljxo+1XhobSSVOMBoKF8bfsnCPdBFboajwAaqi786of1PwxVqfTDtq3V+H8GFdVKUo0qoGiX9LC3eg8GKdFKSfTtBE7HxJKQlEp+fgE2Ntb4e7nRNMAHBxtLhHj8rP6vQhjxw/z9kFLcvJfCkvAI1kdEodFoaN7AF09XJyzMNCRn3OfyjThOR9+g2RN1GdMvjL5tgtGoS1vU4hap2gtQPctWAkIIlZBSSh6jwPK0Wuas2Sy+3rCLod1DeaV3Rxp4u5GWlcMn67YTE5cg+7VrJgY/3YLsvHy2HjrDgnVbZX5BgVj6zmha1PMx1mx5ClOeo60apiGEEAKpg/I4roTUDKX12FlKt7c+lbGJKYqi6FjJzM6V+y9eUy7fTpDLt+9VbDqNkN9GREkpFakoUipSKqt3HZCuvcYqS7f8LgsJi8ZR8rckKiqrvsq/JBSuYdKyctFK4y+ZSoC9tWWZV/J+bj65BVqT6qhRqbCzMjdZnpR+n44TZ9Oj3VPMHTUAlaq4i4/XbmVEj1Dh6+FCgEdbkX4/i/DII7wQ1hrd8kWKYWGtadnAT3R/Yy65eflM7B+GMLK4kVKSkJbJwfPRIi4xGQHCy82FkIb+ONtaU3KyWb/nCHeTU42PR63G3dmekIZPUMvJTp+/+/gFzl27ZXKcpdG5RSMux8YRe+eeyTo2lhYEeLsTEuSPuUatz//xj2PEJSbr031Cm7N579FK910aarWKMc88bdAHwIUb8ew6elafFioVY5/pABQ67pqPmMKVm/EmG7aysqRtk0DeHNKTrs0bAjB+wSpWb9ldDjsCRwc7urVuwnvD+vBkXU99iVaRPDd9EV1aN+WT0QOROishi+g27z1KswZ++Hm4CgSyWX1f7qVlGLQthBT1vNzknsXTaTP2A57w9qBbi4a6Qh3kpZt3eOvLtew4cAypaIvKJAg0Gg2Du7Zj/vjncXPUKcCCtVs4dv5PE8MRICUqtZpBXdvx1eSRONSw4oeI/azYVJ4cDNtYMWsS637Zy56DJyqs7ursyNzxQxnVIxSAz7/fwcGT5/Rt1fXx5o35KyrXt1F+wMLcnFd6hhpkT/p8DbsPHdcb76E9O/Jav05AST+MlCav7OwcIqKO0+212Xy6foeuOqbr6y6FlNQ01u+IpPnId/n12Hl9V0s27iZfq+WtwT34dP12Ply1iWt37gkppZBSCq1WEVO/WiuSMu4XCUe893wvIaUUJ6NjxahPv2Hikh+4cCtBnL1+W6yePl6M/niZSLufrZ8uTlyJFS1HvS+27zsipKII3SpFFK1WREF+vvhu2x7RZswMkZiWWbFwC2dgRatl/Y5InpkyH8XErFxRG5VFYnIKL89ewupdUVXrpxx4uNc0WMF9vHojeSUsxYHz0ew+dEK/qrOxtubjsYMRQhSbJAMIgdpcZ0qklCj5+SUGKpn61Xf079CiFA2oNGaIQruiVRRkQTFdbm4eYz9ZztUfF5KZnctHq8PZOv9dQsfNwt3JEV9PV3q/u4Bf5r+Dp7M93Vo3YcG3m3jqpff56V9vEBrkB8DmqFMMeu8zeoW2YOnkEWjUKlbviMTL1Yn2wUEs/PEXZo7sD8Abi9aQnp6hnxka1vMToU0bkJSaIbbvP0Zm5n0QgpjYOOas2cQXE18oI4deYW2xtjBDkZLoa7c4dTFaP6b9J86x8+i5MuJr16IpHjUdTT4wv1o1y+SFhbbEyc4GgJzsXPYeP0tqanrhQ5PMXbOJF7uElKEzU6vxqOVukJeUlEJebq4+7ermikZdbHJG9w0j/Lcozl2+ChKuxd5mza4DvFw4i8365mcDxX57eF+8XBz06TIKo1ariNu6DFsrc6SUXIq9w6BpC4m+cQskaPML2LL/eCkqwbezX6dfm6YAFGgVdh49y9BpC8nLzQMpuXErnqt3k9l5+DTtGgeSnJbBC91D+WB4H5CS5MxsTl+7jZeLPdNf7MueE+c5deEKXSfNEefXfYaTrQ3j539DgVbLwknDhEatU87ger7MX7uFNdPH0XHCh0wd1hspBQfPXC4WmrMDR1fMxlKjRgLHo2/SYsQUpKKAEPxy4IRRhfn6zZF4OdRA99hg1CcrWLlpl/5BHjhT1ny9O7QXPVo+WSa/JGYbio6PxgyiuZ+XPuvanSTqD5qkkx0QfesOBUpZ74e/myNx4YsM8kInzGHf8bP6hx61fA7+pRS4TZA/XSfM0tURgrmrNzK8axtO/HmDiBKm0quWG28N7mFAa/S02tJMjZWZBmtzM4L9vXljcE+DjWd8iYUXAFJirtHRWJlpsLU0Z0C7ZjQLDDCoU6DV8tNvh3ixZ3s83Zx5Y2C3QqEJHGtY0eFJf6QEexsr9i2ZQf+OISSnprEh8ggXbt4h7k4inm4ueLs46K3L9gMn8HJ1or6XGz4eNdmrf4jFDCelZfDvLb+TlpUDQLCfN5vmv0v4vCmEz5vCF2++VOZhlIYAwp56srhZCVk5ORXSVQgjVsrHzRkba2t92s7aCo3KpM/JSJvFjRrzLXRpFkjP9i0LV3SSq7FxrI04yKwVG4oZEoK544ZiY2Fu0FRZk2QE93NyDdIWFhZAhvHKepo8omPj9Gl7Bzs8nR04deU67RvXo4alOf9a/wvPtgvG08WRc1dv8XX4LnYeOoW5mRmDOoewbMpoDp67QlpmFqeuXAcpqVdHt3g+cvkGizfs5OSf19g0dzJCQNhTDdl3+hJhwYG0adyAyKNnAN26Y9L8Fbzz5RqaB/rTrkkDOrdoRJuGAZipVZX2HB+9GGMQAVTT0Z6MzPsGdaLjEzkRcxNjj8rDyR4PR9sK+/kh8ggpqWm6hBCENW9UKf6qgs8mDCXi4Am9BXh70RqSUtL0Y2vVOJDnO7UsQ1c2vEFCVl4BGrUaraJw6soNFq7baiCoxgG1uZlguC3cGHmEmBu3AcjXKmzZe5TEpBRdoYCxz3blbmoGLnY1sLWyAKBzcANCRk8jMyubgrx8XVW1mtqe7vyw5xCXYuMJbRZE86AA3l3yHSq1mtcHdUcIQbC/N59NGIqzrTWqwgce5OvF5n06c/nlmyPpNGE2CfeSKHp4ubl57D95gf0nLzB35Qa8PNyY+mI/xvR+Wt9GSfyw+yCONpYoiuTY5ausCN9J8UZLENo0kJibcQY0kz5ZZnJxO/3VoXz4Yp8y+YOmzMPK3EzHY4GWq7fi9ebC1saamaP6G23vr6CelxuvPteTL77dCEBSSmrx5KJWs2DScKMyKTPDaBWF2r3HAqBIibZo0VtIW9PViR4tG7PtQIltoRCs2/4764oEVTIOT6ViWK+OfDiyPyev3cbe1kZP1rJ+Xc58N5+lm3/j6s07+Hm7M6RzCK72Ndhx+Czbj54nKV9h5jcbyMkrYP1Hb9KjZSMyc/KQSFztbPSzg0TiaG9L0c4qqLYHJ1d/zJzVm1n3617S0tILx1AcR3Ur/i7jPl7G+RtxLH6t1BpGKrw1f3nZ8RTi6RZNCAn0ZeWWUgKs6s4JuHbLuEvDwsqS8HlTCKztUeU2K4MPXuzD2h2R3EtKMQgqHdy9Pa0b1DVKU9YkSUl+bm7ZmlLnj1k1YwI2FmZlaErXLVl2NyWdvIICzNVqtFpDZ5+3iwNzXupP0VPZdvgMrV9+H39vD8JaNiEhK0/6B3iKkIYBXI9PpP2kjzh4+hJSSkKDg1gyeQQNansAAqVAi1nhjkAIgYejHUteH8b8cUPYf+5P9hw7z55j5zh+4QqKVkuhF5Cvvt/G+L5h5YyhxL0QtG/emO8/nFhWRoBfHS8calgbLfN0Mb17Km6/uL/c7Gxe/XQ5J1fOpYalaSfog8KxhjUfvDKIiXOX6vOsrKz4eOwgY9VNbatBbWmJKHwT1SoVtV0d6fBUQyYP6kF9b/cyJAh4rksoDX1qAZCWncv6XfuJu6szW7v2HWHOt1t5/blu3ElKRZE6D3JaVjarfz2AIiUvdW+HVlEY/sGXZOfk8tOcN+jx5scsmDySOSt+ZPriNfrObKytZJeWjYW1lSVDZi5mx7x38HC2I/ZuEp4ujkSevkzE4dN69rq2akLn4EC6BAfCmOfkxdh40f+9BVy6GquThKJw5GJ0qTEJBvXsqH85zDVqvFwcad80kDYN/Y0fVAnBoskjK9wllabZ9Pk0GtfRyS4hLZ0J8//D0bOXAUH0tZus/HUfE/t2qnybVUDvNsFMVKmgcBfWpJ4ftctRbCPbajXJO5ZjV7jOqBQkDOwcwoC2wfqssX3DaDDodQrydWuTDb8dZO7oAajUam4kJFHLyZ7QsTMJDgpg0WvDsLWykNsOnRGp6ek0b1iPuu7OMi4xWSz7OYI/Fs+QGyKPilNXruPrWVMO6tgKBxsrhBAyKzdPnL0eh4eTPccuXZVNnvARV+MS+Og/G2SRvbpy6y6hjZ6QSCkAGtT2kGEtGolLMTcKuQczTSlRCMH8CUP12+rKyeEBzjClpJaLIz7uzgD4uDuzdMpomg17W9/ezkNnHpnClFH8Ctb/RSGaD/201r+WK42fqMvxQlf79fgE8gu0dG7ZiK37TxDk601sYjKHJ4/AQqNGSimib98FCQ39aiNABPl6szUySgyZpWLV1FcYolu1i6zc/CJdENYWZhy4cJVgf292HDwp3nnhGTRqNWqNRmi1BYDgp4j9vGRtKXq1aYaFmVocuhDDio0RRSZJCCFkqyD/vz5oAWsiojhw6apJufcNaVJhM038vHGwt9U574Crt+/8dd7+Oiq/rX5QeLu56BVGm5dHZk4eI7qHMn7eCr6b+Rp2tjZYmulYkCB//v2QEGoVI3q0Rwgh5014QXSdNEeG797P/ewcsePTt1GphHx/1SZefaaDcHeyl9/+ul/8fuQM3k62+LjXlP4erkIIwfjBveSi7zYVWVZWboqQKzdFCEQJR4OuZ/li7zB83V0ewogFP2zfU+5M4+1kX2ErKiHwdHXSK8y91PJdGH8nquANqjpcS/ocpOROSjodGtfDwdaWU1eu81zH1uw4ep70rBzGL1wtTl6M4aspY2j3ZABaRRGtAn05uOJfBPh4i50HjnPwYgxSSvFcu2Z0GDcTp84jxYJ1W5j5Un9mLP+R94b30R9Yz391kJgycgDmZoULdCGE7phAlwCJWq3mlQE9xNK3Rj6cARedoz0EuDkVryOSUtPIKnQ7PG4U+mFk8QtX5psxE6iEXHw93QzSp6NvEOjtxuLJI+gxeS5Ry2fjaGvDyZibdG/ZiA9HDSgMOYBpqzYzZ0QfGvt6sXPhVBoOfZPo2HjaBPrROtBXXN+wiNspGXg72/Hush95wsuDnq2KHVxmajVzXxnI+Gc7s2nvMU5evsa9lDRACGdHOxr716F322bUdXfWb82D/LwRFLrgharMsb/RMdaqSfMqmLOaDrbUr1OLjPR0fZ6NkR1QrzZNycgsmlkE56/HEVjXk4K8HH1e0excEk3r+6Eu9ApL0Pt3TMHSzIwOzRvrFT0ooI6pqrpXTUqpxCQkG5xY1vdwpSLn5427ySSlF0+VvrVq4mBjZVAn7X42MXEJ+rSrgx3erro3Z1F4BMvCI4hcMgMXOxuBQL8zu56QzOAZizj49QcUBnnRb9oXTBrYjaeb1NfzLyUs3RLJZ+u2ELXsQ2o66Gc0g6g6WdJVLoonAVHsl6mOuKsEhBAqHmcU13vf/KzUGzxZOXv9dsmoORmXnCbN278goy7E6PIVRc7bECHzCwoK4+MUmV+glTNXbZR1nn1NXrwZb0BfFCFWBTzuaLb/igv+AUHgK3bs472v1orXB/dk0oAu+sOuaf8JZ9H32xkYFkLjen6M6tZG7xM5diWWyYvWgIT1sybg6exQ+jyoOgj8EeAfEQQOEB2XIN5b+gP7Tl9iUFgIvdoEExxQh7sp6aRkZNKwrhd3U9KJPHWR7yOiuBIbz/sj+vFyz/aoVcLY4WG1wjx8CCGE+EcoDFIKCcTE3+OH3VHsPnqWc9dvIySoVIKc/AJqOtjSKiiAPqFP0bN1Eyw06vJOmasV5uFDrzAKVRfuw/5MQ7fyLLUlzcrLR6sgrcw1QqMq7rIwXLA8nqsV5hGgyCQZU5gigZtSjqo+rEfV3sPkoRrlQ5T8Q6HyBGaqzFh+Zf6gx6Ds39v+4NjFGBCiDI2VhYX4YuLzBjTJmdm8u/T7ongRA5oAL3feHtzdgIcz1+NY/PNOPF2cmDG8d5EZk+t+O0zkyQv0a9+C7s2DDPpdt+cIkSfOYwxqtZrPJw7FooSPJrdAyxuL1xLo682E3k8b1N8SdYptUSeZOrwvPuXE+oLu053Ji9eWmWkBvGs6M31473LpHzEMTqtNva3lvcV/mUZKyemYWHYfOwcg4hOTyMnJxce7FgKoUcMGKaXB50bp2Tks3/ALtna2uDjaG7SXmplVpq+g2u5cu53A8g2/4u9Zk+c7tRLnb8Qzas4SvNxcmD9uCBKJoFj5Lt68w+7C73ISk1LIvJ+Ft5cHGpUKtUaDVqtACYUp0CqsCN9Fp5BmZRTm6MUYlm/4hVF9OlWoMDn5BSz/+VesrCxxc3EyKKvv410u7d+GEvvs0n4JaSS/vLKq0xR+6lj0yWPnyZ9Iy/YvyOy8fIP8kiTXEpIlLQcqr362Sl+n6DLVz617KdKlxyuKc/fR8nZSqtL85WnSPHSoPHzxqp4HU9ew2V8rtHpOuZOaYbJOZk6eYtZuqNJtyoIyZdNWbFBoOVA59OeNCv0c9zKyFNF6kNJ/+peP3edi7ILiIPDSs0JlFoxVoRFG6xTOHKKEy7XEjbEPGfUoUBSy8wpETr6WoitfqzVKUMvJnuVTx4iklDSav/Q+R89dZs64oTSv51MB2xUXPwooikLJcenG9tj/M6FSp9WPQVxlUJYHIcQ34TtZtTnCIPu1Ic8wf9wQY9XpE9KUfp1C2Lj7gGgcGMDkgV0NIzb/Qdi8Jwq7Pw4Z5A3o3oF1U195TBwVoygIvCpi+0eIuO1TT/J8l7YGeY18Tdv5mPhEdh8+BUJw/so1DpyPpt2TAf+MwZRCk0B/xvbrYpDn5+Vmovbfi0caD/PIICVBPl6M6dW+UtXzCrS8MGsJWdm5/HvGBCbNW8GLs5ZwfNVcHHWRe48kiOxBUbeWe5nvnf8p+O9UGCG4mZDMruMXDLKtLcxp29Aw1EBKyaxVGzl8+iJvDu/Hy93akpaeydufr2L8ZytZN2McVZ9kq469J85z507xyb1apaZHSBOjn3IkJKcRceKiQZ65RkP7RgFl6v6NMBEE/pggqxR4JNn2xyG2lbTzUhJQuxZ//vi5Qc3I05f5ZFU4DfzqMHvUsyAErw/owsY/jvL9r3vp0qIRI7u3M935Q5p33lm40iBtYWlJ2u6VBv6cIuw/foYux04b5Dk7O5K4fdljN6FFZ0lVwaNwywspJVfuJJGenUNwXU+jbx7ozMupG3FGyyzNNDTSfcOj5+FqQjL3Mu7j7WSPh4OtfmeWmH6fa4nJ1LC0INCzpkkZXE9MITHjPk19apn8XFWRcPL6beytrfB3M/SfxKWkczslvQyNSqgIrlvLQFBaRXLyelzh358YwkytpkmdR/N9UiVhcPhoCg/LLV8e/q6jgYp4qEb5EEIIYSqmtzICrJoNeXCax8lDNUrhQU6r/xvwIKvYakUqH6JcT2o1qmEM/wdw5tcUg+4ntwAAAABJRU5ErkJggg==';
+/* ==========================================================
+ * 报销单导出 Excel 模块（纯 JS，零外部依赖）
+ * - ZIP STORED writer + CRC32
+ * - 标准 OpenXML 部件：workbook/styles/sheet1/drawings + image
+ * - 全部用 inlineStr（不依赖 sharedStrings，简化）
+ * ========================================================== */
+
+/* 1. LOGO 解码（一次性缓存） */
+const RB_LOGO_BYTES = (function(){
+  try{
+    const b64 = RB_LOGO_DATAURL.split(',')[1];
+    const bin = atob(b64);
+    const u8 = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) u8[i] = bin.charCodeAt(i);
+    return u8;
+  }catch(e){ return null; }
+})();
+
+/* 2. CRC32（IEEE 802.3） */
+const _CRC_TABLE = (function(){
+  const t = new Uint32Array(256);
+  for(let i=0;i<256;i++){
+    let c = i;
+    for(let k=0;k<8;k++) c = (c & 1) ? (0xEDB88320 ^ (c>>>1)) : (c>>>1);
+    t[i] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(bytes){
+  let c = 0xFFFFFFFF;
+  for(let i=0;i<bytes.length;i++) c = _CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+
+/* 3. ZIP STORED writer：返回单一 Uint8Array */
+function zipBuild(entries){
+  const enc = new TextEncoder();
+  const local = []; const central = []; let offset = 0;
+  for(const e of entries){
+    const nameBytes = enc.encode(e.name);
+    const data = (typeof e.data === 'string') ? enc.encode(e.data) : e.data;
+    const crc = crc32(data);
+    const sz = data.length;
+    const lh = new Uint8Array(30 + nameBytes.length);
+    const dv = new DataView(lh.buffer);
+    dv.setUint32(0, 0x04034b50, true);
+    dv.setUint16(4, 20, true);
+    dv.setUint16(6, 0, true);
+    dv.setUint16(8, 0, true);            // STORED
+    dv.setUint16(10, 0, true);
+    dv.setUint16(12, 0x21, true);         // 1980-01-01
+    dv.setUint32(14, crc, true);
+    dv.setUint32(18, sz, true);
+    dv.setUint32(22, sz, true);
+    dv.setUint16(26, nameBytes.length, true);
+    dv.setUint16(28, 0, true);
+    lh.set(nameBytes, 30);
+    local.push(lh, data);
+    const ch = new Uint8Array(46 + nameBytes.length);
+    const cv = new DataView(ch.buffer);
+    cv.setUint32(0, 0x02014b50, true);
+    cv.setUint16(4, 20, true);
+    cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0, true);
+    cv.setUint16(10, 0, true);
+    cv.setUint16(12, 0, true);
+    cv.setUint16(14, 0x21, true);
+    cv.setUint32(16, crc, true);
+    cv.setUint32(20, sz, true);
+    cv.setUint32(24, sz, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint16(30, 0, true);
+    cv.setUint16(32, 0, true);
+    cv.setUint16(34, 0, true);
+    cv.setUint16(36, 0, true);
+    cv.setUint32(38, 0, true);
+    cv.setUint32(42, offset, true);
+    ch.set(nameBytes, 46);
+    central.push(ch);
+    offset += lh.length + data.length;
+  }
+  const cdOffset = offset; let cdSize = 0;
+  for(const c of central){ cdSize += c.length; }
+  const eocd = new Uint8Array(22);
+  const ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(4, 0, true);
+  ev.setUint16(6, 0, true);
+  ev.setUint16(8, entries.length, true);
+  ev.setUint16(10, entries.length, true);
+  ev.setUint32(12, cdSize, true);
+  ev.setUint32(16, cdOffset, true);
+  ev.setUint16(20, 0, true);
+  central.push(eocd);
+  let total = 0;
+  for(const a of local) total += a.length;
+  for(const a of central) total += a.length;
+  const out = new Uint8Array(total);
+  let pos = 0;
+  for(const a of local){ out.set(a, pos); pos += a.length; }
+  for(const a of central){ out.set(a, pos); pos += a.length; }
+  return out;
+}
+
+/* 4. XML utility */
+function xmlEsc(s){
+  if(s===null||s===undefined) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+}
+function colLetter(idx){
+  let s='';
+  while(idx>0){
+    const m=(idx-1)%26;
+    s=String.fromCharCode(65+m)+s;
+    idx=Math.floor((idx-1)/26);
+  }
+  return s;
+}
+
+/* 5. OpenXML 部件 */
+function buildContentTypes(){
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="png" ContentType="image/png"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+  <Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>
+  <Override PartName="/xl/drawings/drawing1.xml" ContentType="application/vnd.openxmlformats-officedocument.drawingml.drawing+xml"/>
+</Types>`;
+}
+function buildRootRels(){
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
+}
+function buildWorkbook(){
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+          xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="报销单" sheetId="1" r:id="rId1"/></sheets>
+</workbook>`;
+}
+function buildWorkbookRels(){
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/>
+</Relationships>`;
+}
+function buildDrawing(){
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
+          xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+          xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <xdr:twoCellAnchor editAs="oneCell">
+    <xdr:from><xdr:col>0</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>
+    <xdr:to><xdr:col>14</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>
+    <xdr:pic>
+      <xdr:nvPicPr><xdr:cNvPr id="2" name="Logo"/><xdr:cNvPicPr/></xdr:nvPicPr>
+      <xdr:blipFill><a:blip r:embed="rId1"/><a:stretch/></xdr:blipFill>
+      <xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="1800000" cy="720000"/></a:xfrm><a:prstGeom prst="rect"/></xdr:spPr>
+    </xdr:pic>
+  </xdr:twoCellAnchor>
+</xdr:wsDr>`;
+}
+function buildDrawingRels(){
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image1.png"/>
+</Relationships>`;
+}
+function buildSheetRels(){
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/drawing" Target="../drawings/drawing1.xml"/>
+</Relationships>`;
+}
+
+/* 6. styles.xml —— 12 个常用 style
+ * 0: 默认  | 1: 表头绿底加粗居中 | 2: 数据偶数行（淡绿） 居左 | 3: 数据奇数行（白） 居左
+ * 4: 备注 5pt 灰文 居左 | 5: 偶数行数字右对齐 | 6: 奇数行数字右对齐
+ * 7: 派生列(黄纹) 居右 | 8: 派生列奇行 居右
+ * 9: 汇率 label 居右 | 10: 大标题（14pt加粗深蓝）居中
+ * 11: 数字 "¥#,##0.00" | 12: 数字 "#,##0"（整数 VND）
+ */
+function buildStyles(){
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="5">
+    <font><sz val="10"/><name val="Microsoft YaHei"/><color rgb="FF1A2540"/></font>
+    <font><b/><sz val="10"/><name val="Microsoft YaHei"/><color rgb="FF0C1F44"/></font>
+    <font><b/><sz val="14"/><name val="Microsoft YaHei"/><color rgb="FF0C1F44"/></font>
+    <font><i/><sz val="10"/><name val="Microsoft YaHei"/><color rgb="FF64748B"/></font>
+    <font><b/><sz val="11"/><name val="Microsoft YaHei"/><color rgb="FF0C1F44"/></font>
+  </fonts>
+  <fills count="7">
+    <fill><patternFill patternType="none"/></fill>
+    <fill><patternFill patternType="gray125"/></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFD6F0D6"/><bgColor indexed="64"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFFFFFFF"/><bgColor indexed="64"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFE3F3E1"/><bgColor indexed="64"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFEEF3FA"/><bgColor indexed="64"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFFFF7D6"/><bgColor indexed="64"/></patternFill></fill>
+  </fills>
+  <borders count="2">
+    <border><left/><right/><top/><bottom/><diagonal/></border>
+    <border><left style="thin"><color rgb="FF1A2540"/></left><right style="thin"><color rgb="FF1A2540"/></right><top style="thin"><color rgb="FF1A2540"/></top><bottom style="thin"><color rgb="FF1A2540"/></bottom><diagonal/></border>
+  </borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="15">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyFont="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="0" fontId="4" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="0" fontId="0" fillId="3" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="0" fontId="0" fillId="4" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="0" fontId="3" fillId="0" borderId="0" applyFont="1" applyAlignment="1"><alignment horizontal="left" vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="0" fontId="0" fillId="3" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="0" fillId="4" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="3" fillId="6" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="3" fillId="6" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="1" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="0" fontId="0" fillId="5" borderId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="2" fillId="0" borderId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="1" fillId="5" borderId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+    <xf numFmtId="164" fontId="5" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+    <xf numFmtId="165" fontId="5" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+  </cellXfs>
+  <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
+  <numFmts count="2">
+    <numFmt numFmtId="164" formatCode="&quot;¥&quot;#,##0.00"/>
+    <numFmt numFmtId="165" formatCode="#,##0"/>
+  </numFmts>
+</styleSheet>`;
+}
+
+/* ============================================================
+ * buildRbXlsx 主入口：构造 sheet1.xml + 装配 zip + 返回 Blob
+ * ============================================================ */
+function buildRbXlsx(t, rb){
+  const cols = RB_PRINT_COLS;
+  const N = cols.length; // 15
+  const numKeys = new Set(['transport','room','meal','hospitality','fuel','other','days']);
+
+  /* -- 列宽 -- */
+  let colsXml = '<cols>';
+  cols.forEach((c,i)=>{
+    const w = Math.max(10, Math.round((c[3]||60)/6.5));
+    colsXml += `<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`;
+  });
+  colsXml += '</cols>';
+
+  /* -- 单元格助手 -- */
+  function empty(ref, styleIdx){
+    return `<c r="${ref}" s="${styleIdx}" t="inlineStr"><is><t></t></is></c>`;
+  }
+  function txt(ref, styleIdx, str){
+    const s = (str===null||str===undefined)?'':String(str);
+    return `<c r="${ref}" s="${styleIdx}" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(s)}</t></is></c>`;
+  }
+  function num(ref, styleIdx, n, fmtStyleIdx){
+    const v = Math.round((+n||0)*100)/100;
+    return `<c r="${ref}" s="${fmtStyleIdx||styleIdx}" t="n"><v>${v}</v></c>`;
+  }
+  function intN(ref, styleIdx, n){
+    return `<c r="${ref}" s="${styleIdx}" t="n"><v>${Math.round(+n||0)}</v></c>`;
+  }
+
+  const rows = [];
+  const merges = [];
+  const rate = +rb.rate || 0;
+
+  /* row 1: LOGO 区域（A1:O4 由 drawing 占据），但需要真实 cell 让 Excel 不警告 */
+  rows.push(`<row r="1" ht="18" customHeight="1">${empty('A1',0)}</row>`);
+  rows.push(`<row r="2" ht="22" customHeight="1">${empty('A2',0)}</row>`);
+  rows.push(`<row r="3" ht="18" customHeight="1">${empty('A3',0)}</row>`);
+  rows.push(`<row r="4" ht="12" customHeight="1">${empty('A4',0)}</row>`);
+
+  /* row 5: 大标题 VI */
+  rows.push(`<row r="5" ht="32" customHeight="1">${txt('A5',12,'GIẤY THANH TOÁN CÔNG TÁC PHÍ')}</row>`);
+  merges.push('A5:O5');
+
+  /* row 6: 副标题 ZH */
+  rows.push(`<row r="6" ht="24" customHeight="1">${txt('A6',11,'出差报销单')}</row>`);
+  merges.push('A6:O6');
+
+  /* row 7: 汇率 — label + 数字 */
+  rows.push(`<row r="7" ht="20" customHeight="1">${txt('A7',10,'Tỷ giá（每月手动更新）CNY/VND')}${num('O7',13,rate)}</row>`);
+  merges.push('A7:N7');
+
+  /* row 8: 表头（中越双语） */
+  let hdr = '<row r="8" ht="40" customHeight="1">';
+  cols.forEach((c,i)=>{
+    hdr += `<c r="${colLetter(i+1)}8" s="9" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(c[1])}\n${xmlEsc(c[2])}</t></is></c>`;
+  });
+  hdr += '</row>';
+  rows.push(hdr);
+
+  /* row 9..18: 10 行数据 */
+  const dataRows = (rb.rows && rb.rows.length) ? rb.rows : [];
+  let grand = 0;
+  for(let r=0; r<10; r++){
+    const rr = 9 + r;
+    const row = dataRows[r] || {};
+    const txtS = (r%2===0) ? 3 : 2;     // 奇白/偶绿（按行号 r 决定）
+    const numS = (r%2===0) ? 6 : 5;
+    const derS = (r%2===0) ? 8 : 7;     // 派生列（斜纹）
+    let xml = `<row r="${rr}" ht="22" customHeight="1">`;
+    let total = 0;
+    for(let i=0; i<N-2; i++){
+      const k = cols[i][0];
+      const ref = `${colLetter(i+1)}${rr}`;
+      const v = row[k];
+      if(numKeys.has(k)){
+        const n = parseFloat(v)||0;
+        total += n;
+        if(k!=='days') grand += n;
+        xml += (n===0) ? empty(ref, numS) : num(ref, numS, n);
+      }else{
+        xml += txt(ref, txtS, v||'');
+      }
+    }
+    /* total 列（N-1）样式 13（粗体绿底+¥#,##0.00），vnd 列用 14（粗体绿底+#,##0） */
+    xml += num(`${colLetter(N-1)}${rr}`, derS, total, 13);
+    xml += intN(`${colLetter(N)}${rr}`, 14, Math.round(total*rate));
+    xml += '</row>';
+    rows.push(xml);
+  }
+
+  /* row 19: 合计 */
+  let grandRow = `<row r="19" ht="28" customHeight="1">`;
+  grandRow += txt('A19', 1, '合计 Tổng cộng');
+  grandRow += num(`N19`, 1, grand, 13);
+  grandRow += intN('O19', 14, Math.round(grand*rate));
+  grandRow += '</row>';
+  merges.push('A19:M19');
+  rows.push(grandRow);
+
+  /* row 20: 付款说明 label */
+  rows.push(`<row r="20" ht="20" customHeight="1">${txt('A20',1,'付款说明 / Ghi chú thanh toán')}</row>`);
+  merges.push('A20:O20');
+
+  /* row 21: 中文备注 */
+  rows.push(`<row r="21" ht="32" customHeight="1">${txt('A21',4,'注：本表所有金额为人民币（CNY），按当月手动公布汇率 CNY/VND 折算成越南盾（VND）。报销人请在提交前核对所有明细，部门审核 + 领导批准后方可入账。')}</row>`);
+  merges.push('A21:O21');
+
+  /* row 22: 越南语备注 */
+  rows.push(`<row r="22" ht="32" customHeight="1">${txt('A22',4,'Lưu ý: Toàn bộ số tiền ghi trên đơn là CNY, quy đổi sang VND theo tỷ giá CNY/VND công bố mỗi tháng. Người làm đơn vui lòng kiểm tra lại tất cả chi tiết trước khi nộp; bộ phận đánh giá + lãnh đạo phê duyệt mới có thể hạch toán.')}</row>`);
+  merges.push('A22:O22');
+
+  /* row 23: 空行 */
+  rows.push(`<row r="23" ht="14" customHeight="1">${empty('A23',0)}</row>`);
+
+  /* row 24: 签名表头（3 栏：A:E / F:J / K:O） */
+  let sigHd = '<row r="24" ht="26" customHeight="1">';
+  sigHd += txt('A24',1,'报销人 / Người viết đơn');
+  sigHd += txt('F24',1,'部门审核 / Bộ phận đánh giá');
+  sigHd += txt('K24',1,'领导批准 / Lãnh đạo phê duyệt');
+  sigHd += '</row>';
+  merges.push('A24:E24','F24:J24','K24:O24');
+  rows.push(sigHd);
+
+  /* row 25: 签名留白（高 120px） */
+  rows.push(`<row r="25" ht="120" customHeight="1">${empty('A25',0)}${empty('F25',0)}${empty('K25',0)}</row>`);
+  merges.push('A25:E25','F25:J25','K25:O25');
+
+  /* row 26: 日期 + 文件名（右侧灰文） */
+  const ymd = (function(){
+    const d=new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  })();
+  rows.push(`<row r="26" ht="16" customHeight="1">${txt('A26',4,'日期 Ngày：')} ${txt('B26',0,ymd)} ${empty('C26',0)}<c r="K26" s="4" t="inlineStr"><is><t xml:space="preserve">${xmlEsc('Beijiang RB '+ymd)}</t></is></c></row>`);
+  merges.push('K26:O26');
+
+  /* sheet1.xml */
+  const mergesXml = merges.length
+    ? `<mergeCells count="${merges.length}">${merges.map(m=>`<mergeCell ref="${m}"/>`).join('')}</mergeCells>`
+    : '';
+
+  const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+           xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheetViews><sheetView showGridLines="0"/></sheetViews>
+  <sheetFormatPr defaultRowHeight="16" defaultColWidth="11"/>
+  ${colsXml}
+  <sheetData>${rows.join('')}</sheetData>
+  ${mergesXml}
+  <drawing r:id="rId1"/>
+</worksheet>`;
+
+  /* 装配 zip */
+  const entries = [
+    { name: '[Content_Types].xml', data: buildContentTypes() },
+    { name: '_rels/.rels', data: buildRootRels() },
+    { name: 'xl/workbook.xml', data: buildWorkbook() },
+    { name: 'xl/_rels/workbook.xml.rels', data: buildWorkbookRels() },
+    { name: 'xl/worksheets/sheet1.xml', data: sheetXml },
+    { name: 'xl/worksheets/_rels/sheet1.xml.rels', data: buildSheetRels() },
+    { name: 'xl/styles.xml', data: buildStyles() },
+    { name: 'xl/sharedStrings.xml', data: '<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="0" uniqueCount="0"/>' },
+    { name: 'xl/drawings/drawing1.xml', data: buildDrawing() },
+    { name: 'xl/drawings/_rels/drawing1.xml.rels', data: buildDrawingRels() }
+  ];
+  if(RB_LOGO_BYTES){
+    entries.push({ name: 'xl/media/image1.png', data: RB_LOGO_BYTES });
+  }
+  const zipBytes = zipBuild(entries);
+  return new Blob([zipBytes], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+
 function rbPrintCellVal(r,k){
   if(k==='period')return [(r.startTime||''),(r.endTime||'')].filter(Boolean).join(' ~ ')||(r.startTime||r.endTime||'');
   return r[k]||'';
 }
-function renderRbPrintHtml(t,rb){
+function renderRbExcelPreview(t,rb){
   const rows=Array.isArray(rb.rows)?rb.rows:[];
   const month=new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long'});
   const grandCNY=rbGrandTotal(rows);
