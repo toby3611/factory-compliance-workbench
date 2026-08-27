@@ -2561,21 +2561,21 @@ function buildStyles(){
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
   <fonts count="6">
-    <font><sz val="10"/><name val="SimSun"/><charset val="134"/></font>
-    <font><b/><sz val="10"/><name val="SimSun"/><charset val="134"/></font>
-    <font><b/><sz val="18"/><name val="SimSun"/><charset val="134"/></font>
-    <font><b/><sz val="13"/><name val="SimSun"/><charset val="134"/></font>
-    <font><b/><sz val="11"/><name val="SimSun"/><charset val="134"/></font>
-    <font><sz val="10"/><color rgb="FF7F7F7F"/><name val="SimSun"/><charset val="134"/></font>
+    <font><sz val="10"/><name val="Times New Roman"/></font>
+    <font><b/><sz val="10"/><name val="Times New Roman"/></font>
+    <font><b/><sz val="18"/><name val="Times New Roman"/></font>
+    <font><b/><sz val="13"/><name val="Times New Roman"/></font>
+    <font><b/><sz val="11"/><name val="Times New Roman"/></font>
+    <font><sz val="10"/><name val="Times New Roman"/></font>
   </fonts>
   <fills count="3">
     <fill><patternFill patternType="none"/></fill>
     <fill><patternFill patternType="solid"><fgColor rgb="FFFFFFFF"/><bgColor indexed="64"/></patternFill></fill>
-    <fill><patternFill patternType="solid"><fgColor rgb="FFEAF5E8"/><bgColor indexed="64"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFFFFFFF"/><bgColor indexed="64"/></patternFill></fill>
   </fills>
   <borders count="2">
     <border><left/><right/><top/><bottom/><diagonal/></border>
-    <border><left style="thin"><color rgb="FF7F7F7F"/></left><right style="thin"><color rgb="FF7F7F7F"/></right><top style="thin"><color rgb="FF7F7F7F"/></top><bottom style="thin"><color rgb="FF7F7F7F"/></bottom><diagonal/></border>
+    <border><left style="thin"><color rgb="FF000000"/></left><right style="thin"><color rgb="FF000000"/></right><top style="thin"><color rgb="FF000000"/></top><bottom style="thin"><color rgb="FF000000"/></bottom><diagonal/></border>
   </borders>
   <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
   <cellXfs count="13">
@@ -2585,8 +2585,8 @@ function buildStyles(){
     <xf numFmtId="0" fontId="0" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="left" vertical="center" wrapText="1"/></xf>
     <xf numFmtId="0" fontId="0" fillId="1" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
     <xf numFmtId="0" fontId="0" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
-    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyFont="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
-    <xf numFmtId="0" fontId="2" fillId="0" borderId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyFont="1" applyAlignment="1"><alignment horizontal="right" vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="0" fontId="2" fillId="0" borderId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
     <xf numFmtId="0" fontId="3" fillId="0" borderId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
     <xf numFmtId="0" fontId="4" fillId="1" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
     <xf numFmtId="0" fontId="5" fillId="0" borderId="0" applyFont="1" applyAlignment="1"><alignment horizontal="left" vertical="top" wrapText="1"/></xf>
@@ -2654,15 +2654,15 @@ function buildRbXlsx(t, rb){
   /* === r1: 公司名（B1:O1 合并）=== */
   let r1 = '<row r="1" ht="33.75" customHeight="1">';
   r1 += empty('A1', 6);  // A1 占位给 LOGO
-  r1 += txt('B1', 6, '北江纺织(越南)有限公司  Công ty TNHH Dệt may Bắc Giang Việt Nam');
+  r1 += txt('B1', 6, '北江纺织(越南)有限公司\nCông ty TNHH Dệt may Bắc Giang Việt Nam');
   for(let i=2; i<N; i++) r1 += empty(colLetter(i+1)+'1', 6);
   r1 += '</row>';
   rows.push(r1);
   merges.push('B1:O1');
 
   /* === r2: 大标题（VI 中文，18pt 加粗居中）=== */
-  let r2 = '<row r="2" ht="37.5" customHeight="1">';
-  for(let i=0; i<N; i++) r2 += txt(colLetter(i+1)+'2', 7, (i===0) ? 'GIẤY THANH TOÁN CÔNG TÁC PHÍ\n出差报销单' : '');
+  let r2 = '<row r="2" ht="48" customHeight="1">';
+  for(let i=0; i<N; i++) r2 += txt(colLetter(i+1)+'2', 7, (i===0) ? '出差报销单\nGIẤY THANH TOÁN CÔNG TÁC PHÍ' : '');
   r2 += '</row>';
   rows.push(r2);
   merges.push('A2:O2');
@@ -2748,6 +2748,15 @@ function buildRbXlsx(t, rb){
   r18 += '</row>';
   rows.push(r18);
   merges.push('A18:E18','F18:J18','K18:O18');
+
+  /* === r19: 签名三栏（对应 r18 标签各留一格签名）=== */
+  let r19 = '<row r="19" ht="57.0" customHeight="1">';
+  for(let i=0; i<5; i++) r19 += empty(colLetter(i+1)+'19', 2);
+  for(let i=5; i<10; i++) r19 += empty(colLetter(i+1)+'19', 2);
+  for(let i=10; i<15; i++) r19 += empty(colLetter(i+1)+'19', 2);
+  r19 += '</row>';
+  rows.push(r19);
+  merges.push('A19:E19','F19:J19','K19:O19');
 
   /* -- sheet1.xml 装配 -- */
   const mergesXml = merges.length
