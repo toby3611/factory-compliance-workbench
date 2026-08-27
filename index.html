@@ -2624,7 +2624,7 @@ function buildRbXlsx(t, rb){
   for(let i=0; i<N; i++){
     colsXml += `<col min="${i+1}" max="${i+1}" width="${RB_XLSX_COL_WIDTHS[i]}" customWidth="1"/>`;
   }
-  colsXml += '<col min="16" max="256" width="0" hidden="1"/></cols>';
+  colsXml += '<col min="16" max="16384" width="0" hidden="1"/></cols>';
 
   /* -- 单元格助手 -- */
   function empty(ref, s){ return `<c r="${ref}" s="${s}" t="inlineStr"><is><t></t></is></c>`; }
