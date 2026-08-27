@@ -2516,18 +2516,16 @@ function buildWorkbookRels(){
 }
 function buildDrawing(){
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing"
-          xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
-          xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <xdr:twoCellAnchor editAs="oneCell">
-    <xdr:from><xdr:col>0</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>1</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>
-    <xdr:to><xdr:col>14</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>4</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>
-    <xdr:pic>
-      <xdr:nvPicPr><xdr:cNvPr id="2" name="Logo"/><xdr:cNvPicPr/></xdr:nvPicPr>
-      <xdr:blipFill><a:blip r:embed="rId1"/><a:stretch/></xdr:blipFill>
-      <xdr:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="1800000" cy="720000"/></a:xfrm><a:prstGeom prst="rect"/></xdr:spPr>
-    </xdr:pic>
-  </xdr:twoCellAnchor>
+<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+<xdr:twoCellAnchor editAs="oneCell">
+<xdr:from><xdr:col>0</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>
+<xdr:to><xdr:col>14</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>3</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:to>
+<xdr:pic>
+<xdr:nvPicPr><xdr:cNvPr id="2" name="Logo"/><xdr:cNvPicPr/></xdr:nvPicPr>
+<xdr:blipFill><a:blip r:embed="rId1"/><a:stretch/></xdr:blipFill>
+<xdr:spPr bwMode="auto"><a:xfrm><a:off x="0" y="76000"/><a:ext cx="5040000" cy="1110000"/></a:xfrm><a:prstGeom prst="rect"/></xdr:spPr>
+</xdr:pic>
+</xdr:twoCellAnchor>
 </xdr:wsDr>`;
 }
 function buildDrawingRels(){
@@ -2553,12 +2551,13 @@ function buildSheetRels(){
 function buildStyles(){
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-  <fonts count="5">
+  <fonts count="6">
     <font><sz val="10"/><name val="Microsoft YaHei"/><color rgb="FF1A2540"/></font>
-    <font><b/><sz val="10"/><name val="Microsoft YaHei"/><color rgb="FF0C1F44"/></font>
     <font><b/><sz val="14"/><name val="Microsoft YaHei"/><color rgb="FF0C1F44"/></font>
+    <font><b/><sz val="18"/><name val="Microsoft YaHei"/><color rgb="FF0C1F44"/></font>
     <font><i/><sz val="10"/><name val="Microsoft YaHei"/><color rgb="FF64748B"/></font>
     <font><b/><sz val="11"/><name val="Microsoft YaHei"/><color rgb="FF0C1F44"/></font>
+    <font><b/><sz val="11"/><name val="Microsoft YaHei"/><color rgb="FF1A2540"/></font>
   </fonts>
   <fills count="7">
     <fill><patternFill patternType="none"/></fill>
@@ -2586,10 +2585,10 @@ function buildStyles(){
     <xf numFmtId="0" fontId="3" fillId="6" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
     <xf numFmtId="0" fontId="1" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
     <xf numFmtId="0" fontId="0" fillId="5" borderId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="1" fillId="0" borderId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
     <xf numFmtId="0" fontId="2" fillId="0" borderId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-    <xf numFmtId="0" fontId="1" fillId="5" borderId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
-    <xf numFmtId="164" fontId="5" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
-    <xf numFmtId="165" fontId="5" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+    <xf numFmtId="164" fontId="4" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
+    <xf numFmtId="165" fontId="4" fillId="2" borderId="1" applyFont="1" applyFill="1" applyBorder="1" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right" vertical="center"/></xf>
   </cellXfs>
   <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
   <numFmts count="2">
@@ -2636,25 +2635,25 @@ function buildRbXlsx(t, rb){
   const rate = +rb.rate || 0;
 
   /* row 1: LOGO 区域（A1:O4 由 drawing 占据），但需要真实 cell 让 Excel 不警告 */
-  rows.push(`<row r="1" ht="18" customHeight="1">${empty('A1',0)}</row>`);
-  rows.push(`<row r="2" ht="22" customHeight="1">${empty('A2',0)}</row>`);
-  rows.push(`<row r="3" ht="18" customHeight="1">${empty('A3',0)}</row>`);
-  rows.push(`<row r="4" ht="12" customHeight="1">${empty('A4',0)}</row>`);
+  rows.push(`<row r="1" ht="1000" customHeight="1">${empty('A1',0)}</row>`);
+  rows.push(`<row r="2" ht="600" customHeight="1">${empty('A2',0)}</row>`);
+  rows.push(`<row r="3" ht="400" customHeight="1">${empty('A3',0)}</row>`);
+  rows.push(`<row r="4" ht="120" customHeight="1">${empty('A4',0)}</row>`);
 
   /* row 5: 大标题 VI */
-  rows.push(`<row r="5" ht="32" customHeight="1">${txt('A5',12,'GIẤY THANH TOÁN CÔNG TÁC PHÍ')}</row>`);
+  rows.push(`<row r="5" ht="480" customHeight="1">${txt('A5',12,'GIẤY THANH TOÁN CÔNG TÁC PHÍ')}</row>`);
   merges.push('A5:O5');
 
   /* row 6: 副标题 ZH */
-  rows.push(`<row r="6" ht="24" customHeight="1">${txt('A6',11,'出差报销单')}</row>`);
+  rows.push(`<row r="6" ht="360" customHeight="1">${txt('A6',11,'出差报销单')}</row>`);
   merges.push('A6:O6');
 
   /* row 7: 汇率 — label + 数字 */
-  rows.push(`<row r="7" ht="20" customHeight="1">${txt('A7',10,'Tỷ giá（每月手动更新）CNY/VND')}${num('O7',13,rate)}</row>`);
+  rows.push(`<row r="7" ht="320" customHeight="1">${txt('A7',10,'Tỷ giá（每月手动更新）CNY/VND')}${num('O7',13,rate)}</row>`);
   merges.push('A7:N7');
 
   /* row 8: 表头（中越双语） */
-  let hdr = '<row r="8" ht="40" customHeight="1">';
+  let hdr = '<row r="8" ht="600" customHeight="1">';
   cols.forEach((c,i)=>{
     hdr += `<c r="${colLetter(i+1)}8" s="9" t="inlineStr"><is><t xml:space="preserve">${xmlEsc(c[1])}\n${xmlEsc(c[2])}</t></is></c>`;
   });
@@ -2670,7 +2669,7 @@ function buildRbXlsx(t, rb){
     const txtS = (r%2===0) ? 3 : 2;     // 奇白/偶绿（按行号 r 决定）
     const numS = (r%2===0) ? 6 : 5;
     const derS = (r%2===0) ? 8 : 7;     // 派生列（斜纹）
-    let xml = `<row r="${rr}" ht="22" customHeight="1">`;
+    let xml = `<row r="${rr}" ht="300" customHeight="1">`;
     let total = 0;
     for(let i=0; i<N-2; i++){
       const k = cols[i][0];
@@ -2693,7 +2692,7 @@ function buildRbXlsx(t, rb){
   }
 
   /* row 19: 合计 */
-  let grandRow = `<row r="19" ht="28" customHeight="1">`;
+  let grandRow = `<row r="19" ht="360" customHeight="1">`;
   grandRow += txt('A19', 1, '合计 Tổng cộng');
   grandRow += num(`N19`, 1, grand, 13);
   grandRow += intN('O19', 14, Math.round(grand*rate));
@@ -2702,22 +2701,22 @@ function buildRbXlsx(t, rb){
   rows.push(grandRow);
 
   /* row 20: 付款说明 label */
-  rows.push(`<row r="20" ht="20" customHeight="1">${txt('A20',1,'付款说明 / Ghi chú thanh toán')}</row>`);
+  rows.push(`<row r="20" ht="300" customHeight="1">${txt('A20',1,'付款说明 / Ghi chú thanh toán')}</row>`);
   merges.push('A20:O20');
 
   /* row 21: 中文备注 */
-  rows.push(`<row r="21" ht="32" customHeight="1">${txt('A21',4,'注：本表所有金额为人民币（CNY），按当月手动公布汇率 CNY/VND 折算成越南盾（VND）。报销人请在提交前核对所有明细，部门审核 + 领导批准后方可入账。')}</row>`);
+  rows.push(`<row r="21" ht="400" customHeight="1">${txt('A21',4,'注：本表所有金额为人民币（CNY），按当月手动公布汇率 CNY/VND 折算成越南盾（VND）。报销人请在提交前核对所有明细，部门审核 + 领导批准后方可入账。')}</row>`);
   merges.push('A21:O21');
 
   /* row 22: 越南语备注 */
-  rows.push(`<row r="22" ht="32" customHeight="1">${txt('A22',4,'Lưu ý: Toàn bộ số tiền ghi trên đơn là CNY, quy đổi sang VND theo tỷ giá CNY/VND công bố mỗi tháng. Người làm đơn vui lòng kiểm tra lại tất cả chi tiết trước khi nộp; bộ phận đánh giá + lãnh đạo phê duyệt mới có thể hạch toán.')}</row>`);
+  rows.push(`<row r="22" ht="400" customHeight="1">${txt('A22',4,'Lưu ý: Toàn bộ số tiền ghi trên đơn là CNY, quy đổi sang VND theo tỷ giá CNY/VND công bố mỗi tháng. Người làm đơn vui lòng kiểm tra lại tất cả chi tiết trước khi nộp; bộ phận đánh giá + lãnh đạo phê duyệt mới có thể hạch toán.')}</row>`);
   merges.push('A22:O22');
 
   /* row 23: 空行 */
-  rows.push(`<row r="23" ht="14" customHeight="1">${empty('A23',0)}</row>`);
+  rows.push(`<row r="23" ht="200" customHeight="1">${empty('A23',0)}</row>`);
 
   /* row 24: 签名表头（3 栏：A:E / F:J / K:O） */
-  let sigHd = '<row r="24" ht="26" customHeight="1">';
+  let sigHd = '<row r="24" ht="320" customHeight="1">';
   sigHd += txt('A24',1,'报销人 / Người viết đơn');
   sigHd += txt('F24',1,'部门审核 / Bộ phận đánh giá');
   sigHd += txt('K24',1,'领导批准 / Lãnh đạo phê duyệt');
@@ -2726,7 +2725,7 @@ function buildRbXlsx(t, rb){
   rows.push(sigHd);
 
   /* row 25: 签名留白（高 120px） */
-  rows.push(`<row r="25" ht="120" customHeight="1">${empty('A25',0)}${empty('F25',0)}${empty('K25',0)}</row>`);
+  rows.push(`<row r="25" ht="1200" customHeight="1">${empty('A25',0)}${empty('F25',0)}${empty('K25',0)}</row>`);
   merges.push('A25:E25','F25:J25','K25:O25');
 
   /* row 26: 日期 + 文件名（右侧灰文） */
@@ -2734,7 +2733,7 @@ function buildRbXlsx(t, rb){
     const d=new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   })();
-  rows.push(`<row r="26" ht="16" customHeight="1">${txt('A26',4,'日期 Ngày：')} ${txt('B26',0,ymd)} ${empty('C26',0)}<c r="K26" s="4" t="inlineStr"><is><t xml:space="preserve">${xmlEsc('Beijiang RB '+ymd)}</t></is></c></row>`);
+  rows.push(`<row r="26" ht="200" customHeight="1">${txt('A26',4,'日期 Ngày：')} ${txt('B26',0,ymd)} ${empty('C26',0)}<c r="K26" s="4" t="inlineStr"><is><t xml:space="preserve">${xmlEsc('Beijiang RB '+ymd)}</t></is></c></row>`);
   merges.push('K26:O26');
 
   /* sheet1.xml */
