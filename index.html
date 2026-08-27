@@ -2505,6 +2505,7 @@ function buildWorkbook(sheetName){
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
           xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <bookViews><workbookView xWindow="0" yWindow="0" windowWidth="0" windowHeight="0" showGridLines="0" activeTab="0"/></bookViews>
   <sheets><sheet name="${xmlEsc(sn)}" sheetId="1" r:id="rId1"/></sheets>
 </workbook>`;
 }
@@ -2624,7 +2625,7 @@ function buildRbXlsx(t, rb){
   for(let i=0; i<N; i++){
     colsXml += `<col min="${i+1}" max="${i+1}" width="${RB_XLSX_COL_WIDTHS[i]}" customWidth="1"/>`;
   }
-  colsXml += '<col min="16" max="16384" width="0" hidden="1"/></cols>';
+  colsXml += '<col min="16" max="16384" width="2.5" hidden="1" customWidth="1"/></cols>';
 
   /* -- 单元格助手 -- */
   function empty(ref, s){ return `<c r="${ref}" s="${s}" t="inlineStr"><is><t></t></is></c>`; }
