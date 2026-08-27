@@ -2624,7 +2624,7 @@ function buildRbXlsx(t, rb){
   for(let i=0; i<N; i++){
     colsXml += `<col min="${i+1}" max="${i+1}" width="${RB_XLSX_COL_WIDTHS[i]}" customWidth="1"/>`;
   }
-  colsXml += '</cols>';
+  colsXml += '<col min="16" max="256" width="0" hidden="1"/></cols>';
 
   /* -- 单元格助手 -- */
   function empty(ref, s){ return `<c r="${ref}" s="${s}" t="inlineStr"><is><t></t></is></c>`; }
@@ -2773,7 +2773,7 @@ function buildRbXlsx(t, rb){
   const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <sheetViews><sheetView showGridLines="0"/></sheetViews>
+  <sheetViews><sheetView tabSelected="1" workbookViewId="0" showGridLines="0"><selection activeCell="A1" sqref="A1"/></sheetView></sheetViews>
   <sheetFormatPr defaultRowHeight="15.75" defaultColWidth="10.25"/>
   ${colsXml}
   <sheetData>${rows.join('')}</sheetData>
