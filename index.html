@@ -2609,7 +2609,7 @@ function buildRbXlsx(t, rb){
   /* -- 列宽 -- */
   let colsXml = '<cols>';
   cols.forEach((c,i)=>{
-    const w = Math.max(10, Math.round((c[3]||60)/6.5));
+    const w = Math.max(14, Math.round((c[3]||60)/4.5));
     colsXml += `<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`;
   });
   colsXml += '</cols>';
@@ -2745,7 +2745,7 @@ function buildRbXlsx(t, rb){
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
            xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
   <sheetViews><sheetView showGridLines="0"/></sheetViews>
-  <sheetFormatPr defaultRowHeight="16" defaultColWidth="11"/>
+  <sheetFormatPr defaultRowHeight="16" defaultColWidth="14"/>
   ${colsXml}
   <sheetData>${rows.join('')}</sheetData>
   ${mergesXml}
