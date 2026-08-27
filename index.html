@@ -549,14 +549,14 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rb-meta{padding:8px 18px;font-size:12px;color:#475569;background:#f8fafc;border-bottom:1px solid #e2e8f0}
 .rb-tbl-wrap{flex:1;overflow:auto;background:#fff}
 .rb-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
-.rb-tbl thead th{position:sticky;top:0;background:#1e3a8a;color:#fff;padding:8px 6px;font-weight:600;text-align:center;white-space:nowrap;border-right:1px solid #1e40af}
-.rb-tbl tbody td{border-bottom:1px solid #e2e8f0;border-right:1px solid #f1f5f9;padding:3px 4px;vertical-align:middle}
-.rb-tbl tbody tr:hover{background:#f8fafc}
-.rb-tbl tfoot td{background:#f1f5f9;border-top:2px solid #1e3a8a;padding:10px 8px;font-size:13px}
+.rb-tbl thead th{position:sticky;top:0;background:#ffffff;color:#000;padding:8px 6px;font-weight:600;text-align:center;white-space:nowrap;border-right:1px solid #000}
+.rb-tbl tbody td{border-bottom:1px solid #000;border-right:1px solid #000;padding:3px 4px;vertical-align:middle;color:#000}
+.rb-tbl tbody tr:hover{background:#ffffff}
+.rb-tbl tfoot td{background:#ffffff;border-top:2px solid #000;padding:10px 8px;font-size:13px}
 .rb-inp{width:100%;border:0;background:transparent;padding:4px 2px;font-size:12px;outline:none;font-family:inherit}
 .rb-inp:focus{background:#dbeafe;border-radius:3px}
 .rb-num{text-align:right}
-.rb-empty{text-align:center;color:#94a3b8;padding:30px 0;font-style:italic}
+.rb-empty{text-align:center;color:#000;padding:30px 0;font-style:italic}
 .rb-del-cell{text-align:center;width:40px}
 .rb-del{background:transparent;border:0;color:#dc2626;cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px}
 .rb-del:hover{background:#fee2e2}
@@ -575,68 +575,69 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rb-tab .ic{margin-right:5px}
 .rb-pane{display:none}
 .rb-pane.on{display:block}
+#rb-modal td{color:#000}
 /* 报销单 Excel 预览面板 */
-.rb-print{background:#fff;max-width:1280px;margin:0 auto;padding:18px 22px;color:#1a2540;font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.18)}
-.rb-print-hd{display:flex;align-items:flex-start;border-bottom:2px solid #1a2540;padding-bottom:8px;margin-bottom:6px}
+.rb-print{background:#fff;max-width:1280px;margin:0 auto;padding:18px 22px;color:#000;font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.rb-print-hd{display:flex;align-items:flex-start;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:6px}
 .rb-print-logo{flex:0 0 auto;margin-right:auto}
 .rb-print-logo-inner{background:#1e5bbf;color:#fff;padding:7px 14px 5px;border-radius:5px;display:inline-block;line-height:1;text-align:center;box-shadow:inset 0 -3px 0 rgba(255,255,255,.15)}
 .rb-print-logo-inner .prosp{font-family:Arial Black,"Helvetica Neue",sans-serif;font-size:24px;font-weight:900;letter-spacing:1px;display:block}
 .rb-print-logo-inner .prosp .o{color:#7dd3fc}
 .rb-print-logo-inner .textile{margin-top:4px;font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:5px;border-top:1px solid rgba(255,255,255,.45);padding-top:3px;display:block}
-.rb-print-company{font-size:13px;text-align:right;color:#1a2540;line-height:1.5;flex:0 0 auto;margin-left:auto}
-.rb-print-company b{font-size:14px;color:#0c1f44}
-.rb-print-company .vi{font-style:italic;color:#475569;font-size:12px}
+.rb-print-company{font-size:13px;text-align:right;color:#000;line-height:1.5;flex:0 0 auto;margin-left:auto}
+.rb-print-company b{font-size:14px;color:#000}
+.rb-print-company .vi{font-style:italic;color:#000;font-size:12px}
 .rb-print-title{text-align:center;margin:14px 0 8px}
-.rb-print-title .vi{font-size:22px;font-weight:700;letter-spacing:2px;color:#0c1f44;text-transform:uppercase}
-.rb-print-title .zh{font-size:16px;font-weight:700;color:#1a2540;margin-top:4px;letter-spacing:4px}
-.rb-print-rate{display:flex;justify-content:flex-end;align-items:center;gap:8px;font-size:13px;margin:6px 0 8px;padding-bottom:6px;border-bottom:1px dashed #94a3b8}
-.rb-print-rate b{color:#0c1f44;font-size:15px;background:#fff7d6;padding:2px 8px;border-radius:4px;border:1px solid #facc15}
-.rb-print-rate .label{color:#475569}
-.rb-print-rate .lbl-vi{font-style:italic;color:#64748b;font-size:12px}
+.rb-print-title .vi{font-size:22px;font-weight:700;letter-spacing:2px;color:#000;text-transform:uppercase}
+.rb-print-title .zh{font-size:16px;font-weight:700;color:#000;margin-top:4px;letter-spacing:4px}
+.rb-print-rate{display:flex;justify-content:flex-end;align-items:center;gap:8px;font-size:13px;margin:6px 0 8px;padding-bottom:6px;border-bottom:1px dashed #000}
+.rb-print-rate b{color:#000;font-size:15px;background:#ffffff;padding:2px 8px;border-radius:4px;border:1px solid #000}
+.rb-print-rate .label{color:#000}
+.rb-print-rate .lbl-vi{font-style:italic;color:#000;font-size:12px}
 .rb-print-tbl{width:100%;border-collapse:collapse;font-size:11.5px;margin-bottom:6px}
-.rb-print-tbl th,.rb-print-tbl td{border:1px solid #1a2540;padding:5px 4px;text-align:center;vertical-align:middle}
-.rb-print-tbl thead th{background:#d6f0d6;color:#1a2540;font-weight:700;line-height:1.2}
-.rb-print-tbl thead th .vi{display:block;font-style:italic;font-weight:600;font-size:10px;color:#334155;margin-bottom:1px}
-.rb-print-tbl thead th .zh{display:block;font-weight:700;font-size:11.5px;color:#0c1f44}
+.rb-print-tbl th,.rb-print-tbl td{border:1px solid #000;padding:5px 4px;text-align:center;vertical-align:middle}
+.rb-print-tbl thead th{background:#ffffff;color:#000;font-weight:700;line-height:1.2}
+.rb-print-tbl thead th .vi{display:block;font-style:italic;font-weight:600;font-size:10px;color:#000;margin-bottom:1px}
+.rb-print-tbl thead th .zh{display:block;font-weight:700;font-size:11.5px;color:#000}
 .rb-print-tbl tbody tr:nth-child(odd){background:#ffffff}
-.rb-print-tbl tbody tr:nth-child(even){background:#e3f3e1}
-.rb-print-tbl tbody td{color:#1a2540;height:24px}
+.rb-print-tbl tbody tr:nth-child(even){background:#ffffff}
+.rb-print-tbl tbody td{color:#000;height:24px}
 .rb-print-tbl tbody td.left{text-align:left;padding-left:6px}
 .rb-print-tbl tbody td.num{text-align:right;padding-right:6px;font-variant-numeric:tabular-nums}
-.rb-print-tbl tbody tfoot td,.rb-print-tbl tfoot td{background:#d6f0d6;font-weight:700;color:#0c1f44}
-.rb-print-tbl .empty-row td{background:#f8fdf6}
-.rb-print-note{display:flex;font-size:11.5px;line-height:1.6;border-top:2px solid #1a2540;padding-top:8px;margin-top:6px}
-.rb-print-note .label{flex:0 0 150px;font-weight:700;color:#0c1f44}
-.rb-print-note .label .vi{display:block;font-style:italic;font-weight:600;font-size:11px;color:#334155}
-.rb-print-note .label .zh{display:block;font-weight:700;font-size:12px;color:#0c1f44}
-.rb-print-note .body{flex:1;padding-left:10px;text-indent:2em;color:#1a2540}
-.rb-print-note .body .vi{display:block;font-style:italic;color:#334155;margin-bottom:4px}
+.rb-print-tbl tbody tfoot td,.rb-print-tbl tfoot td{background:#ffffff;font-weight:700;color:#000}
+.rb-print-tbl .empty-row td{background:#ffffff}
+.rb-print-note{display:flex;font-size:11.5px;line-height:1.6;border-top:2px solid #000;padding-top:8px;margin-top:6px}
+.rb-print-note .label{flex:0 0 150px;font-weight:700;color:#000}
+.rb-print-note .label .vi{display:block;font-style:italic;font-weight:600;font-size:11px;color:#000}
+.rb-print-note .label .zh{display:block;font-weight:700;font-size:12px;color:#000}
+.rb-print-note .body{flex:1;padding-left:10px;text-indent:2em;color:#000}
+.rb-print-note .body .vi{display:block;font-style:italic;color:#000;margin-bottom:4px}
 .rb-print-sign{display:flex;gap:14px;margin-top:18px;padding-top:4px}
-.rb-print-sign .col{flex:1;text-align:center;border-top:1px solid #1a2540;padding-top:36px;font-size:12px;color:#0c1f44;position:relative}
+.rb-print-sign .col{flex:1;text-align:center;border-top:1px solid #000;padding-top:36px;font-size:12px;color:#000;position:relative}
 .rb-print-sign .col .zh{font-weight:700;font-size:13px;letter-spacing:3px}
-.rb-print-sign .col .vi{font-style:italic;font-size:11.5px;color:#334155;margin-top:3px;display:block}
+.rb-print-sign .col .vi{font-style:italic;font-size:11.5px;color:#000;margin-top:3px;display:block}
 .rb-export-actions{display:flex;justify-content:center;align-items:center;gap:12px;padding:18px;background:transparent;flex-wrap:wrap}
 .rb-export-actions .btn-export{background:#2563eb;color:#fff;border:0;padding:11px 34px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(37,99,235,.22);transition:.18s}
 .rb-export-actions .btn-export:hover{background:#1d4ed8;box-shadow:0 6px 16px rgba(37,99,235,.32);transform:translateY(-1px)}
 .rb-export-actions .btn-export:active{transform:translateY(0)}
-.rb-export-actions .btn-close{background:#64748b;color:#fff;border:0;padding:11px 22px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
-.rb-export-actions .btn-close:hover{background:#475569}
+.rb-export-actions .btn-close{background:#000;color:#fff;border:0;padding:11px 22px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+.rb-export-actions .btn-close:hover{background:#000}
 .rb-export-actions .tip{color:#fff;font-size:12px;opacity:.92;margin-left:6px}
 /* LOGO 真实图片 */
 .rb-print-logo-img{height:62px;width:auto;display:block}
 /* 打印模板表格可编辑单元 */
 .rb-print-tbl td[contenteditable="true"]{cursor:text;position:relative;transition:background .15s}
-.rb-print-tbl td[contenteditable="true"]:hover{background:#fffbeb!important;box-shadow:inset 0 0 0 1px #fcd34d}
-.rb-print-tbl td[contenteditable="true"]:focus{background:#fff7d6!important;outline:2px solid #10b981;outline-offset:-2px}
+.rb-print-tbl td[contenteditable="true"]:hover{background:#ffffff!important;box-shadow:inset 0 0 0 1px #000}
+.rb-print-tbl td[contenteditable="true"]:focus{background:#ffffff!important;outline:2px solid #2563eb;outline-offset:-2px}
 .rb-print-tbl td[contenteditable="true"].num{text-align:right;padding-right:6px}
-.rb-print-tbl td.derived{background:repeating-linear-gradient(135deg,#e3f3e1 0 6px,#d6f0d6 6px 12px);color:#475569;font-style:italic}
+.rb-print-tbl td.derived{background:#ffffff;color:#000;font-style:italic}
 /* 签名三栏（做成与主表格同款） */
 .rb-print-sign-tbl{width:100%;border-collapse:collapse;margin-top:18px;table-layout:fixed}
-.rb-print-sign-tbl th{background:#d6f0d6;color:#0c1f44;border:1px solid #1a2540;padding:6px 4px;text-align:center;font-weight:700;line-height:1.2;width:33.33%}
-.rb-print-sign-tbl th .vi{display:block;font-style:italic;font-weight:600;font-size:10px;color:#334155}
-.rb-print-sign-tbl th .zh{display:block;font-weight:700;font-size:13px;color:#0c1f44;letter-spacing:2px}
-.rb-print-sign-tbl td{border:1px solid #1a2540;height:120px;vertical-align:bottom;text-align:center;padding-bottom:8px;color:#1a2540}
-.rb-print-sign-tbl td .sign-hint{color:#cbd5e1;font-size:11px;font-style:italic}
+.rb-print-sign-tbl th{background:#ffffff;color:#000;border:1px solid #000;padding:6px 4px;text-align:center;font-weight:700;line-height:1.2;width:33.33%}
+.rb-print-sign-tbl th .vi{display:block;font-style:italic;font-weight:600;font-size:10px;color:#000}
+.rb-print-sign-tbl th .zh{display:block;font-weight:700;font-size:13px;color:#000;letter-spacing:2px}
+.rb-print-sign-tbl td{border:1px solid #000;height:120px;vertical-align:bottom;text-align:center;padding-bottom:8px;color:#000}
+.rb-print-sign-tbl td .sign-hint{color:#000;font-size:11px;font-style:italic}
 .phase-btn.on .arr{transform:rotate(90deg)}
 /* 验厂任务行的「实施计划」列：pill 在上、计划明细按钮在下（与 cat=1 认证管理同款视觉） */
 .td-plan-grp{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
@@ -2206,7 +2207,7 @@ function renderReimbursementModal(t){
       ${RB_COLS.map(c=>{
         const k=c[0];
         if(k==='total')return `<td style="text-align:right;font-weight:600">¥${tot.toFixed(2)}</td>`;
-        if(k==='vnd')return `<td style="text-align:right;font-weight:600;color:#047857">${vnd.toLocaleString('vi-VN',{maximumFractionDigits:0})}</td>`;
+        if(k==='vnd')return `<td style="text-align:right;font-weight:600;color:#000">${vnd.toLocaleString('vi-VN',{maximumFractionDigits:0})}</td>`;
         const v=r[k]||'';
         if(k==='days')return `<td><input type="number" min="0" step="0.5" class="rb-inp rb-num" value="${esc(v)}" onchange="rbUpdate(${t.id},${i},'${k}',this.value)" oninput="rbUpdateLive(${t.id},${i},'${k}',this.value)"></td>`;
         if(['transport','room','meal','hospitality','fuel','other'].includes(k))return `<td><input type="number" min="0" step="0.01" class="rb-inp rb-num" value="${esc(v)}" onchange="rbUpdate(${t.id},${i},'${k}',this.value)" oninput="rbUpdateLive(${t.id},${i},'${k}',this.value)"></td>`;
@@ -2240,7 +2241,7 @@ function renderReimbursementModal(t){
             <tfoot><tr class="rb-grand">
               <td colspan="14" style="text-align:right;font-weight:600">合计 Tổng cộng：</td>
               <td style="text-align:right;font-weight:700">¥${grandCNY.toFixed(2)}</td>
-              <td style="text-align:right;font-weight:700;color:#047857">${grandVND.toLocaleString('vi-VN',{maximumFractionDigits:0})}</td>
+              <td style="text-align:right;font-weight:700;color:#000">${grandVND.toLocaleString('vi-VN',{maximumFractionDigits:0})}</td>
               <td></td>
             </tr></tfoot>
           </table>
@@ -2665,7 +2666,8 @@ function buildRbXlsx(t, rb){
   for(let i=0; i<N; i++) r2 += txt(colLetter(i+1)+'2', 7, (i===0) ? '出差报销单\nGIẤY THANH TOÁN CÔNG TÁC PHÍ' : '');
   r2 += '</row>';
   rows.push(r2);
-  merges.push('A2:O2');
+  merges.push('A2:O2');
+
   merges.push('K3:L3');
 
   /* === r3: 汇率 === */
@@ -2919,7 +2921,7 @@ function rbUpdate(taskId,rowIdx,key,value){
   if(foot){
     const ftd=foot.querySelectorAll('td');
     ftd[ftd.length-2].innerHTML=`<b>¥${rbGrandTotal(t.reimbursement.rows).toFixed(2)}</b>`;
-    ftd[ftd.length-1].innerHTML=`<b style="color:#047857">${rbGrandVnd(t.reimbursement.rows,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
+    ftd[ftd.length-1].innerHTML=`<b style="color:#000">${rbGrandVnd(t.reimbursement.rows,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
   }
 }
 function rbUpdateLive(taskId,rowIdx,key,value){
@@ -2943,7 +2945,7 @@ function rbUpdateLive(taskId,rowIdx,key,value){
   if(foot){
     const ftd=foot.querySelectorAll('td');
     ftd[ftd.length-2].innerHTML=`<b>¥${rbGrandTotal(t.reimbursement.rows).toFixed(2)}</b>`;
-    ftd[ftd.length-1].innerHTML=`<b style="color:#047857">${rbGrandVnd(t.reimbursement.rows,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
+    ftd[ftd.length-1].innerHTML=`<b style="color:#000">${rbGrandVnd(t.reimbursement.rows,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
   }
 }
 function rbUpdateRate(taskId){
@@ -2967,7 +2969,7 @@ function rbUpdateRate(taskId){
   const foot=modal.querySelector('tfoot tr');
   if(foot){
     const ftd=foot.querySelectorAll('td');
-    ftd[ftd.length-1].innerHTML=`<b style="color:#047857">${rbGrandVnd(t.reimbursement.rows,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
+    ftd[ftd.length-1].innerHTML=`<b style="color:#000">${rbGrandVnd(t.reimbursement.rows,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
   }
 }
 function rbSaveClose(taskId){
