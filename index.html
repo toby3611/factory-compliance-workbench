@@ -2778,7 +2778,7 @@ function buildRbXlsx(t, rb){
   <sheetViews><sheetView tabSelected="1" workbookViewId="0" showGridLines="0"><selection activeCell="A1" sqref="A1"/></sheetView></sheetViews>
   <sheetFormatPr defaultRowHeight="15.75" defaultColWidth="0"/>
   ${colsXml}
-  <sheetData>${rows.join('')}</sheetData>
+  <sheetData>${rows.join('')}${[...Array(1005).keys()].map(i=>`<row r="${i+20}" ht="0" hidden="1"/>`).join('')}</sheetData>
   ${mergesXml}
   <drawing r:id="rId1"/>
 </worksheet>`;
