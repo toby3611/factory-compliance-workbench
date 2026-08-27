@@ -2779,6 +2779,9 @@ function buildRbXlsx(t, rb){
   <sheetFormatPr defaultRowHeight="15.75" defaultColWidth="0"/>
   ${colsXml}
   <sheetData>${rows.join('')}${[...Array(1005).keys()].map(i=>`<row r="${i+20}" ht="0" hidden="1"/>`).join('')}</sheetData>
+  <printOptions showGridLines="0" gridLines="0" horizontalCentered="0" verticalCentered="0" headings="0"/>
+  <pageMargins left="0.5" right="0.5" top="0.5" bottom="0.5" header="0" footer="0"/>
+  <pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0" horizontalDpi="300" verticalDpi="300"/>
   ${mergesXml}
   <drawing r:id="rId1"/>
 </worksheet>`;
