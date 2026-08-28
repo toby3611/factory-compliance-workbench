@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>综合工作台 · 云端版</title>
+<!-- APP_VERSION: 2026-08-28c (清理死代码rbReadPreviewIntoTask+顶栏版本号显示+本地测试产物清理) -->
 <style>
 :root{
   --primary:#1e6fff;--primary-2:#3b8aff;--primary-soft:#eaf2ff;
@@ -532,6 +536,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .phase-btn{display:inline-flex;align-items:center;gap:4px;background:#ecfdf5;color:#047857;border:1px solid #bbf7d0;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;margin-left:4px}
 .phase-btn:hover{background:#d1fae5;color:#065f46}
 .phase-btn.on{background:#047857;color:#fff;border-color:#047857}
+.rb-old-note{display:block;margin-top:3px;font-size:11px;color:#94a3b8;line-height:1.3;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .phase-btn .arr{display:inline-block;transition:transform .15s}
 
 /* 出差报销单 modal（中越双语 16 列） */
@@ -960,6 +965,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
     <input type="file" id="impFile" accept="application/json" hidden>
     <button class="icon-btn hide-mobile" onclick="loadFromCloud(true)" title="刷新云端"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5"/></svg></button>
     <button class="icon-btn" onclick="doLogout()" title="退出登录"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
+    <span id="verTag" class="ver-tag" title="工作台版本号 · 若与此不一致请 Ctrl+F5 强刷到最新版">v—</span>
     <div class="avatar">黄</div>
   </div>
 </header>
@@ -1222,6 +1228,8 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 <div id="toast" class="toast"></div>
 
 <script>
+/* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
+const APP_VER='2026-08-28c';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -2123,13 +2131,18 @@ function renderModuleTableHTML(){
       if(k==='startDate'||k==='startTime')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.startDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'startDate',this.value)"></td>`;
       if(k==='endDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.endDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'endDate',this.value)"></td>`;
       if(k==='plan'){
-        // 报销类任务（cat=11 + 标题含「报销」）：显示「报销单台账」按钮
-        if(t.cat==='11' && (t.title||'').indexOf('报销')>=0){
+        // 报销类任务（cat=11）：强制显示「报销单台账」按钮（不依赖 title 含「报销」，任何 cat=11 任务都覆盖）
+        // 旧版「现成单台账」等 Gist 数据残留字段统一保留为下方灰色小字，避免信息丢失
+        if(t.cat==='11'){
           const docs=t.rbDocs||[];
           const rbN=docs.reduce((s,d)=>s+((d.rows&&d.rows.length)||0),0);
           const rbSum=docs.reduce((s,d)=>s+rbDocSum(d),0);
           const rbOpen=(typeof openRbLedgerSet!=='undefined')&&openRbLedgerSet.has(t.id);
-          return `<td class="td-plan"><div class="td-plan-grp"><button class="phase-btn ${rbOpen?'on':''}" onclick="event.stopPropagation();openRbLedger(${t.id})" title="打开报销单台账"><span class="arr">${rbOpen?'▾':'▸'}</span> 报销单台账 ${docs.length}单/${rbN}行/¥${rbSum.toFixed(2)}</button></div></td>`;
+          const oldPlan=Array.isArray(t.plan)?t.plan.join(' · '):(t.plan||'');
+          const planNote=oldPlan?`<small class="rb-old-note" title="Gist 历史备注（如不再需要，可在抽屉里删除 t.plan 字段）">${esc(oldPlan)}</small>`:'';
+          // onclick 用 try/catch 包裹，万一 openRbLedger 函数在加载旧 JS 的页面里不存在也能给出明确提示
+          const safeClick=`try{event.stopPropagation();openRbLedger(${t.id})}catch(e){console.error('[rb-ledger] openRbLedger 不可用，请 Ctrl+F5 强刷到最新版：',e);alert('页面 JS 未更新，请按 Ctrl+F5 强刷到最新版');}`;
+          return `<td class="td-plan"><div class="td-plan-grp"><button class="phase-btn ${rbOpen?'on':''}" onclick="${safeClick}" title="打开报销单台账"><span class="arr">${rbOpen?'▾':'▸'}</span> 报销单台账 ${docs.length}单/${rbN}行/¥${rbSum.toFixed(2)}</button>${planNote}</div></td>`;
         }
         return `<td class="td-plan"><div class="td-plan-grp">${planBtn||'—'}</div></td>`;
       }
@@ -2387,8 +2400,6 @@ async function rbExportExcel(taskId){
     await new Promise(r=>setTimeout(r,30));
     const t=data.tasks.find(x=>x.id===taskId);
     if(!t){toast('找不到任务');return;}
-    // 把预览面板的可编辑格内容同步回 当前 doc.rows
-    rbReadPreviewIntoTask(taskId);
     const rb=curRbDoc(taskId)||{rate:0,rows:[]};
     const doc=getRbDoc(t,curRbDocId);
     if(doc)doc.status='已导出';
@@ -2412,34 +2423,6 @@ async function rbExportExcel(taskId){
   }finally{
     if(btn){ btn.disabled=false; btn.innerHTML='📤 导出 Excel'; }
   }
-}
-/* 把预览面板的 td[contenteditable] 内容回写到 当前 doc.rows（按 RB_PRINT_COLS 的 key 顺序） */
-function rbReadPreviewIntoTask(taskId){
-  const t=data.tasks.find(x=>x.id===taskId);
-  if(!t)return;
-  const rb=curRbDoc(taskId);
-  if(!rb)return;
-  const trs=document.querySelectorAll('#rb-modal .rb-print-tbl tbody tr');
-  const newRows=[];
-  const numKeys=new Set(['transport','room','meal','hospitality','fuel','other','days']);
-  trs.forEach(tr=>{
-    const cells=tr.querySelectorAll('td[contenteditable="true"]');
-    if(!cells.length)return;
-    const row={};
-    RB_PRINT_COLS.forEach((col,i)=>{
-      const cell=cells[i];
-      const raw=cell?(cell.textContent||'').replace(/[\r\n]+/g,' ').trim():'';
-      if(numKeys.has(col[0])){
-        row[col[0]] = raw===''?0:(parseFloat(raw.replace(/[^\d.\-]/g,''))||0);
-      }else{
-        row[col[0]] = raw;
-      }
-    });
-    newRows.push(row);
-  });
-  // 编辑面板的 <input> 通过 oninput 已实时同步到 d.rows，预览面板只读不再回写
-  // （isEmpty 行会把单元渲染成空串，回写会误清空真实数据 → 禁用回写）
-  data._dirty=data._dirty||new Date().toISOString();
 }
 /* 文件名：Beijiang_RB_{报销单号}_{YYYY-MM-DD}.xlsx */
 function rbMakeFilename(t,rb,docName){
@@ -4314,7 +4297,7 @@ function disconnectSync(){
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 function scrollToToday(){const el=document.getElementById('todayCard');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
 function aiHelp(){toast('AI 助手已就绪 · 在 WorkBuddy 对话中让我帮你')}
-function renderAll(){normalizeData();renderSideCats();renderCards();renderToday();renderMetrics();renderKB();renderMemos();if(document.getElementById('view-cert').classList.contains('active'))renderCerts()}
+function renderAll(){const vt=document.getElementById('verTag');if(vt)vt.textContent='v'+APP_VER;normalizeData();renderSideCats();renderCards();renderToday();renderMetrics();renderKB();renderMemos();if(document.getElementById('view-cert').classList.contains('active'))renderCerts()}
 
 /* ============ 侧栏业务模块（从 CATS 动态生成 11 大类） ============ */
 function renderSideCats(){
