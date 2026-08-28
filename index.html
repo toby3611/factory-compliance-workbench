@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>综合工作台 · 云端版</title>
-<!-- APP_VERSION: 2026-08-28e (fix: delRbDoc内d.id(number) !== docId(string)恒为true -- 报销单删除不了; 改String()比较+toast提示) -->
+<!-- APP_VERSION: 2026-08-28f (新增: cat=11『休假类』任务实施要求下方按钮改为『休假记录』,内嵌表格CRUD+天数自动算+拖拽排序+导出全部中方休假汇总Excel) -->
 <style>
 :root{
   --primary:#1e6fff;--primary-2:#3b8aff;--primary-soft:#eaf2ff;
@@ -925,6 +925,71 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
   .rb-stats-grid{grid-template-columns:repeat(2,1fr)}
 }
 
+/* ===== 中方休假记录面板（行内展开版 · cat=11『休假类』任务专用） ===== */
+.vac-expand-row > td{background:linear-gradient(180deg,#f0fdf4 0%,#e6f9ed 100%);padding:8px 12px 12px}
+.vac-expand-row > td > .vac-panel{box-shadow:0 4px 18px rgba(34,139,82,.10);border-radius:12px;background:#fff;overflow:hidden}
+.vac-panel{display:flex;flex-direction:column}
+.vac-toolbar{display:flex;align-items:center;gap:12px;padding:12px 14px;background:linear-gradient(180deg,#ecfdf5 0%,#d1fae5 100%);border-bottom:1px solid #a7f3d0;flex-wrap:wrap}
+.vac-title{font-weight:700;font-size:15px;color:#065f46;display:flex;align-items:center;gap:8px;flex:1;min-width:0;flex-wrap:wrap}
+.vac-sub{font-weight:400;font-size:13px;color:#047857;background:rgba(255,255,255,.6);padding:2px 8px;border-radius:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px}
+.vac-stats{font-weight:400;font-size:12px;color:#047857;padding:0 10px;border-left:1px dashed #86efac}
+.vac-stats b{color:#065f46;font-weight:700}
+.vac-tools{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.vac-kw{border:1px solid #a7f3d0;background:#fff;border-radius:8px;padding:6px 10px;font-size:13px;min-width:140px;outline:none;transition:all .15s}
+.vac-kw:focus{border-color:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,.18)}
+.vac-btn{border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.vac-btn:hover{transform:translateY(-1px);box-shadow:0 4px 10px rgba(0,0,0,.08)}
+.vac-btn-add{background:#fff;color:#047857;border:1px solid #a7f3d0}
+.vac-btn-add:hover{background:#ecfdf5}
+.vac-btn-export{background:linear-gradient(180deg,#10b981,#059669);color:#fff;font-weight:600}
+.vac-btn-export:disabled{opacity:.7;cursor:wait}
+.vac-btn-close{background:#fff;color:#6b7280;border:1px solid #d1d5db}
+.vac-btn-close:hover{background:#f9fafb}
+.vac-table-wrap{overflow-x:auto;max-height:520px;overflow-y:auto}
+.vac-tbl{width:100%;border-collapse:collapse;font-size:13px;background:#fff}
+.vac-tbl thead{position:sticky;top:0;background:linear-gradient(180deg,#047857,#065f46);color:#fff;z-index:2}
+.vac-tbl th{padding:8px 10px;text-align:left;font-weight:600;font-size:12px;white-space:nowrap;border-right:1px solid rgba(255,255,255,.15)}
+.vac-tbl th.num{width:28px;text-align:center}
+.vac-tbl td{padding:4px 6px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.vac-tbl tr.vac-row{background:#fff;transition:background .15s}
+.vac-tbl tr.vac-row:nth-child(even){background:#f8fdfb}
+.vac-tbl tr.vac-row:hover{background:#ecfdf5}
+.vac-tbl tr.vac-row[draggable=true]:active{cursor:grabbing}
+.vac-grip{color:#9ca3af;font-size:14px;text-align:center;cursor:grab;user-select:none;width:28px}
+.vac-grip:hover{color:#047857}
+.vac-cell{border:1px solid transparent;background:transparent;border-radius:6px;padding:4px 8px;font-size:13px;width:100%;outline:none;font-family:inherit;transition:all .15s}
+.vac-cell:hover{border-color:#a7f3d0;background:#f0fdf4}
+.vac-cell:focus{border-color:#10b981;background:#fff;box-shadow:0 0 0 2px rgba(16,185,129,.15)}
+.vac-date{padding:3px 6px}
+.vac-num{text-align:center;font-weight:600;color:#047857}
+.vac-create{padding:4px 8px;font-size:12px;color:#6b7280;white-space:nowrap}
+.vac-tbl .td-ops{white-space:nowrap;padding:4px 6px}
+.vac-tbl .td-ops button{background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;border-radius:4px;transition:background .15s}
+.vac-tbl .td-ops button:hover{background:#fee2e2}
+.vac-foot{padding:8px 14px;background:#f0fdf4;font-size:12px;color:#047857;border-top:1px solid #d1fae5;line-height:1.5}
+.vac-foot b{color:#065f46}
+.phase-btn-vac{background:#fff;border-color:#86efac;color:#047857}
+.phase-btn-vac:hover{background:#ecfdf5;border-color:#34d399}
+.phase-btn-vac.on{background:linear-gradient(180deg,#10b981,#059669);color:#fff;border-color:#047857}
+@media (max-width:768px){
+  .vac-toolbar{flex-direction:column;align-items:stretch;gap:8px}
+  .vac-tools{justify-content:flex-end}
+  .vac-kw{width:100%}
+  .vac-tbl{font-size:12px}
+  .vac-tbl th,.vac-tbl td{padding:6px 8px}
+  .vac-cell{padding:4px 6px;font-size:13px}
+  /* 手机端：把表格转卡片式（跟 rb-doc-tbl 同样思路） */
+  .vac-tbl thead{display:none}
+  .vac-tbl,.vac-tbl tbody,.vac-tbl tr.vac-row,.vac-tbl td{display:block;width:auto;box-sizing:border-box}
+  .vac-tbl tr.vac-row{border:1px solid #d1fae5;border-radius:10px;margin:8px 10px;padding:6px 10px;background:#fff}
+  .vac-tbl tr.vac-row:nth-child(even){background:#f8fdfb}
+  .vac-tbl td{border:none;padding:4px 0;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .vac-tbl td.vac-grip{display:none}
+  .vac-tbl td.td-ops{justify-content:flex-end}
+  .vac-tbl .vac-cell{flex:1;max-width:60%}
+  .vac-stats{font-size:11px;border-left:none;padding:0}
+}
+
 </style>
 </head>
 <body>
@@ -1234,7 +1299,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-08-28e';
+const APP_VER='2026-08-28f';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -1911,6 +1976,8 @@ function renderSubModule(){
   bindModuleTable();
   // 报销单台账行内展开：mount 拖拽事件 + 修复视觉（renderSubModule 重渲染后自动恢复 openRbLedgerSet 里的展开）
   mountRbInlineRows();
+  // 中方休假记录台账行内展开：搜索框 + 视觉/位置恢复（vacOpenSet 状态保留）
+  mountVacInlineRows();
 }
 
 /* ============ A 类执行任务通用列表（从 renderSubModule 抽取，可复用） ============ */
@@ -2138,9 +2205,17 @@ function renderModuleTableHTML(){
       if(k==='startDate'||k==='startTime')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.startDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'startDate',this.value)"></td>`;
       if(k==='endDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.endDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'endDate',this.value)"></td>`;
       if(k==='plan'){
-        // 报销类任务（cat=11）：强制显示「报销单台账」按钮（不依赖 title 含「报销」，任何 cat=11 任务都覆盖）
-        // 旧版「现成单台账」等 Gist 数据残留字段统一保留为下方灰色小字，避免信息丢失
+        // cat=11 任务：根据标题是否含『休假』分流
+        //   - 含『休假』 → 休假记录面板（内嵌表格 CRUD + 天数自动算 + 导出全部中方休假汇总 Excel）
+        //   - 其他 cat=11 → 报销单台账（原有逻辑不动）
         if(t.cat==='11'){
+          if((t.title||'').indexOf('休假')>=0 || (t.workDetail||'').indexOf('休假')>=0){
+            const vOpen=isVacRowOpen(t.id);
+            const rows=Array.isArray(t.vacationRows)?t.vacationRows:[];
+            const vCount=rows.length;
+            const safeClick=`try{event.stopPropagation();toggleVacationRow('${t.id}',this)}catch(e){console.error('[vac]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
+            return `<td class="td-plan"><div class="td-plan-grp"><button class="phase-btn phase-btn-vac ${vOpen?'on':''}" data-task-id="${t.id}" data-vac="1" onclick="${safeClick}" title="点击展开 / 收起休假记录（在该行下方展开，不弹窗）"><span class="arr" id="vac-arrow-${t.id}">${vOpen?'▾':'▸'}</span> 休假记录 ${vCount} 条</button></div></td>`;
+          }
           const docs=t.rbDocs||[];
           const rbN=docs.reduce((s,d)=>s+((d.rows&&d.rows.length)||0),0);
           const rbSum=docs.reduce((s,d)=>s+rbDocSum(d),0);
@@ -2173,7 +2248,7 @@ function renderModuleTableHTML(){
         <button title="编辑" onclick="openModuleEdit(${t.id})">✎</button>
         <button title="删除" onclick="del(${t.id})">🗑</button>
       </td>
-    </tr>${isYc && tIsOpen?`<tr class="phase-row" id="pr-t-${t.id}"><td colspan="${colCount}"><div class="phase-inner">${renderPhasePanel(t)}</div></td></tr>`:''}${t.cat==='11' && isRbRowOpen(t.id)?`<tr class="rb-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderRbLedger(t.id)}</td></tr>`:''}`;
+    </tr>${isYc && tIsOpen?`<tr class="phase-row" id="pr-t-${t.id}"><td colspan="${colCount}"><div class="phase-inner">${renderPhasePanel(t)}</div></td></tr>`:''}${t.cat==='11' && isRbRowOpen(t.id)?`<tr class="rb-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderRbLedger(t.id)}</td></tr>`:''}${t.cat==='11' && ((t.title||'').indexOf('休假')>=0 || (t.workDetail||'').indexOf('休假')>=0) && isVacRowOpen(t.id)?`<tr class="vac-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderVacationPanel(t.id)}</td></tr>`:''}`;
   }).join('');
 
   return `${chips}<div class="mt-wrap">
@@ -3139,6 +3214,202 @@ function buildRbXlsx(t, rb, sheetName){
   return new Blob([zipBytes], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 }
 
+/* ===== 中方休假汇总 xlsx 生成器（纯 JS · 零依赖 · 复用 zipBuild/crc32/xmlEsc/colLetter） =====
+ * 收集所有 cat=11 标题含『休假』的任务的 vacationRows，导出为单一汇总表。
+ * 行布局：1 大标题（A:J 合并）|2 副标题|3 空|4 表头|5..N 数据|N+1 footer（导出人+日期）
+ * 列：A 序号 / B 任务 / C 名字 / D 部门 / E 起时间 / F 止时间 / G 天数 / H 休假地点 / I 录入时间 / J 备注
+ */
+function buildVacationXlsx(){
+  const tasks=data.tasks.filter(t=>t.cat==='11' && ((t.title||'')+' '+(t.workDetail||'')).indexOf('休假')>=0);
+  let allData=[];
+  tasks.forEach(t=>{
+    const tname=(t.workDetail||t.title||'');
+    (Array.isArray(t.vacationRows)?t.vacationRows:[]).forEach((r,i)=>{
+      allData.push({
+        taskName:tname,
+        idx:i+1,
+        name:r.name||'',dept:r.dept||'',
+        startDate:r.startDate||'',endDate:r.endDate||'',days:r.days||'',
+        place:r.place||'',createAt:r.createAt||'',note:r.note||''
+      });
+    });
+  });
+  // 汇总
+  const totalRows=allData.length;
+  const totalDays=allData.reduce((s,d)=>s+(parseInt(d.days,10)||0),0);
+  const names=new Set();
+  allData.forEach(d=>{ if((d.name||'').trim()) names.add((d.name||'').trim()); });
+  const totalPersons=names.size;
+  const d=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const todayStr=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const timeStr=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const x=N=>`"${String(N).padStart(5,'0')}"`;
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+  function tx(c,r,v,s){return `<c r="${c}${r}" s="${s||0}" t="inlineStr"><is><t xml:space="preserve">${esc(v)}</t></is></c>`}
+  function num(c,r,v,s){return `<c r="${c}${r}" s="${s||0}" t="n"><v>${v}</v></c>`}
+  function emp(c,r,s){return `<c r="${c}${r}" s="${s||0}"/>`}
+  const totalRow=4+totalRows+1; // 5..(4+N) 数据；N+1 footer
+  const rows=[];
+  // r1 大标题（合并 A1:J1）
+  rows.push(`<row r="1" ht="32" customHeight="1">${tx('A',1,'🌴 中方休假人员汇总  ·  北江纺织（越南）有限公司',6)}<c r="B1"/><c r="C1"/><c r="D1"/><c r="E1"/><c r="F1"/><c r="G1"/><c r="H1"/><c r="I1"/><c r="J1"/></row>`);
+  // r2 副标题（合并 A2:J2）：共 N 条 · D 天 · P 人 · 导出日期
+  const subTxt=`共 ${totalRows} 条记录 · 累计 ${totalDays} 天 · 涉及 ${totalPersons} 人 · 导出日期 ${todayStr}`;
+  rows.push(`<row r="2" ht="20" customHeight="1">${tx('A',2,subTxt,7)}<c r="B2"/><c r="C2"/><c r="D2"/><c r="E2"/><c r="F2"/><c r="G2"/><c r="H2"/><c r="I2"/><c r="J2"/></row>`);
+  // r3 空行
+  rows.push(`<row r="3" ht="6" customHeight="1">${emp('A',3,0)}${emp('B',3,0)}${emp('C',3,0)}${emp('D',3,0)}${emp('E',3,0)}${emp('F',3,0)}${emp('G',3,0)}${emp('H',3,0)}${emp('I',3,0)}${emp('J',3,0)}</row>`);
+  // r4 表头（10 列）
+  const HEADERS=['序号','任务','名字','部门','起时间','止时间','天数','休假地点','录入时间','备注'];
+  let r4='<row r="4" ht="22" customHeight="1">';
+  HEADERS.forEach((h,i)=>{ r4+=tx(colLetter(i+1),4,h,1); });
+  r4+='</row>';
+  rows.push(r4);
+  // r5.. 数据
+  allData.forEach((r,i)=>{
+    const rowNum=5+i;
+    const bg=(i%2===0)?2:3; // 偶数行=2，奇数行=3（条纹）
+    let s=`<row r="${rowNum}" ht="20" customHeight="1">`;
+    s+=tx('A',rowNum,String(r.idx),bg);
+    s+=tx('B',rowNum,r.taskName,bg);
+    s+=tx('C',rowNum,r.name,bg);
+    s+=tx('D',rowNum,r.dept,bg);
+    s+=tx('E',rowNum,r.startDate,bg);
+    s+=tx('F',rowNum,r.endDate,bg);
+    s+=tx('G',rowNum,r.days,bg);
+    s+=tx('H',rowNum,r.place,bg);
+    s+=tx('I',rowNum,r.createAt,bg);
+    s+=tx('J',rowNum,r.note,bg);
+    s+='</row>';
+    rows.push(s);
+  });
+  // footer 行
+  const footRow=totalRow;
+  let fr=`<row r="${footRow}" ht="18" customHeight="1">`;
+  fr+=tx('A',footRow,`导出人：黄海涛 · 导出时间：${timeStr}`,4);
+  fr+=`<c r="B${footRow}"/><c r="C${footRow}"/><c r="D${footRow}"/><c r="E${footRow}"/><c r="F${footRow}"/><c r="G${footRow}"/><c r="H${footRow}"/><c r="I${footRow}"/><c r="J${footRow}"/>`;
+  fr+='</row>';
+  rows.push(fr);
+
+  const merges=['A1:J1','A2:J2','A'+footRow+':J'+footRow];
+  const mergesXml=`<mergeCells count="${merges.length}">${merges.map(m=>`<mergeCell ref="${m}"/>`).join('')}</mergeCells>`;
+
+  // 列宽：10 列（序号 / 任务 / 名字 / 部门 / 起 / 止 / 天 / 地点 / 录入 / 备注）
+  const colWidths=[6,22,12,12,14,14,8,16,18,22];
+  let colsXml='<cols>';
+  colWidths.forEach((w,i)=>{
+    colsXml+=`<col min="${i+1}" max="${i+1}" width="${w}" customWidth="1"/>`;
+  });
+  colsXml+='</cols>';
+
+  // styles.xml：8 个 xfs（0 默认 / 1 表头居中蓝底白字 / 2 偶数行 / 3 奇数行 / 4 footer 灰底 / 6 大标题 / 7 副标题）
+  const stylesXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <fonts count="5">
+    <font><sz val="11"/><name val="Microsoft YaHei"/></font>
+    <font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Microsoft YaHei"/></font>
+    <font><sz val="11"/><name val="Microsoft YaHei"/></font>
+    <font><sz val="11"/><name val="Microsoft YaHei"/></font>
+    <font><i/><sz val="9"/><color rgb="FF6B7280"/><name val="Microsoft YaHei"/></font>
+    <font><b/><sz val="16"/><color rgb="FF1565C0"/><name val="Microsoft YaHei"/></font>
+    <font><sz val="10"/><color rgb="FF374151"/><name val="Microsoft YaHei"/></font>
+  </fonts>
+  <fills count="6">
+    <fill><patternFill patternType="none"/></fill>
+    <fill><patternFill patternType="gray125"/></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FF2563EB"/><bgColor rgb="FF2563EB"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFF8FAFC"/><bgColor rgb="FFF8FAFC"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFEFF6FF"/><bgColor rgb="FFEFF6FF"/></patternFill></fill>
+    <fill><patternFill patternType="solid"><fgColor rgb="FFFEF3C7"/><bgColor rgb="FFFEF3C7"/></patternFill></fill>
+  </fills>
+  <borders count="2">
+    <border><left/><right/><top/><bottom/><diagonal/></border>
+    <border><left style="thin"><color rgb="FFCBD5E1"/></left><right style="thin"><color rgb="FFCBD5E1"/></right><top style="thin"><color rgb="FFCBD5E1"/></top><bottom style="thin"><color rgb="FFCBD5E1"/></bottom></border>
+  </borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="8">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+    <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="0" fontId="2" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="0" fontId="4" fillId="5" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment vertical="center"/></xf>
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyAlignment="1"><alignment vertical="center"/></xf>
+    <xf numFmtId="0" fontId="5" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+    <xf numFmtId="0" fontId="6" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+  </cellXfs>
+  <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
+</styleSheet>`;
+
+  const sheetName=`中方休假汇总 ${todayStr}`.slice(0,28);
+  const sheetXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="A1" sqref="A1"/></sheetView></sheetViews>
+  <sheetFormatPr defaultRowHeight="15" defaultColWidth="0"/>
+  ${colsXml}
+  <sheetData>${rows.join('')}</sheetData>
+  ${mergesXml}
+</worksheet>`;
+  const workbookXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="${esc(sheetName)}" sheetId="1" r:id="rId1"/></sheets>
+</workbook>`;
+  const workbookRelsXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`;
+  const rootRelsXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
+  const contentTypesXml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+</Types>`;
+  const entries=[
+    {name:'[Content_Types].xml',data:contentTypesXml},
+    {name:'_rels/.rels',data:rootRelsXml},
+    {name:'xl/workbook.xml',data:workbookXml},
+    {name:'xl/_rels/workbook.xml.rels',data:workbookRelsXml},
+    {name:'xl/worksheets/sheet1.xml',data:sheetXml},
+    {name:'xl/styles.xml',data:stylesXml}
+  ];
+  const zipBytes=zipBuild(entries);
+  return new Blob([zipBytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+}
+function vacExportAllSummary(){
+  // 二次确认
+  const tasks=data.tasks.filter(t=>t.cat==='11' && ((t.title||'')+' '+(t.workDetail||'')).indexOf('休假')>=0);
+  if(!tasks.length){toast('暂无休假类任务');return;}
+  const N=tasks.reduce((s,t)=>s+((Array.isArray(t.vacationRows)?t.vacationRows.length:0)),0);
+  const btnId='vac-export-btn';
+  const btn=document.getElementById(btnId);
+  if(N===0){
+    if(!confirm('当前所有休假类任务均无记录，仍要生成空模板导出吗？')) return;
+  }
+  if(btn){ btn.disabled=true; btn.textContent='⏳ 正在生成…'; }
+  try{
+    const blob=buildVacationXlsx();
+    const d=new Date();
+    const pad=n=>String(n).padStart(2,'0');
+    const stamp=`${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+    const fname=`Beijiang_Vacation_Summary_${stamp}.xlsx`;
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=fname;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },1500);
+    toast(`已导出：${fname}（${tasks.length} 个任务，${N} 条记录）`);
+  }catch(err){
+    console.error('[vac-export]',err);
+    alert('导出失败：'+err.message+'。请 Ctrl+F5 强刷后再试。');
+  }finally{
+    if(btn){ btn.disabled=false; btn.innerHTML='📤 导出全部中方休假汇总'; }
+  }
+}
+
 function rbPrintCellVal(r,k){
   if(k==='period')return [(r.startTime||''),(r.endTime||'')].filter(Boolean).join(' ~ ')||(r.startTime||r.endTime||'');
   return r[k]||'';
@@ -3694,6 +3965,256 @@ function saveModule(){
   closeModuleDrawer();
   renderSubModule();
   toast(id?'已保存':'已新增');
+}
+
+/* ===== 中方休假记录台账（行内展开版 · cat=11『休假类』任务专用） ===== */
+let vacOpenSet=new Set();
+const _vacKw={};
+function isVacRowOpen(tid){
+  return vacOpenSet && vacOpenSet.has(String(tid));
+}
+function closeVacationRow(taskId){
+  const tid=String(taskId);
+  const row=document.querySelector('tr.vac-expand-row[data-task-id="'+tid+'"]');
+  if(row) row.remove();
+  const btn=document.querySelector('button.phase-btn[data-task-id="'+tid+'"][data-vac="1"]');
+  if(btn){
+    btn.classList.remove('on');
+    const arr=document.getElementById('vac-arrow-'+tid);
+    if(arr) arr.textContent='▸';
+  }
+  vacOpenSet.delete(tid);
+}
+function toggleVacationRow(taskId,btn){
+  try{
+    const tid=String(taskId);
+    const tr=btn && btn.closest ? btn.closest('tr') : null;
+    if(!tr) return;
+    let nxt=tr.nextElementSibling;
+    if(nxt && nxt.classList && nxt.classList.contains('vac-expand-row') && String(nxt.dataset.taskId)===tid){
+      nxt.remove();
+      btn.classList.remove('on');
+      const arr=document.getElementById('vac-arrow-'+tid);
+      if(arr) arr.textContent='▸';
+      vacOpenSet.delete(tid);
+      return;
+    }
+    document.querySelectorAll('tr.vac-expand-row[data-task-id="'+tid+'"]').forEach(r=>r.remove());
+    const cols=tr.children.length;
+    const newRow=document.createElement('tr');
+    newRow.className='vac-expand-row';
+    newRow.dataset.taskId=tid;
+    const td=document.createElement('td');
+    td.colSpan=cols;
+    td.innerHTML=renderVacationPanel(tid);
+    newRow.appendChild(td);
+    tr.parentNode.insertBefore(newRow,tr.nextSibling);
+    btn.classList.add('on');
+    const arr=document.getElementById('vac-arrow-'+tid);
+    if(arr) arr.textContent='▾';
+    vacOpenSet.add(tid);
+    const kw=document.getElementById('vac-kw-'+tid);
+    if(kw && !kw._bind){
+      kw._bind=true;
+      kw.addEventListener('input',()=>{ _vacKw[tid]=kw.value; refreshVacationPanel(tid); });
+    }
+  }catch(err){
+    console.error('[vac] toggle 失败：',err);
+    alert('页面 JS 未更新，请按 Ctrl+F5 强刷到最新版');
+  }
+}
+function refreshVacationPanel(taskId){
+  const tid=String(taskId);
+  const row=document.querySelector('tr.vac-expand-row[data-task-id="'+tid+'"]');
+  if(!row) return;
+  const td=row.querySelector('td');
+  if(!td) return;
+  td.innerHTML=renderVacationPanel(tid);
+  const kw=document.getElementById('vac-kw-'+tid);
+  if(kw && !kw._bind){
+    kw._bind=true;
+    kw.addEventListener('input',()=>{ _vacKw[tid]=kw.value; refreshVacationPanel(tid); });
+  }
+}
+function vacAddRow(taskId){
+  const tid=String(taskId);
+  const t=data.tasks.find(x=>String(x.id)===tid);
+  if(!t){toast('任务不存在'); return;}
+  if(!Array.isArray(t.vacationRows)) t.vacationRows=[];
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const stamp=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const newId=Date.now()+Math.floor(Math.random()*1000);
+  t.vacationRows.push({
+    id:newId, name:'',dept:'',startDate:'',endDate:'',days:'',place:'',createAt:stamp,note:''
+  });
+  saveData();
+  refreshVacationPanel(tid);
+  // 焦点移到刚加的一行的「名字」input
+  setTimeout(()=>{
+    const el=document.getElementById('vac-name-'+tid+'-'+newId);
+    if(el) el.focus();
+  },50);
+}
+function vacDelRow(taskId,rid){
+  const tid=String(taskId);
+  const t=data.tasks.find(x=>String(x.id)===tid);
+  if(!t) return;
+  if(!Array.isArray(t.vacationRows) || t.vacationRows.length===0){toast('无记录可删'); return;}
+  const before=t.vacationRows.length;
+  t.vacationRows=t.vacationRows.filter(r=>String(r.id)!==String(rid));
+  const removed=before-t.vacationRows.length;
+  saveData();
+  refreshVacationPanel(tid);
+  toast(removed?`已删除 ${removed} 条休假记录`:`未找到记录 ID=${rid}`);
+}
+function vacUpdateField(taskId,rid,field,val){
+  const tid=String(taskId);
+  const t=data.tasks.find(x=>String(x.id)===tid);
+  if(!t) return;
+  const r=(t.vacationRows||[]).find(x=>String(x.id)===String(rid));
+  if(!r) { try{console.warn('[vac] rid not found',rid,'task',tid,'field',field);}catch(e){}; return; }
+  r[field]=val;
+  // 起止都填了 → 自动算 days
+  if(field==='startDate' || field==='endDate'){
+    let days='';
+    if(r.startDate && r.endDate){
+      try{
+        const s=new Date(r.startDate), e=new Date(r.endDate);
+        if(!isNaN(s.getTime()) && !isNaN(e.getTime()) && e>=s){
+          days=String(Math.round((e-s)/86400000)+1);
+        }
+      }catch(e){console.warn('[vac] days calc error',e);}
+    }
+    r.days=days;
+    saveData();
+    refreshVacationPanel(tid);   // 起止变更：刷面板（更新统计 + days 显示）
+    return;
+  }
+  // 其他字段：仅保存，不在键入时刷新面板（防 blur 中重渲染）
+  saveData();
+  // 但需要把统计行「累计 N 条 / N 天 / N 人」重新计算 —— 通过类名快速局部更新，不重渲 tbody
+  const statEl=document.querySelector('tr.vac-expand-row[data-task-id="'+tid+'"] .vac-stats');
+  if(statEl){
+    const all=t.vacationRows;
+    const totalDays=all.reduce((s,x)=>s+(parseInt(x.days,10)||0),0);
+    const nameSet=new Set();
+    all.forEach(x=>{ const n=(x.name||'').trim(); if(n) nameSet.add(n); });
+    statEl.innerHTML=`共 <b>${all.length}</b> 条 · 累计 <b>${totalDays}</b> 天 · 涉及 <b>${nameSet.size}</b> 人`;
+  }
+}
+// 行拖拽排序
+function _vacDragStart(e,rid){
+  e.dataTransfer.setData('text/plain', String(rid));
+  e.dataTransfer.effectAllowed='move';
+}
+function _vacDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
+function _vacDrop(e,taskId,targetRid){
+  e.preventDefault();
+  const srcRid=e.dataTransfer.getData('text/plain');
+  if(!srcRid || srcRid===String(targetRid)) return;
+  const tid=String(taskId);
+  const t=data.tasks.find(x=>String(x.id)===tid);
+  if(!t || !Array.isArray(t.vacationRows)) return;
+  const rows=t.vacationRows;
+  const srcIdx=rows.findIndex(r=>String(r.id)===srcRid);
+  const dstIdx=rows.findIndex(r=>String(r.id)===String(targetRid));
+  if(srcIdx<0 || dstIdx<0) return;
+  const [moved]=rows.splice(srcIdx,1);
+  rows.splice(dstIdx,0,moved);
+  saveData();
+  refreshVacationPanel(tid);
+}
+function renderVacationPanel(taskId){
+  const tid=String(taskId);
+  const t=data.tasks.find(x=>String(x.id)===tid);
+  if(!t) return `<div style="padding:20px;color:#a33">任务 ${tid} 不存在</div>`;
+  if(!Array.isArray(t.vacationRows)) t.vacationRows=[];
+  const kw=(_vacKw[tid]||'').trim().toLowerCase();
+  const rowsAll=t.vacationRows;
+  const rows=rowsAll
+    .map((r,i)=>({r,i}))
+    .filter(({r})=>{
+      if(!kw) return true;
+      return ((r.name||'').toLowerCase().indexOf(kw)>=0)
+        || ((r.dept||'').toLowerCase().indexOf(kw)>=0)
+        || ((r.place||'').toLowerCase().indexOf(kw)>=0)
+        || ((r.note||'').toLowerCase().indexOf(kw)>=0);
+    });
+  const titleText=t.workDetail||t.title||'中方休假记录';
+  const totalRows=rowsAll.length;
+  const totalDays=rowsAll.reduce((s,r)=>s+(parseInt(r.days,10)||0),0);
+  const names=new Set();
+  rowsAll.forEach(r=>{ const n=(r.name||'').trim(); if(n) names.add(n); });
+  const totalPersons=names.size;
+  const trs=rows.map(({r},idx)=>{
+    const rid=r.id;
+    const sd=r.startDate||'', ed=r.endDate||'', days=r.days||'';
+    return `<tr draggable="true" ondragstart="_vacDragStart(event,'${rid}')" ondragover="_vacDragOver(event)" ondrop="_vacDrop(event,'${tid}','${rid}')" class="vac-row" data-vac-rid="${rid}">
+      <td class="num vac-grip" title="按住拖动排序">⠿</td>
+      <td><input type="text" id="vac-name-${tid}-${rid}" class="vac-cell" value="${esc(r.name||'')}" placeholder="姓名" onchange="vacUpdateField('${tid}','${rid}','name',this.value)"></td>
+      <td><input type="text" class="vac-cell" value="${esc(r.dept||'')}" placeholder="部门" onchange="vacUpdateField('${tid}','${rid}','dept',this.value)"></td>
+      <td><input type="date" class="vac-cell vac-date" value="${esc(sd)}" onchange="vacUpdateField('${tid}','${rid}','startDate',this.value)"></td>
+      <td><input type="date" class="vac-cell vac-date" value="${esc(ed)}" onchange="vacUpdateField('${tid}','${rid}','endDate',this.value)"></td>
+      <td><input type="text" id="vac-days-${tid}-${rid}" class="vac-cell vac-num" value="${esc(days)}" placeholder="自动" readonly title="起止日期自动计算" style="background:#f3f4f6;color:#6b7280;cursor:not-allowed"></td>
+      <td><input type="text" class="vac-cell" value="${esc(r.place||'')}" placeholder="国家/城市" onchange="vacUpdateField('${tid}','${rid}','place',this.value)"></td>
+      <td class="vac-create" style="color:#6b7280;font-size:12px;white-space:nowrap">${esc(r.createAt||'')}</td>
+      <td><input type="text" class="vac-cell" value="${esc(r.note||'')}" placeholder="备注" onchange="vacUpdateField('${tid}','${rid}','note',this.value)"></td>
+      <td class="td-ops" onclick="event.stopPropagation()"><button title="删除该记录" onclick="vacDelRow('${tid}','${rid}')">🗑</button></td>
+    </tr>`;
+  }).join('');
+
+  return `<div class="vac-panel">
+    <div class="vac-toolbar">
+      <div class="vac-title">🌴 中方休假记录 <span class="vac-sub">${esc(titleText)}</span>
+        <span class="vac-stats">共 <b>${totalRows}</b> 条 · 累计 <b>${totalDays}</b> 天 · 涉及 <b>${totalPersons}</b> 人</span>
+      </div>
+      <div class="vac-tools">
+        <input type="text" id="vac-kw-${tid}" class="vac-kw" placeholder="🔍 搜索：名字/部门/地点/备注" value="${esc(_vacKw[tid]||'')}">
+        <button class="vac-btn vac-btn-add" onclick="vacAddRow('${tid}')" title="新增一条休假记录">➕ 新增休假</button>
+        <button id="vac-export-btn" class="vac-btn vac-btn-export" onclick="vacExportAllSummary()" title="将全部中方休假任务汇总导出为 Excel">📤 导出全部中方休假汇总</button>
+        <button class="vac-btn vac-btn-close" onclick="closeVacationRow('${tid}')" title="关闭该行面板">✕ 关闭</button>
+      </div>
+    </div>
+    <div class="vac-table-wrap">
+      <table class="vac-tbl">
+        <thead><tr>
+          <th class="num" style="width:28px">⠿</th>
+          <th style="min-width:90px">名字</th>
+          <th style="min-width:90px">部门</th>
+          <th style="width:130px">起时间</th>
+          <th style="width:130px">止时间</th>
+          <th style="width:60px">天数</th>
+          <th style="min-width:110px">休假地点</th>
+          <th style="width:140px">录入时间</th>
+          <th style="min-width:140px">备注</th>
+          <th class="td-ops" style="width:48px">操作</th>
+        </tr></thead>
+        <tbody>${trs||`<tr><td colspan="10" class="mt-empty">暂无休假记录，点右上「➕ 新增休假」开始记录</td></tr>`}</tbody>
+      </table>
+    </div>
+    <div class="vac-foot">💡 表格内单击格子直接编辑；天数由起止日期自动计算；按住「⠿」可上下拖拽调整顺序；点「📤 导出全部中方休假汇总」可将多个休假类任务的全部记录导出为单一 Excel（包含汇总数和导出时间）。</div>
+  </div>`;
+}
+// mount：renderSubModule 重渲染后调用
+function mountVacInlineRows(){
+  document.querySelectorAll('tr.vac-expand-row[data-task-id]').forEach(row=>{
+    const tid=row.dataset.taskId;
+    if(!tid) return;
+    const td=row.querySelector('td');
+    if(!td) return;
+    const kw=document.getElementById('vac-kw-'+tid);
+    if(kw && !kw._bind){
+      kw._bind=true;
+      kw.addEventListener('input',()=>{ _vacKw[tid]=kw.value; refreshVacationPanel(tid); });
+    }
+    const preBtn=row.previousElementSibling && row.previousElementSibling.querySelector && row.previousElementSibling.querySelector('button.phase-btn[data-vac="1"]');
+    if(preBtn){
+      preBtn.classList.add('on');
+      const arr=row.previousElementSibling.querySelector('span.arr');
+      if(arr) arr.textContent='▾';
+    }
+  });
 }
 
 function renderAuthView(){
@@ -4437,6 +4958,12 @@ function normalizeData(){
         }
         delete t.reimbursement;
       }
+    }
+  });
+  // 休假类任务（cat=11 + 标题含「休假」）：初始化 t.vacationRows=[]
+  if(Array.isArray(data.tasks))(data.tasks||[]).forEach(t=>{
+    if(t.cat==='11' && ((t.title||'').indexOf('休假')>=0 || (t.workDetail||'').indexOf('休假')>=0)){
+      if(!Array.isArray(t.vacationRows)) t.vacationRows=[];
     }
   });
   if(!Array.isArray(data.kb))data.kb=[];
