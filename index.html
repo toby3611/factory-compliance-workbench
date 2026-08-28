@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>综合工作台 · 云端版</title>
-<!-- APP_VERSION: 2026-08-28d (报销单台账modal改行内展开：按钮点→表格行下方展开列表，不弹窗) -->
+<!-- APP_VERSION: 2026-08-28e (fix: delRbDoc内d.id(number) !== docId(string)恒为true -- 报销单删除不了; 改String()比较+toast提示) -->
 <style>
 :root{
   --primary:#1e6fff;--primary-2:#3b8aff;--primary-soft:#eaf2ff;
@@ -1234,7 +1234,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-08-28d';
+const APP_VER='2026-08-28e';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -3526,11 +3526,14 @@ function copyRbDoc(taskId,docId){
 function delRbDoc(taskId,docId){
   const t=data.tasks.find(x=>String(x.id)===String(taskId)); if(!t)return;
   if(!confirm('确定删除该报销单？此操作不可撤销'))return;
-  t.rbDocs=t.rbDocs.filter(d=>d.id!==docId);
+  // 关键：d.id 是 number (nid=Math.max(...)+1)，docId 是 onclick 字符串拼接过来的 string —— 必须 String() 比较
+  const before=t.rbDocs.length;
+  t.rbDocs=t.rbDocs.filter(d=>String(d.id)!==String(docId));
+  const removed=before-t.rbDocs.length;
   saveData();
   closeReimbursementModal();
   renderSubModule();
-  toast('报销单已删除');
+  toast(removed?('已删除 '+removed+' 张报销单'):'未找到匹配报销单（ID='+docId+'），可能已被删除');
 }
 async function exportAllRb(taskId){
   const t=data.tasks.find(x=>String(x.id)===String(taskId));
