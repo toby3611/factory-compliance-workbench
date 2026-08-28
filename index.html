@@ -845,6 +845,71 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .d-bar-fi{height:100%;border-radius:3px}
 .d-bar-s{width:60px;text-align:right;color:#5ec3ff;font-family:ui-monospace,monospace;font-size:10px;flex:none}
 .d-note{font-size:11px;color:#9fc4e8;margin-top:8px;line-height:1.5}
+
+/* ===== 报销单台账（多单据列表） ===== */
+.rb-ledger-mask{position:fixed;inset:0;background:rgba(13,33,69,.55);z-index:880;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}
+.rb-ledger{background:#fff;border-radius:12px;width:100%;max-width:1080px;box-shadow:0 12px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:calc(100vh - 48px);overflow:hidden}
+.rb-ledger-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(90deg,#1e6fff,#3b8aff);color:#fff}
+.rb-ledger-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px}
+.rb-ledger-sub{font-size:12px;opacity:.8;font-weight:400}
+.rb-ledger-head .rb-close{background:rgba(255,255,255,.18);border:none;color:#fff;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px}
+.rb-ledger-head .rb-close:hover{background:rgba(255,255,255,.3)}
+.rb-ledger-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 18px;background:#f7faff;border-bottom:1px solid var(--line)}
+.rb-ledger-info{font-size:13px;color:var(--muted)}
+.rb-ledger-info b{color:var(--text)}
+.rb-ledger-acts{display:flex;gap:8px;flex-wrap:wrap}
+.rb-ledger-tools{display:flex;gap:10px;padding:10px 18px;align-items:center;flex-wrap:wrap}
+.rb-search{padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;min-width:220px;flex:1}
+.rb-sel{padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fff}
+.rb-ledger-list{overflow:auto;padding:0 0 8px}
+.rb-doc-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.rb-doc-tbl th{background:#f3f7ff;color:var(--muted);font-weight:600;font-size:12px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.rb-doc-tbl th.r{text-align:right}
+.rb-doc-tbl td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.rb-doc-tbl tbody tr{transition:.15s}
+.rb-doc-tbl tbody tr:hover{background:#f9fbff}
+.rb-doc-tbl .td-num{color:var(--muted);font-size:12px;text-align:center;width:44px}
+.rb-doc-tbl .td-name{font-weight:600}
+.rb-doc-tbl .td-name small{display:block;color:var(--muted);font-weight:400;font-size:11px;margin-top:1px}
+.rb-doc-tbl .td-c{text-align:center;font-size:12.5px;font-variant-numeric:tabular-nums}
+.rb-doc-tbl .td-time{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.rb-doc-tbl .td-ops{text-align:right;white-space:nowrap}
+.rb-doc-tbl .td-ops .btn{margin-left:4px}
+.rb-doc-tbl .mt-empty{text-align:center;color:var(--muted);padding:40px 0}
+/* 详情 modal 顶部的单据信息条 */
+.rb-docbar{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 16px;background:#f7faff;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+.rb-docbar-it{display:flex;align-items:center;gap:6px}
+.rb-docbar-it b{color:var(--text)}
+.rb-memo{padding:4px 8px;border:1px solid var(--line);border-radius:6px;font-size:12.5px;min-width:220px}
+.rb-doc-ops{display:flex;align-items:center;gap:8px;margin-left:auto}
+.rb-hbtn{padding:5px 9px;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:6px;cursor:pointer;font-size:12px}
+.rb-hbtn:hover{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
+.rb-hbtn-del:hover{background:#fef2f2;border-color:var(--red);color:var(--red)}
+/* 统计弹窗 */
+.rb-stats-body{padding:16px 18px}
+.rb-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.rb-stat{background:linear-gradient(135deg,#eaf2ff,#f4f9ff);border:1px solid #c5d8f7;border-radius:10px;padding:12px;text-align:center}
+.rb-stat .lab{font-size:11px;color:var(--muted)}
+.rb-stat .val{font-size:20px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+@media (max-width:768px){
+  .rb-ledger-mask{padding:8px 4px}
+  .rb-ledger{max-width:100%}
+  .rb-ledger-bar,.rb-ledger-tools{flex-direction:column;align-items:stretch}
+  .rb-ledger-acts{justify-content:stretch}
+  .rb-ledger-acts .btn{flex:1}
+  /* 手机端：表格改卡片式 */
+  .rb-doc-tbl thead{display:none}
+  .rb-doc-tbl,.rb-doc-tbl tbody,.rb-doc-tbl tr,.rb-doc-tbl td{display:block;width:100%}
+  .rb-doc-tbl tr{border:1px solid var(--line);border-radius:10px;margin:10px 12px;padding:6px 10px;background:#fff;box-shadow:var(--shadow)}
+  .rb-doc-tbl td{border:none;padding:5px 2px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .rb-doc-tbl td.td-num{display:none}
+  .rb-doc-tbl td.td-name{font-size:14px}
+  .rb-doc-tbl td::before{content:attr(data-label);color:var(--muted);font-size:11px;font-weight:500}
+  .rb-doc-tbl .td-ops{justify-content:flex-end;flex-wrap:wrap}
+  .rb-doc-tbl .td-ops .btn{margin:2px}
+  .rb-stats-grid{grid-template-columns:repeat(2,1fr)}
+}
+
 </style>
 </head>
 <body>
@@ -1777,6 +1842,19 @@ let authKeyword='';
 let openPhases=new Set();
 let openTaskPhases=new Set();
 let openReimbursementSet=new Set();
+/* ===== 报销单台账（cat=11「中方报销」多单据） ===== */
+let openRbLedgerSet=new Set();       // 哪些任务打开了台账列表
+let curRbDocId=null;                 // 当前正在查看/编辑的报销单 docId
+function getRbDoc(t,docId){return (t&&t.rbDocs||[]).find(d=>d.id===docId)||null;}
+function curRbDoc(taskId){
+  const tid=taskId!=null?String(taskId):null;
+  const t=data.tasks.find(x=>String(x.id)===tid);
+  return t?getRbDoc(t,curRbDocId):null;
+}
+function newRbDocName(t){const n=((t&&t.rbDocs)||[]).length+1;return '报销单'+String(n).padStart(3,'0');}
+function nowStamp(){const d=new Date();const p=x=>String(x).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;}
+function rbDocSum(d){return ((d&&d.rows)||[]).reduce((s,r)=>s+((+r.transport||0)+(+r.room||0)+(+r.meal||0)+(+r.hospitality||0)+(+r.fuel||0)+(+r.other||0)),0);}
+function triggerDownload(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.style.display='none';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},1800);}
 
 function openSubModule(catId,subName){
   currentSubCat=catId;
@@ -2040,13 +2118,13 @@ function renderModuleTableHTML(){
       if(k==='startDate'||k==='startTime')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.startDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'startDate',this.value)"></td>`;
       if(k==='endDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.endDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'endDate',this.value)"></td>`;
       if(k==='plan'){
-        // 报销类任务（cat=11 + 标题含「报销」）：显示「报销单」按钮
+        // 报销类任务（cat=11 + 标题含「报销」）：显示「报销单台账」按钮
         if(t.cat==='11' && (t.title||'').indexOf('报销')>=0){
-          const rb=t.reimbursement||{rate:0,rows:[]};
-          const rbN=rb.rows.length;
-          const rbSum=(rb.rows||[]).reduce((s,r)=>s+((+r.transport||0)+(+r.room||0)+(+r.meal||0)+(+r.hospitality||0)+(+r.fuel||0)+(+r.other||0)),0);
-          const rbOpen=(typeof openReimbursementSet!=='undefined')&&openReimbursementSet.has(t.id);
-          return `<td class="td-plan"><div class="td-plan-grp"><button class="phase-btn ${rbOpen?'on':''}" onclick="event.stopPropagation();openReimbursement(${t.id})" title="打开出差报销单"><span class="arr">${rbOpen?'▾':'▸'}</span> 报销单 ${rbN}行/¥${rbSum.toFixed(2)}</button></div></td>`;
+          const docs=t.rbDocs||[];
+          const rbN=docs.reduce((s,d)=>s+((d.rows&&d.rows.length)||0),0);
+          const rbSum=docs.reduce((s,d)=>s+rbDocSum(d),0);
+          const rbOpen=(typeof openRbLedgerSet!=='undefined')&&openRbLedgerSet.has(t.id);
+          return `<td class="td-plan"><div class="td-plan-grp"><button class="phase-btn ${rbOpen?'on':''}" onclick="event.stopPropagation();openRbLedger(${t.id})" title="打开报销单台账"><span class="arr">${rbOpen?'▾':'▸'}</span> 报销单台账 ${docs.length}单/${rbN}行/¥${rbSum.toFixed(2)}</button></div></td>`;
         }
         return `<td class="td-plan"><div class="td-plan-grp">${planBtn||'—'}</div></td>`;
       }
@@ -2181,11 +2259,11 @@ function rbRowVnd(r,rate){
 function rbGrandTotal(rows){return (rows||[]).reduce((s,r)=>s+rbRowTotal(r),0);}
 function rbGrandVnd(rows,rate){return rbGrandTotal(rows) * (+rate||0);}
 
-function openReimbursement(taskId){
-  if(openReimbursementSet.has(taskId)){openReimbursementSet.delete(taskId);closeReimbursementModal();renderSubModule();return;}
+function openReimbursement(taskId,docId){
   const t=data.tasks.find(x=>x.id===taskId);
   if(!t)return;
-  if(!t.reimbursement)t.reimbursement={rate:3952.7,rows:[]};
+  if(!Array.isArray(t.rbDocs)||!t.rbDocs.length){ openRbAdd(taskId); return; }
+  curRbDocId = (docId!=null)?docId:t.rbDocs[t.rbDocs.length-1].id;
   openReimbursementSet.add(taskId);
   renderReimbursementModal(t);
 }
@@ -2195,7 +2273,8 @@ function closeReimbursementModal(){
 }
 function renderReimbursementModal(t){
   closeReimbursementModal();
-  const rb=t.reimbursement||{rate:3952.7,rows:[]};
+  const doc=getRbDoc(t,curRbDocId)||{id:0,name:'报销单',memo:'',createAt:'',status:'待导出',rate:3952.7,rows:[]};
+  const rb=doc;
   if(!Array.isArray(rb.rows))rb.rows=[];
   const grandCNY=rbGrandTotal(rb.rows);
   const grandVND=rbGrandVnd(rb.rows,rb.rate);
@@ -2218,15 +2297,24 @@ function renderReimbursementModal(t){
     </tr>`;
   }).join('')||`<tr><td colspan="${RB_COLS.length+1}" class="rb-empty">暂无报销条目，点下方「＋ 添加行」开始录入</td></tr>`;
 
-  const html=`<div id="rb-modal" class="rb-modal" onclick="if(event.target===this)closeReimbursementModal()">
+  const html=`<div id="rb-modal" class="rb-modal" data-task-id="${t.id}" onclick="if(event.target===this)closeReimbursementModal()">
     <div class="rb-box">
       <div class="rb-head">
-        <div class="rb-title">📋 出差报销单 <span class="rb-sub">GIẤY THANH TOÁN CÔNG TÁC PHÍ</span></div>
+        <div class="rb-title">📋 ${esc(doc.name)} <span class="rb-sub">GIẤY THANH TOÁN CÔNG TÁC PHÍ</span></div>
         <div class="rb-rate">
           <label>汇率 <span class="rb-rate-unit">CNY/VND</span>（每月手动更新）：</label>
           <input type="number" min="0" step="0.0001" id="rb-rate-${t.id}" value="${rb.rate||0}" onchange="rbUpdateRate(${t.id})" oninput="rbUpdateRate(${t.id})">
         </div>
-        <button class="rb-close" onclick="closeReimbursementModal()" title="关闭">✕</button>
+        <div class="rb-doc-ops">
+          <span class="bd ${doc.status==='已导出'?'ok':'warn'}">${doc.status==='已导出'?'✓ 已导出':'⏳ 待导出'}</span>
+          <button class="rb-hbtn" onclick="copyRbDoc(${t.id},${doc.id})" title="复制为新单">📄 复制</button>
+          <button class="rb-hbtn rb-hbtn-del" onclick="delRbDoc(${t.id},${doc.id})" title="删除本单">🗑</button>
+          <button class="rb-close" onclick="closeReimbursementModal()" title="关闭">✕</button>
+        </div>
+      </div>
+      <div class="rb-docbar">
+        <span class="rb-docbar-it">🕓 录入时间：<b>${esc(doc.createAt||'—')}</b></span>
+        <span class="rb-docbar-it">📝 出差简述：<input class="rb-memo" id="rb-memo-${t.id}" value="${esc(doc.memo||'')}" onchange="rbUpdateMemo(${t.id},${doc.id},this.value)" placeholder="例：8月初胡志明客户拜访"></span>
       </div>
       <div class="rb-tabs no-print">
         <button type="button" class="rb-tab on" data-pane="edit" onclick="rbSwitchPane('edit')"><span class="ic">✏️</span>编辑录入</button>
@@ -2275,6 +2363,16 @@ function rbSwitchPane(pane){
   box.querySelectorAll('.rb-pane').forEach(p=>{
     p.classList.toggle('on',p.classList.contains(pane+'-pane'));
   });
+  // 切到导出 Excel 面板时，重新渲染预览（数据可能已变）
+  if(pane==='excel'){
+    const taskId=box.getAttribute('data-task-id');
+    const t=data.tasks.find(x=>String(x.id)===String(taskId));
+    const d=curRbDoc(taskId);
+    if(t&&d){
+      const pb=box.querySelector('#rb-print-box');
+      if(pb)pb.innerHTML=renderRbExcelPreview(t,d);
+    }
+  }
 }
 /* 报销单导出 Excel：先把预览格改动回写 → buildRbXlsx 生成 .xlsx → 触发下载 */
 async function rbExportExcel(taskId){
@@ -2284,13 +2382,16 @@ async function rbExportExcel(taskId){
     await new Promise(r=>setTimeout(r,30));
     const t=data.tasks.find(x=>x.id===taskId);
     if(!t){toast('找不到任务');return;}
-    // 把预览面板的可编辑格内容同步回 t.reimbursement.rows
+    // 把预览面板的可编辑格内容同步回 当前 doc.rows
     rbReadPreviewIntoTask(taskId);
-    const rb=t.reimbursement||{rate:0,rows:[]};
+    const rb=curRbDoc(taskId)||{rate:0,rows:[]};
+    const doc=getRbDoc(t,curRbDocId);
+    if(doc)doc.status='已导出';
+    saveData();
     // 生成 xlsx blob
-    const blob=buildRbXlsx(t,rb);
+    const blob=buildRbXlsx(t,rb,doc?doc.name:'报销单');
     // 触发下载
-    const name=rbMakeFilename(t,rb);
+    const name=rbMakeFilename(t,rb,doc?doc.name:'报销单');
     const url=URL.createObjectURL(blob);
     const a=document.createElement('a');
     a.href=url; a.download=name; a.style.display='none';
@@ -2298,6 +2399,8 @@ async function rbExportExcel(taskId){
     a.click();
     setTimeout(()=>{URL.revokeObjectURL(url); a.remove();},1800);
     toast('✅ 已导出 '+name);
+    if(openRbLedgerSet.has(taskId)) renderRbLedger(taskId);
+    renderSubModule();
   }catch(err){
     console.error('[rbExportExcel]',err);
     toast('导出失败：'+(err&&err.message?err.message:err));
@@ -2305,11 +2408,12 @@ async function rbExportExcel(taskId){
     if(btn){ btn.disabled=false; btn.innerHTML='📤 导出 Excel'; }
   }
 }
-/* 把预览面板的 td[contenteditable] 内容回写到 t.reimbursement.rows（按 RB_PRINT_COLS 的 key 顺序） */
+/* 把预览面板的 td[contenteditable] 内容回写到 当前 doc.rows（按 RB_PRINT_COLS 的 key 顺序） */
 function rbReadPreviewIntoTask(taskId){
   const t=data.tasks.find(x=>x.id===taskId);
   if(!t)return;
-  const rb=t.reimbursement||(t.reimbursement={rate:0,rows:[]});
+  const rb=curRbDoc(taskId);
+  if(!rb)return;
   const trs=document.querySelectorAll('#rb-modal .rb-print-tbl tbody tr');
   const newRows=[];
   const numKeys=new Set(['transport','room','meal','hospitality','fuel','other','days']);
@@ -2328,13 +2432,13 @@ function rbReadPreviewIntoTask(taskId){
     });
     newRows.push(row);
   });
-  rb.rows=newRows;
+  // 编辑面板的 <input> 通过 oninput 已实时同步到 d.rows，预览面板只读不再回写
+  // （isEmpty 行会把单元渲染成空串，回写会误清空真实数据 → 禁用回写）
   data._dirty=data._dirty||new Date().toISOString();
 }
-/* 文件名：Beijiang_RB_{姓名}_{YYYY-MM-DD}.xlsx（无姓名退化为「报销单」） */
-function rbMakeFilename(t,rb){
-  const first=(rb.rows&&rb.rows[0]&&rb.rows[0].name)?rb.rows[0].name.trim():'';
-  const safe=first?first.replace(/[\\/:*?"<>|\s]/g,'_'):'报销单';
+/* 文件名：Beijiang_RB_{报销单号}_{YYYY-MM-DD}.xlsx */
+function rbMakeFilename(t,rb,docName){
+  const safe=(docName&&String(docName).trim())?String(docName).trim().replace(/[\\/:*?"<>|\s]/g,'_'):'报销单';
   const d=new Date();
   const yyyy=d.getFullYear();
   const mm=String(d.getMonth()+1).padStart(2,'0');
@@ -2615,7 +2719,7 @@ const RB_XLSX_COL_WIDTHS = [11.03, 9.125, 9.125, 15.5, 9.125, 12.24, 9.78, 8.875
  *   r1 公司名 | r2 大标题 | r3 汇率 | r4 表头 | r5-r14 10 行数据
  *   r15 合计 | r16 付款说明 | r17 分隔 | r18 签名三栏
  * ============================================================ */
-function buildRbXlsx(t, rb){
+function buildRbXlsx(t, rb, sheetName){
   const cols = RB_PRINT_COLS;
   const N = cols.length; // 15
   const numKeys = new Set(['transport','room','meal','hospitality','fuel','other','days']);
@@ -2768,9 +2872,9 @@ function buildRbXlsx(t, rb){
     ? `<mergeCells count="${merges.length}">${merges.map(m=>`<mergeCell ref="${m}"/>`).join('')}</mergeCells>`
     : '';
 
-  /* sheet 名：报销单 y.m.d（最稳，无 emoji 兼容问题） */
+  /* sheet 名：优先用传入的 doc.name，否则 报销单 y.m.d */
   const d = new Date();
-  const sheetName = `报销单 ${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
+  const sheetNameFinal = (sheetName && String(sheetName).trim()) ? String(sheetName).slice(0,28) : `报销单 ${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
 
   const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
@@ -2790,7 +2894,7 @@ function buildRbXlsx(t, rb){
   const entries = [
     { name: '[Content_Types].xml', data: buildContentTypes() },
     { name: '_rels/.rels', data: buildRootRels() },
-    { name: 'xl/workbook.xml', data: buildWorkbook(sheetName) },
+    { name: 'xl/workbook.xml', data: buildWorkbook(sheetNameFinal) },
     { name: 'xl/_rels/workbook.xml.rels', data: buildWorkbookRels() },
     { name: 'xl/worksheets/sheet1.xml', data: sheetXml },
     { name: 'xl/worksheets/_rels/sheet1.xml.rels', data: buildSheetRels() },
@@ -2891,26 +2995,29 @@ function renderRbExcelPreview(t,rb){
 }
 function rbAddRow(taskId){
   const t=data.tasks.find(x=>x.id===taskId);
-  if(!t||!t.reimbursement)return;
-  t.reimbursement.rows.push({name:'',dept:'',applyDate:'',startTime:'',endTime:'',days:'',purpose:'',destination:'',transport:'',room:'',meal:'',hospitality:'',fuel:'',other:''});
+  const d=curRbDoc(taskId);
+  if(!t||!d)return;
+  d.rows.push({name:'',dept:'',applyDate:'',startTime:'',endTime:'',days:'',purpose:'',destination:'',transport:'',room:'',meal:'',hospitality:'',fuel:'',other:''});
   renderReimbursementModal(t);
 }
 function rbDelRow(taskId,rowIdx){
   const t=data.tasks.find(x=>x.id===taskId);
-  if(!t||!t.reimbursement)return;
+  const d=curRbDoc(taskId);
+  if(!t||!d)return;
   if(!confirm('确定删除该报销行？'))return;
-  t.reimbursement.rows.splice(rowIdx,1);
+  d.rows.splice(rowIdx,1);
   renderReimbursementModal(t);
 }
 function rbUpdate(taskId,rowIdx,key,value){
   const t=data.tasks.find(x=>x.id===taskId);
-  if(!t||!t.reimbursement)return;
-  t.reimbursement.rows[rowIdx][key]=value;
+  const d=curRbDoc(taskId);
+  if(!t||!d)return;
+  d.rows[rowIdx][key]=value;
   saveData();
   // 不重渲染整 modal（保留焦点），只更新当前行的 total/vnd + 合计
-  const row=t.reimbursement.rows[rowIdx];
+  const row=d.rows[rowIdx];
   const tot=rbRowTotal(row);
-  const vnd=rbRowVnd(row,t.reimbursement.rate);
+  const vnd=rbRowVnd(row,d.rate);
   const modal=document.getElementById('rb-modal');
   if(!modal)return;
   const trs=modal.querySelectorAll('tbody tr');
@@ -2925,18 +3032,19 @@ function rbUpdate(taskId,rowIdx,key,value){
   const foot=modal.querySelector('tfoot tr');
   if(foot){
     const ftd=foot.querySelectorAll('td');
-    ftd[ftd.length-2].innerHTML=`<b>¥${rbGrandTotal(t.reimbursement.rows).toFixed(2)}</b>`;
-    ftd[ftd.length-1].innerHTML=`<b style="color:#000">${rbGrandVnd(t.reimbursement.rows,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
+    ftd[ftd.length-2].innerHTML=`<b>¥${rbGrandTotal(d.rows).toFixed(2)}</b>`;
+    ftd[ftd.length-1].innerHTML=`<b style="color:#000">${rbGrandVnd(d.rows,d.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
   }
 }
 function rbUpdateLive(taskId,rowIdx,key,value){
   // 实时刷新 total/vnd（不调 saveData，避免频繁落库）
   const t=data.tasks.find(x=>x.id===taskId);
-  if(!t||!t.reimbursement)return;
-  t.reimbursement.rows[rowIdx][key]=value;
-  const row=t.reimbursement.rows[rowIdx];
+  const d=curRbDoc(taskId);
+  if(!t||!d)return;
+  d.rows[rowIdx][key]=value;
+  const row=d.rows[rowIdx];
   const tot=rbRowTotal(row);
-  const vnd=rbRowVnd(row,t.reimbursement.rate);
+  const vnd=rbRowVnd(row,d.rate);
   const modal=document.getElementById('rb-modal');
   if(!modal)return;
   const trs=modal.querySelectorAll('tbody tr');
@@ -2949,32 +3057,33 @@ function rbUpdateLive(taskId,rowIdx,key,value){
   const foot=modal.querySelector('tfoot tr');
   if(foot){
     const ftd=foot.querySelectorAll('td');
-    ftd[ftd.length-2].innerHTML=`<b>¥${rbGrandTotal(t.reimbursement.rows).toFixed(2)}</b>`;
-    ftd[ftd.length-1].innerHTML=`<b style="color:#000">${rbGrandVnd(t.reimbursement.rows,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
+    ftd[ftd.length-2].innerHTML=`<b>¥${rbGrandTotal(d.rows).toFixed(2)}</b>`;
+    ftd[ftd.length-1].innerHTML=`<b style="color:#000">${rbGrandVnd(d.rows,d.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
   }
 }
 function rbUpdateRate(taskId){
   const t=data.tasks.find(x=>x.id===taskId);
-  if(!t||!t.reimbursement)return;
+  const d=curRbDoc(taskId);
+  if(!t||!d)return;
   const inp=document.getElementById('rb-rate-'+taskId);
   if(!inp)return;
-  t.reimbursement.rate=parseFloat(inp.value)||0;
+  d.rate=parseFloat(inp.value)||0;
   saveData();
   // 重算所有行 vnd + 合计
   const modal=document.getElementById('rb-modal');
   if(!modal)return;
   const trs=modal.querySelectorAll('tbody tr');
   trs.forEach((tr,i)=>{
-    const r=t.reimbursement.rows[i];
+    const r=d.rows[i];
     if(!r)return;
     const tds=tr.querySelectorAll('td');
     const vndTd=tds[tds.length-2];
-    if(vndTd)vndTd.innerHTML=rbRowVnd(r,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0});
+    if(vndTd)vndTd.innerHTML=rbRowVnd(r,d.rate).toLocaleString('vi-VN',{maximumFractionDigits:0});
   });
   const foot=modal.querySelector('tfoot tr');
   if(foot){
     const ftd=foot.querySelectorAll('td');
-    ftd[ftd.length-1].innerHTML=`<b style="color:#000">${rbGrandVnd(t.reimbursement.rows,t.reimbursement.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
+    ftd[ftd.length-1].innerHTML=`<b style="color:#000">${rbGrandVnd(d.rows,d.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
   }
 }
 function rbSaveClose(taskId){
@@ -2983,6 +3092,186 @@ function rbSaveClose(taskId){
   closeReimbursementModal();
   toast('报销单已保存');
   renderSubModule();
+}
+
+/* ===== 报销单台账（多单据列表 + 录入 + 复制 + 删除 + 导出全部 + 统计） ===== */
+function rbUpdateMemo(taskId,docId,val){
+  const t=data.tasks.find(x=>x.id===taskId); if(!t)return;
+  const d=getRbDoc(t,docId); if(!d)return;
+  d.memo=val; saveData();
+}
+function closeRbLedgerModalOnly(){const m=document.getElementById('rb-ledger-modal');if(m)m.remove();}
+function openRbLedger(taskId){
+  if(openRbLedgerSet.has(taskId)){ closeRbLedger(); return; }
+  const t=data.tasks.find(x=>x.id===taskId);
+  if(!t)return;
+  openRbLedgerSet.add(taskId);
+  renderRbLedger(taskId);
+}
+function closeRbLedger(){
+  closeRbLedgerModalOnly();
+  openRbLedgerSet.clear();
+  closeReimbursementModal();
+}
+function renderRbLedger(taskId){
+  closeRbLedgerModalOnly();
+  const t=data.tasks.find(x=>x.id===taskId);
+  if(!t)return;
+  if(!Array.isArray(t.rbDocs))t.rbDocs=[];
+  const totalCNY=t.rbDocs.reduce((s,d)=>s+rbDocSum(d),0);
+  const rows=t.rbDocs.map((d,i)=>{
+    const sum=rbDocSum(d);
+    return `<tr class="rb-doc-row" data-id="${d.id}">
+      <td class="td-num" data-label="序号">${String(i+1).padStart(2,'0')}</td>
+      <td class="td-name" data-label="报销单号">${esc(d.name)}<small>${esc(d.memo||'')}</small></td>
+      <td class="td-c" data-label="明细行">${d.rows.length} 行</td>
+      <td class="td-c" data-label="金额" style="font-weight:600;color:var(--primary)">¥ ${sum.toFixed(2)}</td>
+      <td class="td-c" data-label="汇率">${d.rate?('1 CNY='+d.rate+' VND'):'—'}</td>
+      <td class="td-time" data-label="录入时间">${esc(d.createAt||'—')}</td>
+      <td data-label="状态"><span class="bd ${d.status==='已导出'?'ok':'warn'}">${d.status==='已导出'?'✓ 已导出':'⏳ 待导出'}</span></td>
+      <td class="td-ops" data-label="操作">
+        <button class="btn sm primary" onclick="openReimbursement(${taskId},${d.id})">📋 报销明细</button>
+        <button class="btn sm" onclick="copyRbDoc(${taskId},${d.id})" title="复制为新单">📄</button>
+        <button class="btn sm" onclick="delRbDoc(${taskId},${d.id})" title="删除">🗑</button>
+      </td>
+    </tr>`;
+  }).join('')||`<tr><td colspan="8" class="mt-empty">暂无报销单，点上方「＋ 录入新报销单」开始录入</td></tr>`;
+  const html=`<div id="rb-ledger-modal" class="rb-ledger-mask" onclick="if(event.target===this)closeRbLedger()">
+    <div class="rb-ledger">
+      <div class="rb-ledger-head">
+        <div class="rb-ledger-title">📋 报销单台账 <span class="rb-ledger-sub">${esc(t.title||t.workDetail||'')}</span></div>
+        <button class="rb-close" onclick="closeRbLedger()" title="关闭">✕</button>
+      </div>
+      <div class="rb-ledger-bar">
+        <div class="rb-ledger-info">共 <b>${t.rbDocs.length}</b> 张报销单 · 合计 <b style="color:var(--primary)">¥ ${totalCNY.toFixed(2)}</b></div>
+        <div class="rb-ledger-acts">
+          <button class="btn" onclick="exportAllRb(${taskId})">📦 导出全部</button>
+          <button class="btn" onclick="rbStats(${taskId})">📊 统计</button>
+          <button class="btn primary" onclick="openRbAdd(${taskId})">＋ 录入新报销单</button>
+        </div>
+      </div>
+      <div class="rb-ledger-tools">
+        <input id="rb-ledger-search" class="rb-search" placeholder="搜索报销单号 / 备注…" oninput="rbLedgerFilter(${taskId})">
+        <select id="rb-ledger-status" class="rb-sel" onchange="rbLedgerFilter(${taskId})">
+          <option value="">全部状态</option><option value="已导出">已导出</option><option value="待导出">待导出</option>
+        </select>
+      </div>
+      <div class="rb-ledger-list">
+        <table class="rb-doc-tbl">
+          <thead><tr>
+            <th style="width:44px">序号</th><th>报销单号</th><th style="width:70px">明细行</th>
+            <th style="width:110px">金额</th><th style="width:150px">汇率</th><th style="width:160px">录入时间</th>
+            <th style="width:96px">状态</th><th style="width:220px" class="r">操作</th>
+          </tr></thead>
+          <tbody id="rb-ledger-body">${rows}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function rbLedgerFilter(taskId){
+  const t=data.tasks.find(x=>x.id===taskId); if(!t)return;
+  const q=(document.getElementById('rb-ledger-search').value||'').trim().toLowerCase();
+  const st=document.getElementById('rb-ledger-status').value;
+  const body=document.getElementById('rb-ledger-body'); if(!body)return;
+  const filtered=t.rbDocs.filter(d=>{
+    if(st && d.status!==st) return false;
+    if(q && !((d.name||'').toLowerCase().includes(q) || (d.memo||'').toLowerCase().includes(q))) return false;
+    return true;
+  });
+  body.innerHTML = filtered.map((d,i)=>{
+    const sum=rbDocSum(d);
+    return `<tr class="rb-doc-row" data-id="${d.id}">
+      <td class="td-num" data-label="序号">${String(i+1).padStart(2,'0')}</td>
+      <td class="td-name" data-label="报销单号">${esc(d.name)}<small>${esc(d.memo||'')}</small></td>
+      <td class="td-c" data-label="明细行">${d.rows.length} 行</td>
+      <td class="td-c" data-label="金额" style="font-weight:600;color:var(--primary)">¥ ${sum.toFixed(2)}</td>
+      <td class="td-c" data-label="汇率">${d.rate?('1 CNY='+d.rate+' VND'):'—'}</td>
+      <td class="td-time" data-label="录入时间">${esc(d.createAt||'—')}</td>
+      <td data-label="状态"><span class="bd ${d.status==='已导出'?'ok':'warn'}">${d.status==='已导出'?'✓ 已导出':'⏳ 待导出'}</span></td>
+      <td class="td-ops" data-label="操作">
+        <button class="btn sm primary" onclick="openReimbursement(${taskId},${d.id})">📋 报销明细</button>
+        <button class="btn sm" onclick="copyRbDoc(${taskId},${d.id})" title="复制为新单">📄</button>
+        <button class="btn sm" onclick="delRbDoc(${taskId},${d.id})" title="删除">🗑</button>
+      </td>
+    </tr>`;
+  }).join('')||`<tr><td colspan="8" class="mt-empty">没有匹配的报销单</td></tr>`;
+}
+function openRbAdd(taskId){
+  const t=data.tasks.find(x=>x.id===taskId); if(!t)return;
+  if(!Array.isArray(t.rbDocs))t.rbDocs=[];
+  const nid=(t.rbDocs.reduce((m,d)=>Math.max(m,d.id),0))+1;
+  const doc={id:nid,name:newRbDocName(t),memo:'',createAt:nowStamp(),status:'待导出',rate:(t.rbDocs[0]&&t.rbDocs[0].rate)||3952.7,rows:[]};
+  t.rbDocs.push(doc);
+  saveData();
+  // 保留台账在身后；详情 z-index 更高，关掉后回到台账
+  openReimbursement(taskId,doc.id);
+  if(openRbLedgerSet.has(taskId)) renderRbLedger(taskId);
+  renderSubModule();
+  toast('已新建 '+doc.name+'，开始录入');
+}
+function copyRbDoc(taskId,docId){
+  const t=data.tasks.find(x=>x.id===taskId); if(!t)return;
+  const src=getRbDoc(t,docId); if(!src)return;
+  const nid=(t.rbDocs.reduce((m,d)=>Math.max(m,d.id),0))+1;
+  const copy={id:nid,name:newRbDocName(t),memo:'(副本) '+(src.memo||''),createAt:nowStamp(),status:'待导出',rate:src.rate,rows:JSON.parse(JSON.stringify(src.rows||[]))};
+  t.rbDocs.push(copy); saveData();
+  closeReimbursementModal();
+  openReimbursement(taskId,copy.id);
+  if(openRbLedgerSet.has(taskId)) renderRbLedger(taskId);
+  renderSubModule();
+  toast('已复制为 '+copy.name);
+}
+function delRbDoc(taskId,docId){
+  const t=data.tasks.find(x=>x.id===taskId); if(!t)return;
+  if(!confirm('确定删除该报销单？此操作不可撤销'))return;
+  t.rbDocs=t.rbDocs.filter(d=>d.id!==docId);
+  saveData();
+  closeReimbursementModal();
+  if(openRbLedgerSet.has(taskId)) renderRbLedger(taskId);
+  renderSubModule();
+  toast('报销单已删除');
+}
+async function exportAllRb(taskId){
+  const t=data.tasks.find(x=>x.id===taskId);
+  if(!t||!t.rbDocs||!t.rbDocs.length){toast('没有可导出的报销单');return;}
+  toast('正在导出 '+t.rbDocs.length+' 张报销单…');
+  const stamp=nowStamp().slice(0,10).replace(/-/g,'');
+  for(let i=0;i<t.rbDocs.length;i++){
+    const d=t.rbDocs[i];
+    const blob=buildRbXlsx(t,d,d.name);
+    triggerDownload(blob,`Beijiang_RB_${(d.name||'报销单').replace(/[\\/:*?"<>|\s]/g,'_')}_${stamp}.xlsx`);
+    d.status='已导出';
+    await new Promise(r=>setTimeout(r,500));
+  }
+  saveData();
+  if(openRbLedgerSet.has(taskId)) renderRbLedger(taskId);
+  renderSubModule();
+  toast('已导出全部报销单 ('+t.rbDocs.length+' 张)');
+}
+function rbStats(taskId){
+  const t=data.tasks.find(x=>x.id===taskId);
+  if(!t||!t.rbDocs)return;
+  const totalCNY=t.rbDocs.reduce((s,d)=>s+rbDocSum(d),0);
+  const totalVND=t.rbDocs.reduce((s,d)=>s+rbDocSum(d)*(d.rate||0),0);
+  const doneN=t.rbDocs.filter(d=>d.status==='已导出').length;
+  const rows=t.rbDocs.map((d,i)=>`<tr><td>${String(i+1).padStart(2,'0')}</td><td>${esc(d.name)}</td><td style="text-align:right">¥ ${rbDocSum(d).toFixed(2)}</td><td style="text-align:right">${Math.round(rbDocSum(d)*(d.rate||0)).toLocaleString('vi-VN')}</td></tr>`).join('');
+  const html=`<div id="rb-stats-modal" class="rb-ledger-mask" onclick="if(event.target===this)this.remove()" style="z-index:920">
+    <div class="rb-ledger" style="max-width:560px">
+      <div class="rb-ledger-head"><div class="rb-ledger-title">📊 报销单统计</div><button class="rb-close" onclick="this.closest('.rb-ledger-mask').remove()">✕</button></div>
+      <div class="rb-stats-body">
+        <div class="rb-stats-grid">
+          <div class="rb-stat"><div class="lab">报销单总数</div><div class="val">${t.rbDocs.length}</div></div>
+          <div class="rb-stat"><div class="lab">已导出</div><div class="val">${doneN}</div></div>
+          <div class="rb-stat"><div class="lab">合计 CNY</div><div class="val" style="color:var(--primary)">¥ ${totalCNY.toFixed(2)}</div></div>
+          <div class="rb-stat"><div class="lab">合计 VND</div><div class="val">${Math.round(totalVND).toLocaleString('vi-VN')}</div></div>
+        </div>
+        <table class="rb-doc-tbl" style="margin-top:10px"><thead><tr><th>序号</th><th>报销单号</th><th style="text-align:right">CNY</th><th style="text-align:right">VND</th></tr></thead><tbody>${rows}</tbody></table>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend',html);
 }
 function toggleTaskDone(taskId){
   const t=data.tasks.find(x=>x.id==taskId);
@@ -3836,10 +4125,17 @@ function normalizeData(){
       else if(t.cat==='8') t.phases=[defaultPhases()[0]];
     }
   });
-  // 报销类任务（cat=11 + 标题含「报销」）：自动初始化报销单数据结构
+  // 报销类任务（cat=11 + 标题含「报销」）：迁移为「多报销单」数据结构 t.rbDocs=[{id,name,memo,createAt,status,rate,rows}]
   if(Array.isArray(data.tasks))(data.tasks||[]).forEach(t=>{
-    if(t.cat==='11' && (t.title||'').indexOf('报销')>=0 && !t.reimbursement){
-      t.reimbursement={rate:3952.7, rows:[]};
+    if(t.cat==='11' && (t.title||'').indexOf('报销')>=0){
+      if(!Array.isArray(t.rbDocs)){
+        if(t.reimbursement && Array.isArray(t.reimbursement.rows) && t.reimbursement.rows.length){
+          t.rbDocs=[{id:1,name:'报销单001',memo:(t.workDetail||t.title||''),createAt:(t.firstCert||''),status:'已导出',rate:t.reimbursement.rate||3952.7,rows:t.reimbursement.rows}];
+        }else{
+          t.rbDocs=[];
+        }
+        delete t.reimbursement;
+      }
     }
   });
   if(!Array.isArray(data.kb))data.kb=[];
