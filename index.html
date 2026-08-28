@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>综合工作台 · 云端版</title>
-<!-- APP_VERSION: 2026-08-28c (清理死代码rbReadPreviewIntoTask+顶栏版本号显示+本地测试产物清理) -->
+<!-- APP_VERSION: 2026-08-28d (报销单台账modal改行内展开：按钮点→表格行下方展开列表，不弹窗) -->
 <style>
 :root{
   --primary:#1e6fff;--primary-2:#3b8aff;--primary-soft:#eaf2ff;
@@ -851,32 +851,26 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .d-bar-s{width:60px;text-align:right;color:#5ec3ff;font-family:ui-monospace,monospace;font-size:10px;flex:none}
 .d-note{font-size:11px;color:#9fc4e8;margin-top:8px;line-height:1.5}
 
-/* ===== 报销单台账（多单据列表） ===== */
-.rb-ledger-mask{position:fixed;inset:0;background:rgba(13,33,69,.55);z-index:880;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}
-.rb-ledger{background:#fff;border-radius:12px;width:100%;max-width:1080px;box-shadow:0 12px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;max-height:calc(100vh - 48px);overflow:hidden}
-.rb-ledger-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:linear-gradient(90deg,#1e6fff,#3b8aff);color:#fff}
-.rb-ledger-title{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px}
-.rb-ledger-sub{font-size:12px;opacity:.8;font-weight:400}
+/* ===== 报销单台账（行内展开版 · 嵌入 cat=11 表格行下方） ===== */
+.rb-ledger{background:#fff;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;border:1px solid var(--line);margin:0}
+.rb-ledger-head{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:linear-gradient(90deg,#1e6fff,#3b8aff);color:#fff}
+.rb-ledger-title{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.rb-ledger-sub{font-size:12px;opacity:.85;font-weight:400}
 .rb-ledger-head .rb-close{background:rgba(255,255,255,.18);border:none;color:#fff;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:14px}
 .rb-ledger-head .rb-close:hover{background:rgba(255,255,255,.3)}
-.rb-ledger-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 18px;background:#f7faff;border-bottom:1px solid var(--line)}
+.rb-ledger-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 16px;background:#f7faff;border-bottom:1px solid var(--line)}
 .rb-ledger-info{font-size:13px;color:var(--muted)}
 .rb-ledger-info b{color:var(--text)}
 .rb-ledger-acts{display:flex;gap:8px;flex-wrap:wrap}
-.rb-ledger-tools{display:flex;gap:10px;padding:10px 18px;align-items:center;flex-wrap:wrap}
-.rb-search{padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;min-width:220px;flex:1}
+.rb-ledger-tools{display:flex;gap:10px;padding:8px 16px;align-items:center;flex-wrap:wrap;background:#fafcff;border-bottom:1px solid var(--line)}
+.rb-search{padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;min-width:200px;flex:1}
 .rb-sel{padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fff}
-.rb-tip-hint{margin-left:auto;font-size:12px;color:#1e6fff;background:#eaf3ff;padding:5px 10px;border-radius:6px;flex:0 0 auto;border:1px solid #cfe1ff}
-/* 修复：移除 .rb-dropzone 的 position:relative，避免覆盖父级 .rb-ledger-mask 的 position:fixed（特异性相同，后定义胜出，导致 modal 掉到工作台底部）*/
-.rb-dropzone{}
-.rb-dropzone.drag-ov::after{content:"📥 放开即可导入 Excel 报销单";position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(30,111,255,.92);color:#fff;padding:18px 30px;border-radius:14px;font-size:18px;font-weight:600;box-shadow:0 12px 40px rgba(30,111,255,.4);z-index:9999;pointer-events:none;letter-spacing:1px}
-.rb-dropzone.drag-ov .rb-ledger{outline:3px dashed #1e6fff;outline-offset:-3px;box-shadow:0 0 0 6px rgba(30,111,255,.15), 0 12px 48px rgba(0,0,0,.18)}
-@media (max-width:768px){.rb-tip-hint{display:none}}
-.rb-ledger-list{overflow:auto;padding:0 0 8px}
+.rb-tip-hint{font-size:12px;color:#1e6fff;background:#eaf3ff;padding:5px 10px;border-radius:6px;border:1px solid #cfe1ff}
+.rb-ledger-list{padding:2px 0 6px;background:#fff}
 .rb-doc-tbl{width:100%;border-collapse:collapse;font-size:13px}
-.rb-doc-tbl th{background:#f3f7ff;color:var(--muted);font-weight:600;font-size:12px;padding:10px 14px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.rb-doc-tbl th{background:#f3f7ff;color:var(--muted);font-weight:600;font-size:12px;padding:9px 14px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
 .rb-doc-tbl th.r{text-align:right}
-.rb-doc-tbl td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.rb-doc-tbl td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
 .rb-doc-tbl tbody tr{transition:.15s}
 .rb-doc-tbl tbody tr:hover{background:#f9fbff}
 .rb-doc-tbl .td-num{color:var(--muted);font-size:12px;text-align:center;width:44px}
@@ -886,7 +880,15 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rb-doc-tbl .td-time{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
 .rb-doc-tbl .td-ops{text-align:right;white-space:nowrap}
 .rb-doc-tbl .td-ops .btn{margin-left:4px}
-.rb-doc-tbl .mt-empty{text-align:center;color:var(--muted);padding:40px 0}
+.rb-doc-tbl .mt-empty{text-align:center;color:var(--muted);padding:32px 0}
+/* 行内展开：底色淡蓝渐变，面板嵌在表格行下方 */
+.rb-expand-row > td{background:linear-gradient(180deg,#eef4ff 0%,#e4ecfa 100%);padding:10px 14px 14px}
+.rb-expand-row > td > .rb-ledger{box-shadow:0 6px 24px rgba(30,111,255,.12)}
+.phase-btn.on{background:var(--primary)!important;color:#fff!important;border-color:var(--primary)!important}
+/* 行内拖拽区（替代原 .rb-ledger-mask 全屏 dropzone） */
+.rb-inline-drop{border:2px dashed #b8cdff;border-radius:8px;padding:12px;text-align:center;font-size:13px;color:var(--primary);background:#f4f8ff;cursor:pointer;transition:.2s;margin:0 16px 8px}
+.rb-inline-drop:hover{background:#eaf3ff;border-color:var(--primary)}
+.rb-inline-drop.drag-ov{background:#1e6fff;color:#fff;border-color:var(--primary);border-style:solid}
 /* 详情 modal 顶部的单据信息条 */
 .rb-docbar{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 16px;background:#f7faff;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted)}
 .rb-docbar-it{display:flex;align-items:center;gap:6px}
@@ -896,15 +898,17 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rb-hbtn{padding:5px 9px;border:1px solid var(--line);background:#fff;color:var(--text);border-radius:6px;cursor:pointer;font-size:12px}
 .rb-hbtn:hover{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
 .rb-hbtn-del:hover{background:#fef2f2;border-color:var(--red);color:var(--red)}
-/* 统计弹窗 */
+/* 统计弹窗（独立遮罩，不再借用 .rb-ledger-mask） */
+.rb-stats-overlay{position:fixed;inset:0;background:rgba(13,33,69,.55);z-index:920;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}
+.rb-stats-overlay .rb-ledger{max-width:560px;width:100%}
 .rb-stats-body{padding:16px 18px}
 .rb-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .rb-stat{background:linear-gradient(135deg,#eaf2ff,#f4f9ff);border:1px solid #c5d8f7;border-radius:10px;padding:12px;text-align:center}
 .rb-stat .lab{font-size:11px;color:var(--muted)}
 .rb-stat .val{font-size:20px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
 @media (max-width:768px){
-  .rb-ledger-mask{padding:8px 4px}
-  .rb-ledger{max-width:100%}
+  .rb-stats-overlay{padding:8px 4px}
+  .rb-tip-hint{display:none}
   .rb-ledger-bar,.rb-ledger-tools{flex-direction:column;align-items:stretch}
   .rb-ledger-acts{justify-content:stretch}
   .rb-ledger-acts .btn{flex:1}
@@ -1230,7 +1234,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-08-28c';
+const APP_VER='2026-08-28d';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -1859,7 +1863,7 @@ let openReimbursementSet=new Set();
 /* ===== 报销单台账（cat=11「中方报销」多单据） ===== */
 let openRbLedgerSet=new Set();       // 哪些任务打开了台账列表
 let curRbDocId=null;                 // 当前正在查看/编辑的报销单 docId
-function getRbDoc(t,docId){return (t&&t.rbDocs||[]).find(d=>d.id===docId)||null;}
+function getRbDoc(t,docId){return (t&&t.rbDocs||[]).find(d=>String(d.id)===String(docId))||null;}
 function curRbDoc(taskId){
   const tid=taskId!=null?String(taskId):null;
   const t=data.tasks.find(x=>String(x.id)===tid);
@@ -1905,6 +1909,8 @@ function renderSubModule(){
   // 11 大类统一走通用表格视图（按图 1 模板）
   body.innerHTML=renderModuleTableHTML();
   bindModuleTable();
+  // 报销单台账行内展开：mount 拖拽事件 + 修复视觉（renderSubModule 重渲染后自动恢复 openRbLedgerSet 里的展开）
+  mountRbInlineRows();
 }
 
 /* ============ A 类执行任务通用列表（从 renderSubModule 抽取，可复用） ============ */
@@ -2138,12 +2144,12 @@ function renderModuleTableHTML(){
           const docs=t.rbDocs||[];
           const rbN=docs.reduce((s,d)=>s+((d.rows&&d.rows.length)||0),0);
           const rbSum=docs.reduce((s,d)=>s+rbDocSum(d),0);
-          const rbOpen=(typeof openRbLedgerSet!=='undefined')&&openRbLedgerSet.has(t.id);
+          const rbOpen=isRbRowOpen(t.id);
           const oldPlan=Array.isArray(t.plan)?t.plan.join(' · '):(t.plan||'');
           const planNote=oldPlan?`<small class="rb-old-note" title="Gist 历史备注（如不再需要，可在抽屉里删除 t.plan 字段）">${esc(oldPlan)}</small>`:'';
-          // onclick 用 try/catch 包裹，万一 openRbLedger 函数在加载旧 JS 的页面里不存在也能给出明确提示
-          const safeClick=`try{event.stopPropagation();openRbLedger(${t.id})}catch(e){console.error('[rb-ledger] openRbLedger 不可用，请 Ctrl+F5 强刷到最新版：',e);alert('页面 JS 未更新，请按 Ctrl+F5 强刷到最新版');}`;
-          return `<td class="td-plan"><div class="td-plan-grp"><button class="phase-btn ${rbOpen?'on':''}" onclick="${safeClick}" title="打开报销单台账"><span class="arr">${rbOpen?'▾':'▸'}</span> 报销单台账 ${docs.length}单/${rbN}行/¥${rbSum.toFixed(2)}</button>${planNote}</div></td>`;
+          // 行内展开：点按钮 → 在该行下方插入/移除展开行，不再弹 modal
+          const safeClick=`try{event.stopPropagation();toggleRbLedgerRow('${t.id}',this)}catch(e){console.error('[rb-ledger]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
+          return `<td class="td-plan"><div class="td-plan-grp"><button class="phase-btn ${rbOpen?'on':''}" data-task-id="${t.id}" onclick="${safeClick}" title="点击展开 / 收起报销单台账（在该行下方展开，不弹窗）"><span class="arr" id="rb-ledger-arrow-${t.id}">${rbOpen?'▾':'▸'}</span> 报销单台账 ${docs.length}单/${rbN}行/¥${rbSum.toFixed(2)}</button>${planNote}</div></td>`;
         }
         return `<td class="td-plan"><div class="td-plan-grp">${planBtn||'—'}</div></td>`;
       }
@@ -2167,7 +2173,7 @@ function renderModuleTableHTML(){
         <button title="编辑" onclick="openModuleEdit(${t.id})">✎</button>
         <button title="删除" onclick="del(${t.id})">🗑</button>
       </td>
-    </tr>${isYc && tIsOpen?`<tr class="phase-row" id="pr-t-${t.id}"><td colspan="${colCount}"><div class="phase-inner">${renderPhasePanel(t)}</div></td></tr>`:''}`;
+    </tr>${isYc && tIsOpen?`<tr class="phase-row" id="pr-t-${t.id}"><td colspan="${colCount}"><div class="phase-inner">${renderPhasePanel(t)}</div></td></tr>`:''}${t.cat==='11' && isRbRowOpen(t.id)?`<tr class="rb-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderRbLedger(t.id)}</td></tr>`:''}`;
   }).join('');
 
   return `${chips}<div class="mt-wrap">
@@ -2179,6 +2185,23 @@ function renderModuleTableHTML(){
   <div class="auth-foot">💡 单击任意一行可查看详情 / 编辑；月份格点击可切换完成状态；验厂/会员会费任务可点「▸ 计划明细」展开实施计划面板；数据自动同步至云端 Gist，电脑手机一致。</div>`;
 }
 function bindModuleTable(){ /* 预留 */ }
+// 给所有 .rb-inline-drop 绑拖拽（renderSubModule 重渲染后调用）
+function mountRbInlineRows(){
+  document.querySelectorAll('tr.rb-expand-row[data-task-id]').forEach(row=>{
+    const tid=row.dataset.taskId;
+    if(!tid) return;
+    const td=row.querySelector('td');
+    if(!td) return;
+    bindRbInlineDrop(td, Number(tid));
+    // 同步按钮 .on + ▾（render 出来的 tr 自然带 .on class，但保险起见再校一次）
+    const preBtn=row.previousElementSibling && row.previousElementSibling.querySelector && row.previousElementSibling.querySelector('button.phase-btn');
+    if(preBtn){
+      preBtn.classList.add('on');
+      const arr=row.previousElementSibling.querySelector('span.arr');
+      if(arr) arr.textContent='▾';
+    }
+  });
+}
 
 /* ============ 按月排期视图 ============ */
 const MONTH_LABELS=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
@@ -2279,7 +2302,7 @@ function rbGrandTotal(rows){return (rows||[]).reduce((s,r)=>s+rbRowTotal(r),0);}
 function rbGrandVnd(rows,rate){return rbGrandTotal(rows) * (+rate||0);}
 
 function openReimbursement(taskId,docId){
-  const t=data.tasks.find(x=>x.id===taskId);
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
   if(!t)return;
   if(!Array.isArray(t.rbDocs)||!t.rbDocs.length){ openRbAdd(taskId); return; }
   curRbDocId = (docId!=null)?docId:t.rbDocs[t.rbDocs.length-1].id;
@@ -2416,7 +2439,6 @@ async function rbExportExcel(taskId){
     a.click();
     setTimeout(()=>{URL.revokeObjectURL(url); a.remove();},1800);
     toast('✅ 已导出 '+name);
-    if(openRbLedgerSet.has(taskId)) renderRbLedger(taskId);
     renderSubModule();
   }catch(err){
     console.error('[rbExportExcel]',err);
@@ -2690,7 +2712,7 @@ function matchHeader(text, key){
   return false;
 }
 async function importRbFromXlsx(taskId, file){
-  const t=data.tasks.find(x=>x.id===taskId); if(!t||!file) return;
+  const t=data.tasks.find(x=>String(x.id)===String(taskId)); if(!t||!file) return;
   if(!/\.xlsx?$/i.test(file.name)){ toast('请选择 .xlsx 或 .xlsm 文件'); return; }
   if(file.size>20*1024*1024){ toast('文件超过 20MB，请压缩后再试'); return; }
   toast('正在解析 '+file.name+' …');
@@ -2762,7 +2784,6 @@ async function importRbFromXlsx(taskId, file){
   saveData();
   toast(`已从 ${file.name} 导入 ${rows.length} 行 · 新建「${doc.name}」`);
   openReimbursement(taskId, doc.id);
-  if(openRbLedgerSet.has(taskId)) renderRbLedger(taskId);
   renderSubModule();
 }
 function rbDropFile(e, taskId){
@@ -3304,30 +3325,97 @@ function rbSaveClose(taskId){
 
 /* ===== 报销单台账（多单据列表 + 录入 + 复制 + 删除 + 导出全部 + 统计） ===== */
 function rbUpdateMemo(taskId,docId,val){
-  const t=data.tasks.find(x=>x.id===taskId); if(!t)return;
+  const t=data.tasks.find(x=>String(x.id)===String(taskId)); if(!t)return;
   const d=getRbDoc(t,docId); if(!d)return;
   d.memo=val; saveData();
 }
-function closeRbLedgerModalOnly(){const m=document.getElementById('rb-ledger-modal');if(m)m.remove();}
-function openRbLedger(taskId){
-  if(openRbLedgerSet.has(taskId)){ closeRbLedger(); return; }
-  const t=data.tasks.find(x=>x.id===taskId);
-  if(!t)return;
-  openRbLedgerSet.add(taskId);
-  renderRbLedger(taskId);
+/* ----- 报销单台账（行内展开版：点按钮在表格行下方展开） ----- */
+function isRbRowOpen(taskId){
+  return openRbLedgerSet && openRbLedgerSet.has(String(taskId));
 }
-function closeRbLedger(){
-  closeRbLedgerModalOnly();
-  openRbLedgerSet.clear();
-  closeReimbursementModal();
+// 行内 ✕ 关闭（不依赖 toggle 的 nextElementSibling 逻辑，因为关闭按钮在 .rb-expand-row 内）
+function closeRbLedgerRow(taskId){
+  const tid=String(taskId);
+  const row=document.querySelector('tr.rb-expand-row[data-task-id="'+tid+'"]');
+  if(row) row.remove();
+  const btn=document.querySelector('button.phase-btn[data-task-id="'+tid+'"]');
+  if(btn){
+    btn.classList.remove('on');
+    const arr=btn.querySelector('span.arr');
+    if(arr) arr.textContent='▸';
+  }
+  openRbLedgerSet.delete(tid);
+}
+function toggleRbLedgerRow(taskId,btn){
+  try{
+    const tid=String(taskId);
+    const tr=btn && btn.closest ? btn.closest('tr') : null;
+    if(!tr) return;
+    // 已展开 → 收起
+    let nxt=tr.nextElementSibling;
+    if(nxt && nxt.classList && nxt.classList.contains('rb-expand-row') && String(nxt.dataset.taskId)===tid){
+      nxt.remove();
+      btn.classList.remove('on');
+      const arr=document.getElementById('rb-ledger-arrow-'+tid); if(arr) arr.textContent='▸';
+      openRbLedgerSet.delete(tid);
+      return;
+    }
+    // 移除同任务的其他展开（防重）
+    document.querySelectorAll('tr.rb-expand-row[data-task-id="'+tid+'"]').forEach(r=>r.remove());
+    // 创建展开行
+    const cols=tr.children.length;
+    const newRow=document.createElement('tr');
+    newRow.className='rb-expand-row';
+    newRow.dataset.taskId=tid;
+    const td=document.createElement('td');
+    td.colSpan=cols;
+    td.innerHTML=renderRbLedger(tid);
+    newRow.appendChild(td);
+    tr.parentNode.insertBefore(newRow,tr.nextSibling);
+    btn.classList.add('on');
+    const arr=document.getElementById('rb-ledger-arrow-'+tid); if(arr) arr.textContent='▾';
+    openRbLedgerSet.add(tid);
+    // 绑定行内拖拽区
+    bindRbInlineDrop(td,taskId);
+  }catch(err){
+    console.error('[rb-ledger] toggle 失败：',err);
+    alert('页面 JS 未更新，请按 Ctrl+F5 强刷到最新版');
+  }
+}
+// 刷新已展开的台账行（CRUD 后调用）
+function refreshRbLedgerExpand(taskId){
+  const tid=String(taskId);
+  const row=document.querySelector('tr.rb-expand-row[data-task-id="'+tid+'"]');
+  if(!row) return;
+  const td=row.querySelector('td');
+  td.innerHTML=renderRbLedger(tid);
+  bindRbInlineDrop(td,taskId);
+}
+// 行内拖拽绑定（拖到 .rb-inline-drop 触发解析）
+function bindRbInlineDrop(td,taskId){
+  const dz=td.querySelector('.rb-inline-drop');
+  if(!dz) return;
+  dz.addEventListener('dragover',e=>{e.preventDefault();e.stopPropagation();dz.classList.add('drag-ov');});
+  dz.addEventListener('dragleave',()=>dz.classList.remove('drag-ov'));
+  dz.addEventListener('drop',e=>{
+    e.preventDefault();e.stopPropagation();dz.classList.remove('drag-ov');
+    rbDropFile(e,taskId);
+  });
+  // 提供「点击选择文件」入口
+  dz.addEventListener('click',()=>{
+    const fi=document.getElementById('rb-import-file-'+taskId);
+    if(fi) fi.click();
+  });
 }
 function renderRbLedger(taskId){
-  closeRbLedgerModalOnly();
-  const t=data.tasks.find(x=>x.id===taskId);
-  if(!t)return;
+  const t=data.tasks.find(x=>x.id===taskId || String(x.id)===String(taskId));
+  if(!t)return `<div style="padding:20px;color:#a33">任务 ${taskId} 不存在</div>`;
   if(!Array.isArray(t.rbDocs))t.rbDocs=[];
-  const totalCNY=t.rbDocs.reduce((s,d)=>s+rbDocSum(d),0);
-  const rows=t.rbDocs.map((d,i)=>{
+  const docs=t.rbDocs;
+  const totalCNY=docs.reduce((s,d)=>s+rbDocSum(d),0);
+  const totalRows=docs.reduce((s,d)=>s+((d.rows&&d.rows.length)||0),0);
+  const tid=String(taskId);
+  const rows=docs.map((d,i)=>{
     const sum=rbDocSum(d);
     return `<tr class="rb-doc-row" data-id="${d.id}">
       <td class="td-num" data-label="序号">${String(i+1).padStart(2,'0')}</td>
@@ -3338,38 +3426,36 @@ function renderRbLedger(taskId){
       <td class="td-time" data-label="录入时间">${esc(d.createAt||'—')}</td>
       <td data-label="状态"><span class="bd ${d.status==='已导出'?'ok':'warn'}">${d.status==='已导出'?'✓ 已导出':'⏳ 待导出'}</span></td>
       <td class="td-ops" data-label="操作">
-        <button class="btn sm primary" onclick="openReimbursement(${taskId},${d.id})">📋 报销明细</button>
-        <button class="btn sm" onclick="copyRbDoc(${taskId},${d.id})" title="复制为新单">📄</button>
-        <button class="btn sm" onclick="delRbDoc(${taskId},${d.id})" title="删除">🗑</button>
+        <button class="btn sm primary" onclick="openReimbursement('${tid}','${d.id}')">📋 报销明细</button>
+        <button class="btn sm" onclick="copyRbDoc('${tid}','${d.id}')" title="复制为新单">📄</button>
+        <button class="btn sm" onclick="delRbDoc('${tid}','${d.id}')" title="删除">🗑</button>
       </td>
     </tr>`;
-  }).join('')||`<tr><td colspan="8" class="mt-empty">暂无报销单，点上方「＋ 录入新报销单」开始录入</td></tr>`;
-  const html=`<div id="rb-ledger-modal" class="rb-ledger-mask rb-dropzone"
-    onclick="if(event.target===this)closeRbLedger()"
-    ondragover="event.preventDefault();this.classList.add('drag-ov')"
-    ondragleave="this.classList.remove('drag-ov')"
-    ondrop="this.classList.remove('drag-ov');rbDropFile(event,${taskId})">
-    <div class="rb-ledger" onclick="event.stopPropagation()">
+  }).join('')||`<tr><td colspan="8" class="mt-empty">暂无报销单，点上方「✏️ 录入新报销单」或把 Excel 拖到下方虚线框自动解析</td></tr>`;
+  return `<div class="rb-ledger">
       <div class="rb-ledger-head">
         <div class="rb-ledger-title">📋 报销单台账 <span class="rb-ledger-sub">${esc(t.title||t.workDetail||'')}</span></div>
-        <button class="rb-close" onclick="closeRbLedger()" title="关闭">✕</button>
+        <button class="rb-close" onclick="closeRbLedgerRow('${tid}')" title="收起台账">✕</button>
       </div>
       <div class="rb-ledger-bar">
-        <div class="rb-ledger-info">共 <b>${t.rbDocs.length}</b> 张报销单 · 合计 <b style="color:var(--primary)">¥ ${totalCNY.toFixed(2)}</b></div>
+        <div class="rb-ledger-info">共 <b>${docs.length}</b> 张报销单 · 合计 <b style="color:var(--primary)">¥ ${totalCNY.toFixed(2)}</b> · 总明细 <b>${totalRows}</b> 行</div>
         <div class="rb-ledger-acts">
-          <button class="btn" onclick="exportAllRb(${taskId})">📦 导出全部</button>
-          <button class="btn" onclick="rbStats(${taskId})">📊 统计</button>
-          <button class="btn primary" onclick="document.getElementById('rb-import-file-${taskId}').click()" title="把 Excel 拖入下方或点击选择">📥 导入 Excel</button>
-          <button class="btn sm" onclick="openRbAdd(${taskId})" title="手动从空白表开始录入">✏️ 手动录入</button>
-          <input type="file" id="rb-import-file-${taskId}" accept=".xlsx,.xlsm" style="display:none" onchange="rbImportFile(${taskId},this)">
+          <button class="btn" onclick="exportAllRb('${tid}')">📦 导出全部</button>
+          <button class="btn" onclick="rbStats('${tid}')">📊 统计</button>
+          <button class="btn primary" onclick="document.getElementById('rb-import-file-${tid}').click()" title="把 Excel 拖入下方或点击选择">📥 导入 Excel</button>
+          <button class="btn sm" onclick="openRbAdd('${tid}')" title="手动从空白表开始录入">✏️ 手动录入</button>
+          <input type="file" id="rb-import-file-${tid}" accept=".xlsx,.xlsm" style="display:none" onchange="rbImportFile('${tid}',this)">
         </div>
       </div>
       <div class="rb-ledger-tools">
-        <input id="rb-ledger-search" class="rb-search" placeholder="搜索报销单号 / 备注…" oninput="rbLedgerFilter(${taskId})">
-        <select id="rb-ledger-status" class="rb-sel" onchange="rbLedgerFilter(${taskId})">
+        <input id="rb-ledger-search-${tid}" class="rb-search" placeholder="搜索报销单号 / 备注…" oninput="rbLedgerFilter('${tid}')">
+        <select id="rb-ledger-status-${tid}" class="rb-sel" onchange="rbLedgerFilter('${tid}')">
           <option value="">全部状态</option><option value="已导出">已导出</option><option value="待导出">待导出</option>
         </select>
         <span class="rb-tip-hint">💡 可拖入 .xlsx / .xlsm 自动解析为新报销单</span>
+      </div>
+      <div class="rb-inline-drop" title="把 .xlsx / .xlsm 拖到这里或点此选择文件">
+        📥 拖入 Excel 自动识别 · 或点此选择文件
       </div>
       <div class="rb-ledger-list">
         <table class="rb-doc-tbl">
@@ -3378,18 +3464,19 @@ function renderRbLedger(taskId){
             <th style="width:110px">金额</th><th style="width:150px">汇率</th><th style="width:160px">录入时间</th>
             <th style="width:96px">状态</th><th style="width:220px" class="r">操作</th>
           </tr></thead>
-          <tbody id="rb-ledger-body">${rows}</tbody>
+          <tbody id="rb-ledger-body-${tid}">${rows}</tbody>
         </table>
       </div>
-    </div>
-  </div>`;
-  document.body.insertAdjacentHTML('beforeend',html);
+    </div>`;
 }
 function rbLedgerFilter(taskId){
-  const t=data.tasks.find(x=>x.id===taskId); if(!t)return;
-  const q=(document.getElementById('rb-ledger-search').value||'').trim().toLowerCase();
-  const st=document.getElementById('rb-ledger-status').value;
-  const body=document.getElementById('rb-ledger-body'); if(!body)return;
+  const t=data.tasks.find(x=>x.id===taskId || String(x.id)===String(taskId)); if(!t)return;
+  const tid=String(taskId);
+  const si=document.getElementById('rb-ledger-search-'+tid);
+  const se=document.getElementById('rb-ledger-status-'+tid);
+  const body=document.getElementById('rb-ledger-body-'+tid); if(!body)return;
+  const q=(si?si.value:'').trim().toLowerCase();
+  const st=se?se.value:'';
   const filtered=t.rbDocs.filter(d=>{
     if(st && d.status!==st) return false;
     if(q && !((d.name||'').toLowerCase().includes(q) || (d.memo||'').toLowerCase().includes(q))) return false;
@@ -3406,15 +3493,15 @@ function rbLedgerFilter(taskId){
       <td class="td-time" data-label="录入时间">${esc(d.createAt||'—')}</td>
       <td data-label="状态"><span class="bd ${d.status==='已导出'?'ok':'warn'}">${d.status==='已导出'?'✓ 已导出':'⏳ 待导出'}</span></td>
       <td class="td-ops" data-label="操作">
-        <button class="btn sm primary" onclick="openReimbursement(${taskId},${d.id})">📋 报销明细</button>
-        <button class="btn sm" onclick="copyRbDoc(${taskId},${d.id})" title="复制为新单">📄</button>
-        <button class="btn sm" onclick="delRbDoc(${taskId},${d.id})" title="删除">🗑</button>
+        <button class="btn sm primary" onclick="openReimbursement('${tid}','${d.id}')">📋 报销明细</button>
+        <button class="btn sm" onclick="copyRbDoc('${tid}','${d.id}')" title="复制为新单">📄</button>
+        <button class="btn sm" onclick="delRbDoc('${tid}','${d.id}')" title="删除">🗑</button>
       </td>
     </tr>`;
   }).join('')||`<tr><td colspan="8" class="mt-empty">没有匹配的报销单</td></tr>`;
 }
 function openRbAdd(taskId){
-  const t=data.tasks.find(x=>x.id===taskId); if(!t)return;
+  const t=data.tasks.find(x=>String(x.id)===String(taskId)); if(!t)return;
   if(!Array.isArray(t.rbDocs))t.rbDocs=[];
   const nid=(t.rbDocs.reduce((m,d)=>Math.max(m,d.id),0))+1;
   const doc={id:nid,name:newRbDocName(t),memo:'',createAt:nowStamp(),status:'待导出',rate:(t.rbDocs[0]&&t.rbDocs[0].rate)||3952.7,rows:[]};
@@ -3422,34 +3509,31 @@ function openRbAdd(taskId){
   saveData();
   // 保留台账在身后；详情 z-index 更高，关掉后回到台账
   openReimbursement(taskId,doc.id);
-  if(openRbLedgerSet.has(taskId)) renderRbLedger(taskId);
   renderSubModule();
   toast('已新建 '+doc.name+'，开始录入');
 }
 function copyRbDoc(taskId,docId){
-  const t=data.tasks.find(x=>x.id===taskId); if(!t)return;
+  const t=data.tasks.find(x=>String(x.id)===String(taskId)); if(!t)return;
   const src=getRbDoc(t,docId); if(!src)return;
   const nid=(t.rbDocs.reduce((m,d)=>Math.max(m,d.id),0))+1;
   const copy={id:nid,name:newRbDocName(t),memo:'(副本) '+(src.memo||''),createAt:nowStamp(),status:'待导出',rate:src.rate,rows:JSON.parse(JSON.stringify(src.rows||[]))};
   t.rbDocs.push(copy); saveData();
   closeReimbursementModal();
   openReimbursement(taskId,copy.id);
-  if(openRbLedgerSet.has(taskId)) renderRbLedger(taskId);
   renderSubModule();
   toast('已复制为 '+copy.name);
 }
 function delRbDoc(taskId,docId){
-  const t=data.tasks.find(x=>x.id===taskId); if(!t)return;
+  const t=data.tasks.find(x=>String(x.id)===String(taskId)); if(!t)return;
   if(!confirm('确定删除该报销单？此操作不可撤销'))return;
   t.rbDocs=t.rbDocs.filter(d=>d.id!==docId);
   saveData();
   closeReimbursementModal();
-  if(openRbLedgerSet.has(taskId)) renderRbLedger(taskId);
   renderSubModule();
   toast('报销单已删除');
 }
 async function exportAllRb(taskId){
-  const t=data.tasks.find(x=>x.id===taskId);
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
   if(!t||!t.rbDocs||!t.rbDocs.length){toast('没有可导出的报销单');return;}
   toast('正在导出 '+t.rbDocs.length+' 张报销单…');
   const stamp=nowStamp().slice(0,10).replace(/-/g,'');
@@ -3461,20 +3545,19 @@ async function exportAllRb(taskId){
     await new Promise(r=>setTimeout(r,500));
   }
   saveData();
-  if(openRbLedgerSet.has(taskId)) renderRbLedger(taskId);
   renderSubModule();
   toast('已导出全部报销单 ('+t.rbDocs.length+' 张)');
 }
 function rbStats(taskId){
-  const t=data.tasks.find(x=>x.id===taskId);
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
   if(!t||!t.rbDocs)return;
   const totalCNY=t.rbDocs.reduce((s,d)=>s+rbDocSum(d),0);
   const totalVND=t.rbDocs.reduce((s,d)=>s+rbDocSum(d)*(d.rate||0),0);
   const doneN=t.rbDocs.filter(d=>d.status==='已导出').length;
   const rows=t.rbDocs.map((d,i)=>`<tr><td>${String(i+1).padStart(2,'0')}</td><td>${esc(d.name)}</td><td style="text-align:right">¥ ${rbDocSum(d).toFixed(2)}</td><td style="text-align:right">${Math.round(rbDocSum(d)*(d.rate||0)).toLocaleString('vi-VN')}</td></tr>`).join('');
-  const html=`<div id="rb-stats-modal" class="rb-ledger-mask" onclick="if(event.target===this)this.remove()" style="z-index:920">
-    <div class="rb-ledger" style="max-width:560px">
-      <div class="rb-ledger-head"><div class="rb-ledger-title">📊 报销单统计</div><button class="rb-close" onclick="this.closest('.rb-ledger-mask').remove()">✕</button></div>
+  const html=`<div id="rb-stats-modal" class="rb-stats-overlay" onclick="if(event.target===this)this.remove()">
+    <div class="rb-ledger">
+      <div class="rb-ledger-head"><div class="rb-ledger-title">📊 报销单统计</div><button class="rb-close" onclick="this.closest('.rb-stats-overlay').remove()">✕</button></div>
       <div class="rb-stats-body">
         <div class="rb-stats-grid">
           <div class="rb-stat"><div class="lab">报销单总数</div><div class="val">${t.rbDocs.length}</div></div>
