@@ -867,7 +867,8 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rb-search{padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;min-width:220px;flex:1}
 .rb-sel{padding:7px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;background:#fff}
 .rb-tip-hint{margin-left:auto;font-size:12px;color:#1e6fff;background:#eaf3ff;padding:5px 10px;border-radius:6px;flex:0 0 auto;border:1px solid #cfe1ff}
-.rb-dropzone{position:relative}
+/* 修复：移除 .rb-dropzone 的 position:relative，避免覆盖父级 .rb-ledger-mask 的 position:fixed（特异性相同，后定义胜出，导致 modal 掉到工作台底部）*/
+.rb-dropzone{}
 .rb-dropzone.drag-ov::after{content:"📥 放开即可导入 Excel 报销单";position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(30,111,255,.92);color:#fff;padding:18px 30px;border-radius:14px;font-size:18px;font-weight:600;box-shadow:0 12px 40px rgba(30,111,255,.4);z-index:9999;pointer-events:none;letter-spacing:1px}
 .rb-dropzone.drag-ov .rb-ledger{outline:3px dashed #1e6fff;outline-offset:-3px;box-shadow:0 0 0 6px rgba(30,111,255,.15), 0 12px 48px rgba(0,0,0,.18)}
 @media (max-width:768px){.rb-tip-hint{display:none}}
