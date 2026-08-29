@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>综合工作台 · 云端版</title>
-<!-- APP_VERSION: 2026-08-28g (refactor: 把休假记录if块从cat=11报销代码块内提到外面独立分支;中方报销代码块恢复与v2026-08-28e逐字一致) -->
+<!-- APP_VERSION: 2026-08-28h (报销单改回v2026-08-28d前的modal弹层;删除inline展开函数/CSS/拼接;休假面板保留) -->
 <style>
 :root{
   --primary:#1e6fff;--primary-2:#3b8aff;--primary-soft:#eaf2ff;
@@ -536,7 +536,6 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .phase-btn{display:inline-flex;align-items:center;gap:4px;background:#ecfdf5;color:#047857;border:1px solid #bbf7d0;padding:4px 10px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;margin-left:4px}
 .phase-btn:hover{background:#d1fae5;color:#065f46}
 .phase-btn.on{background:#047857;color:#fff;border-color:#047857}
-.rb-old-note{display:block;margin-top:3px;font-size:11px;color:#94a3b8;line-height:1.3;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .phase-btn .arr{display:inline-block;transition:transform .15s}
 
 /* 出差报销单 modal（中越双语 16 列） */
@@ -881,14 +880,6 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rb-doc-tbl .td-ops{text-align:right;white-space:nowrap}
 .rb-doc-tbl .td-ops .btn{margin-left:4px}
 .rb-doc-tbl .mt-empty{text-align:center;color:var(--muted);padding:32px 0}
-/* 行内展开：底色淡蓝渐变，面板嵌在表格行下方 */
-.rb-expand-row > td{background:linear-gradient(180deg,#eef4ff 0%,#e4ecfa 100%);padding:10px 14px 14px}
-.rb-expand-row > td > .rb-ledger{box-shadow:0 6px 24px rgba(30,111,255,.12)}
-.phase-btn.on{background:var(--primary)!important;color:#fff!important;border-color:var(--primary)!important}
-/* 行内拖拽区（替代原 .rb-ledger-mask 全屏 dropzone） */
-.rb-inline-drop{border:2px dashed #b8cdff;border-radius:8px;padding:12px;text-align:center;font-size:13px;color:var(--primary);background:#f4f8ff;cursor:pointer;transition:.2s;margin:0 16px 8px}
-.rb-inline-drop:hover{background:#eaf3ff;border-color:var(--primary)}
-.rb-inline-drop.drag-ov{background:#1e6fff;color:#fff;border-color:var(--primary);border-style:solid}
 /* 详情 modal 顶部的单据信息条 */
 .rb-docbar{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 16px;background:#f7faff;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted)}
 .rb-docbar-it{display:flex;align-items:center;gap:6px}
@@ -1299,7 +1290,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-08-28g';
+const APP_VER='2026-08-28h';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -1926,7 +1917,6 @@ let openPhases=new Set();
 let openTaskPhases=new Set();
 let openReimbursementSet=new Set();
 /* ===== 报销单台账（cat=11「中方报销」多单据） ===== */
-let openRbLedgerSet=new Set();       // 哪些任务打开了台账列表
 let curRbDocId=null;                 // 当前正在查看/编辑的报销单 docId
 function getRbDoc(t,docId){return (t&&t.rbDocs||[]).find(d=>String(d.id)===String(docId))||null;}
 function curRbDoc(taskId){
@@ -1974,8 +1964,6 @@ function renderSubModule(){
   // 11 大类统一走通用表格视图（按图 1 模板）
   body.innerHTML=renderModuleTableHTML();
   bindModuleTable();
-  // 报销单台账行内展开：mount 拖拽事件 + 修复视觉（renderSubModule 重渲染后自动恢复 openRbLedgerSet 里的展开）
-  mountRbInlineRows();
   // 中方休假记录台账行内展开：搜索框 + 视觉/位置恢复（vacOpenSet 状态保留）
   mountVacInlineRows();
 }
@@ -2214,17 +2202,13 @@ function renderModuleTableHTML(){
           const safeClick=`try{event.stopPropagation();toggleVacationRow('${t.id}',this)}catch(e){console.error('[vac]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
           return `<td class="td-plan"><div class="td-plan-grp"><button class="phase-btn phase-btn-vac ${vOpen?'on':''}" data-task-id="${t.id}" data-vac="1" onclick="${safeClick}" title="点击展开 / 收起休假记录（在该行下方展开，不弹窗）"><span class="arr" id="vac-arrow-${t.id}">${vOpen?'▾':'▸'}</span> 休假记录 ${vCount} 条</button></div></td>`;
         }
-        // 中方报销（v2026-08-28e 原样，零改动）：cat=11 显示「报销单台账」行内展开按钮
+        // 中方报销（v2026-08-28d 前的样式）：点击弹层 modal
         if(t.cat==='11'){
           const docs=t.rbDocs||[];
           const rbN=docs.reduce((s,d)=>s+((d.rows&&d.rows.length)||0),0);
           const rbSum=docs.reduce((s,d)=>s+rbDocSum(d),0);
-          const rbOpen=isRbRowOpen(t.id);
-          const oldPlan=Array.isArray(t.plan)?t.plan.join(' · '):(t.plan||'');
-          const planNote=oldPlan?`<small class="rb-old-note" title="Gist 历史备注（如不再需要，可在抽屉里删除 t.plan 字段）">${esc(oldPlan)}</small>`:'';
-          // 行内展开：点按钮 → 在该行下方插入/移除展开行，不再弹 modal
-          const safeClick=`try{event.stopPropagation();toggleRbLedgerRow('${t.id}',this)}catch(e){console.error('[rb-ledger]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
-          return `<td class="td-plan"><div class="td-plan-grp"><button class="phase-btn ${rbOpen?'on':''}" data-task-id="${t.id}" onclick="${safeClick}" title="点击展开 / 收起报销单台账（在该行下方展开，不弹窗）"><span class="arr" id="rb-ledger-arrow-${t.id}">${rbOpen?'▾':'▸'}</span> 报销单台账 ${docs.length}单/${rbN}行/¥${rbSum.toFixed(2)}</button>${planNote}</div></td>`;
+          const safeClick=`try{event.stopPropagation();openReimbursement('${t.id}',null)}catch(e){console.error('[rb]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
+          return `<td class="td-plan"><div class="td-plan-grp"><button class="phase-btn" data-task-id="${t.id}" onclick="${safeClick}" title="点击打开报销单台账弹层"><span class="arr">▸</span> 报销单台账 ${docs.length}单/${rbN}行/¥${rbSum.toFixed(2)}</button></div></td>`;
         }
         return `<td class="td-plan"><div class="td-plan-grp">${planBtn||'—'}</div></td>`;
       }
@@ -2248,7 +2232,7 @@ function renderModuleTableHTML(){
         <button title="编辑" onclick="openModuleEdit(${t.id})">✎</button>
         <button title="删除" onclick="del(${t.id})">🗑</button>
       </td>
-    </tr>${isYc && tIsOpen?`<tr class="phase-row" id="pr-t-${t.id}"><td colspan="${colCount}"><div class="phase-inner">${renderPhasePanel(t)}</div></td></tr>`:''}${t.cat==='11' && isRbRowOpen(t.id)?`<tr class="rb-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderRbLedger(t.id)}</td></tr>`:''}${t.cat==='11' && ((t.title||'').indexOf('休假')>=0 || (t.workDetail||'').indexOf('休假')>=0) && isVacRowOpen(t.id)?`<tr class="vac-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderVacationPanel(t.id)}</td></tr>`:''}`;
+    </tr>${isYc && tIsOpen?`<tr class="phase-row" id="pr-t-${t.id}"><td colspan="${colCount}"><div class="phase-inner">${renderPhasePanel(t)}</div></td></tr>`:''}${t.cat==='11' && ((t.title||'').indexOf('休假')>=0 || (t.workDetail||'').indexOf('休假')>=0) && isVacRowOpen(t.id)?`<tr class="vac-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderVacationPanel(t.id)}</td></tr>`:''}`;
   }).join('');
 
   return `${chips}<div class="mt-wrap">
@@ -2260,24 +2244,6 @@ function renderModuleTableHTML(){
   <div class="auth-foot">💡 单击任意一行可查看详情 / 编辑；月份格点击可切换完成状态；验厂/会员会费任务可点「▸ 计划明细」展开实施计划面板；数据自动同步至云端 Gist，电脑手机一致。</div>`;
 }
 function bindModuleTable(){ /* 预留 */ }
-// 给所有 .rb-inline-drop 绑拖拽（renderSubModule 重渲染后调用）
-function mountRbInlineRows(){
-  document.querySelectorAll('tr.rb-expand-row[data-task-id]').forEach(row=>{
-    const tid=row.dataset.taskId;
-    if(!tid) return;
-    const td=row.querySelector('td');
-    if(!td) return;
-    bindRbInlineDrop(td, Number(tid));
-    // 同步按钮 .on + ▾（render 出来的 tr 自然带 .on class，但保险起见再校一次）
-    const preBtn=row.previousElementSibling && row.previousElementSibling.querySelector && row.previousElementSibling.querySelector('button.phase-btn');
-    if(preBtn){
-      preBtn.classList.add('on');
-      const arr=row.previousElementSibling.querySelector('span.arr');
-      if(arr) arr.textContent='▾';
-    }
-  });
-}
-
 /* ============ 按月排期视图 ============ */
 const MONTH_LABELS=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 function setSubView(m){subViewMode=m;renderSubModule()}
@@ -3594,183 +3560,8 @@ function rbSaveClose(taskId){
   renderSubModule();
 }
 
-/* ===== 报销单台账（多单据列表 + 录入 + 复制 + 删除 + 导出全部 + 统计） ===== */
-function rbUpdateMemo(taskId,docId,val){
-  const t=data.tasks.find(x=>String(x.id)===String(taskId)); if(!t)return;
-  const d=getRbDoc(t,docId); if(!d)return;
-  d.memo=val; saveData();
-}
-/* ----- 报销单台账（行内展开版：点按钮在表格行下方展开） ----- */
-function isRbRowOpen(taskId){
-  return openRbLedgerSet && openRbLedgerSet.has(String(taskId));
-}
-// 行内 ✕ 关闭（不依赖 toggle 的 nextElementSibling 逻辑，因为关闭按钮在 .rb-expand-row 内）
-function closeRbLedgerRow(taskId){
-  const tid=String(taskId);
-  const row=document.querySelector('tr.rb-expand-row[data-task-id="'+tid+'"]');
-  if(row) row.remove();
-  const btn=document.querySelector('button.phase-btn[data-task-id="'+tid+'"]');
-  if(btn){
-    btn.classList.remove('on');
-    const arr=btn.querySelector('span.arr');
-    if(arr) arr.textContent='▸';
-  }
-  openRbLedgerSet.delete(tid);
-}
-function toggleRbLedgerRow(taskId,btn){
-  try{
-    const tid=String(taskId);
-    const tr=btn && btn.closest ? btn.closest('tr') : null;
-    if(!tr) return;
-    // 已展开 → 收起
-    let nxt=tr.nextElementSibling;
-    if(nxt && nxt.classList && nxt.classList.contains('rb-expand-row') && String(nxt.dataset.taskId)===tid){
-      nxt.remove();
-      btn.classList.remove('on');
-      const arr=document.getElementById('rb-ledger-arrow-'+tid); if(arr) arr.textContent='▸';
-      openRbLedgerSet.delete(tid);
-      return;
-    }
-    // 移除同任务的其他展开（防重）
-    document.querySelectorAll('tr.rb-expand-row[data-task-id="'+tid+'"]').forEach(r=>r.remove());
-    // 创建展开行
-    const cols=tr.children.length;
-    const newRow=document.createElement('tr');
-    newRow.className='rb-expand-row';
-    newRow.dataset.taskId=tid;
-    const td=document.createElement('td');
-    td.colSpan=cols;
-    td.innerHTML=renderRbLedger(tid);
-    newRow.appendChild(td);
-    tr.parentNode.insertBefore(newRow,tr.nextSibling);
-    btn.classList.add('on');
-    const arr=document.getElementById('rb-ledger-arrow-'+tid); if(arr) arr.textContent='▾';
-    openRbLedgerSet.add(tid);
-    // 绑定行内拖拽区
-    bindRbInlineDrop(td,taskId);
-  }catch(err){
-    console.error('[rb-ledger] toggle 失败：',err);
-    alert('页面 JS 未更新，请按 Ctrl+F5 强刷到最新版');
-  }
-}
-// 刷新已展开的台账行（CRUD 后调用）
-function refreshRbLedgerExpand(taskId){
-  const tid=String(taskId);
-  const row=document.querySelector('tr.rb-expand-row[data-task-id="'+tid+'"]');
-  if(!row) return;
-  const td=row.querySelector('td');
-  td.innerHTML=renderRbLedger(tid);
-  bindRbInlineDrop(td,taskId);
-}
-// 行内拖拽绑定（拖到 .rb-inline-drop 触发解析）
-function bindRbInlineDrop(td,taskId){
-  const dz=td.querySelector('.rb-inline-drop');
-  if(!dz) return;
-  dz.addEventListener('dragover',e=>{e.preventDefault();e.stopPropagation();dz.classList.add('drag-ov');});
-  dz.addEventListener('dragleave',()=>dz.classList.remove('drag-ov'));
-  dz.addEventListener('drop',e=>{
-    e.preventDefault();e.stopPropagation();dz.classList.remove('drag-ov');
-    rbDropFile(e,taskId);
-  });
-  // 提供「点击选择文件」入口
-  dz.addEventListener('click',()=>{
-    const fi=document.getElementById('rb-import-file-'+taskId);
-    if(fi) fi.click();
-  });
-}
-function renderRbLedger(taskId){
-  const t=data.tasks.find(x=>x.id===taskId || String(x.id)===String(taskId));
-  if(!t)return `<div style="padding:20px;color:#a33">任务 ${taskId} 不存在</div>`;
-  if(!Array.isArray(t.rbDocs))t.rbDocs=[];
-  const docs=t.rbDocs;
-  const totalCNY=docs.reduce((s,d)=>s+rbDocSum(d),0);
-  const totalRows=docs.reduce((s,d)=>s+((d.rows&&d.rows.length)||0),0);
-  const tid=String(taskId);
-  const rows=docs.map((d,i)=>{
-    const sum=rbDocSum(d);
-    return `<tr class="rb-doc-row" data-id="${d.id}">
-      <td class="td-num" data-label="序号">${String(i+1).padStart(2,'0')}</td>
-      <td class="td-name" data-label="报销单号">${esc(d.name)}<small>${esc(d.memo||'')}</small></td>
-      <td class="td-c" data-label="明细行">${d.rows.length} 行</td>
-      <td class="td-c" data-label="金额" style="font-weight:600;color:var(--primary)">¥ ${sum.toFixed(2)}</td>
-      <td class="td-c" data-label="汇率">${d.rate?('1 CNY='+d.rate+' VND'):'—'}</td>
-      <td class="td-time" data-label="录入时间">${esc(d.createAt||'—')}</td>
-      <td data-label="状态"><span class="bd ${d.status==='已导出'?'ok':'warn'}">${d.status==='已导出'?'✓ 已导出':'⏳ 待导出'}</span></td>
-      <td class="td-ops" data-label="操作">
-        <button class="btn sm primary" onclick="openReimbursement('${tid}','${d.id}')">📋 报销明细</button>
-        <button class="btn sm" onclick="copyRbDoc('${tid}','${d.id}')" title="复制为新单">📄</button>
-        <button class="btn sm" onclick="delRbDoc('${tid}','${d.id}')" title="删除">🗑</button>
-      </td>
-    </tr>`;
-  }).join('')||`<tr><td colspan="8" class="mt-empty">暂无报销单，点上方「✏️ 录入新报销单」或把 Excel 拖到下方虚线框自动解析</td></tr>`;
-  return `<div class="rb-ledger">
-      <div class="rb-ledger-head">
-        <div class="rb-ledger-title">📋 报销单台账 <span class="rb-ledger-sub">${esc(t.title||t.workDetail||'')}</span></div>
-        <button class="rb-close" onclick="closeRbLedgerRow('${tid}')" title="收起台账">✕</button>
-      </div>
-      <div class="rb-ledger-bar">
-        <div class="rb-ledger-info">共 <b>${docs.length}</b> 张报销单 · 合计 <b style="color:var(--primary)">¥ ${totalCNY.toFixed(2)}</b> · 总明细 <b>${totalRows}</b> 行</div>
-        <div class="rb-ledger-acts">
-          <button class="btn" onclick="exportAllRb('${tid}')">📦 导出全部</button>
-          <button class="btn" onclick="rbStats('${tid}')">📊 统计</button>
-          <button class="btn primary" onclick="document.getElementById('rb-import-file-${tid}').click()" title="把 Excel 拖入下方或点击选择">📥 导入 Excel</button>
-          <button class="btn sm" onclick="openRbAdd('${tid}')" title="手动从空白表开始录入">✏️ 手动录入</button>
-          <input type="file" id="rb-import-file-${tid}" accept=".xlsx,.xlsm" style="display:none" onchange="rbImportFile('${tid}',this)">
-        </div>
-      </div>
-      <div class="rb-ledger-tools">
-        <input id="rb-ledger-search-${tid}" class="rb-search" placeholder="搜索报销单号 / 备注…" oninput="rbLedgerFilter('${tid}')">
-        <select id="rb-ledger-status-${tid}" class="rb-sel" onchange="rbLedgerFilter('${tid}')">
-          <option value="">全部状态</option><option value="已导出">已导出</option><option value="待导出">待导出</option>
-        </select>
-        <span class="rb-tip-hint">💡 可拖入 .xlsx / .xlsm 自动解析为新报销单</span>
-      </div>
-      <div class="rb-inline-drop" title="把 .xlsx / .xlsm 拖到这里或点此选择文件">
-        📥 拖入 Excel 自动识别 · 或点此选择文件
-      </div>
-      <div class="rb-ledger-list">
-        <table class="rb-doc-tbl">
-          <thead><tr>
-            <th style="width:44px">序号</th><th>报销单号</th><th style="width:70px">明细行</th>
-            <th style="width:110px">金额</th><th style="width:150px">汇率</th><th style="width:160px">录入时间</th>
-            <th style="width:96px">状态</th><th style="width:220px" class="r">操作</th>
-          </tr></thead>
-          <tbody id="rb-ledger-body-${tid}">${rows}</tbody>
-        </table>
-      </div>
-    </div>`;
-}
-function rbLedgerFilter(taskId){
-  const t=data.tasks.find(x=>x.id===taskId || String(x.id)===String(taskId)); if(!t)return;
-  const tid=String(taskId);
-  const si=document.getElementById('rb-ledger-search-'+tid);
-  const se=document.getElementById('rb-ledger-status-'+tid);
-  const body=document.getElementById('rb-ledger-body-'+tid); if(!body)return;
-  const q=(si?si.value:'').trim().toLowerCase();
-  const st=se?se.value:'';
-  const filtered=t.rbDocs.filter(d=>{
-    if(st && d.status!==st) return false;
-    if(q && !((d.name||'').toLowerCase().includes(q) || (d.memo||'').toLowerCase().includes(q))) return false;
-    return true;
-  });
-  body.innerHTML = filtered.map((d,i)=>{
-    const sum=rbDocSum(d);
-    return `<tr class="rb-doc-row" data-id="${d.id}">
-      <td class="td-num" data-label="序号">${String(i+1).padStart(2,'0')}</td>
-      <td class="td-name" data-label="报销单号">${esc(d.name)}<small>${esc(d.memo||'')}</small></td>
-      <td class="td-c" data-label="明细行">${d.rows.length} 行</td>
-      <td class="td-c" data-label="金额" style="font-weight:600;color:var(--primary)">¥ ${sum.toFixed(2)}</td>
-      <td class="td-c" data-label="汇率">${d.rate?('1 CNY='+d.rate+' VND'):'—'}</td>
-      <td class="td-time" data-label="录入时间">${esc(d.createAt||'—')}</td>
-      <td data-label="状态"><span class="bd ${d.status==='已导出'?'ok':'warn'}">${d.status==='已导出'?'✓ 已导出':'⏳ 待导出'}</span></td>
-      <td class="td-ops" data-label="操作">
-        <button class="btn sm primary" onclick="openReimbursement('${tid}','${d.id}')">📋 报销明细</button>
-        <button class="btn sm" onclick="copyRbDoc('${tid}','${d.id}')" title="复制为新单">📄</button>
-        <button class="btn sm" onclick="delRbDoc('${tid}','${d.id}')" title="删除">🗑</button>
-      </td>
-    </tr>`;
-  }).join('')||`<tr><td colspan="8" class="mt-empty">没有匹配的报销单</td></tr>`;
-}
+
+/* ===== v2026-08-28h: 从干净 g 版本补回被误删的报销单 modal 动作函数 ===== */
 function openRbAdd(taskId){
   const t=data.tasks.find(x=>String(x.id)===String(taskId)); if(!t)return;
   if(!Array.isArray(t.rbDocs))t.rbDocs=[];
@@ -3845,128 +3636,12 @@ function rbStats(taskId){
   </div>`;
   document.body.insertAdjacentHTML('beforeend',html);
 }
-function toggleTaskDone(taskId){
-  const t=data.tasks.find(x=>x.id==taskId);
-  if(!t)return;
-  t.done=!t.done;
-  saveData();
-  renderSubModule();
-  toast(t.done?'已标记完成':'已标记未完成');
+/* ===== 报销单台账（多单据列表 + 录入 + 复制 + 删除 + 导出全部 + 统计） ===== */
+function rbUpdateMemo(taskId,docId,val){
+  const t=data.tasks.find(x=>String(x.id)===String(taskId)); if(!t)return;
+  const d=getRbDoc(t,docId); if(!d)return;
+  d.memo=val; saveData();
 }
-function openModuleAdd(){
-  ensureModuleDrawer();
-  window._moduleEditId=null;
-  document.getElementById('moduleDrawerTitle').textContent='新增条目 · '+CATSHORT[currentSubCat];
-  const c=CATS.find(x=>x.id===currentSubCat);
-  document.getElementById('moduleDrawerBody').innerHTML=moduleDrawerBody({cat:currentSubCat,sub:currentSubFilter||c.subs[0]});
-  document.getElementById('moduleMask').classList.remove('hidden');
-  document.getElementById('moduleDrawer').classList.add('on');
-}
-function openModuleEdit(id){
-  ensureModuleDrawer();
-  const t=data.tasks.find(x=>x.id==id);
-  if(!t)return;
-  window._moduleEditId=id;
-  document.getElementById('moduleDrawerTitle').textContent='编辑 · '+(t.workDetail||t.title||'条目');
-  document.getElementById('moduleDrawerBody').innerHTML=moduleDrawerBody(t);
-  document.getElementById('moduleMask').classList.remove('hidden');
-  document.getElementById('moduleDrawer').classList.add('on');
-}
-function closeModuleDrawer(){
-  document.getElementById('moduleMask').classList.add('hidden');
-  document.getElementById('moduleDrawer').classList.remove('on');
-}
-function ensureModuleDrawer(){
-  if(document.getElementById('moduleMask'))return;
-  const m=document.createElement('div');m.className='mask hidden';m.id='moduleMask';m.onclick=closeModuleDrawer;
-  const d=document.createElement('div');d.className='drawer';d.id='moduleDrawer';
-  d.innerHTML=`<div class="d-hd"><h3 id="moduleDrawerTitle">编辑</h3><button class="x" onclick="closeModuleDrawer()">×</button></div>
-    <div class="d-bd" id="moduleDrawerBody"></div>
-    <div class="d-ft">
-      <button class="btn" onclick="closeModuleDrawer()">关闭</button>
-      <button class="btn primary" onclick="saveModule()">💾 保存</button>
-    </div>`;
-  document.body.appendChild(m);document.body.appendChild(d);
-}
-function moduleDrawerBody(t){
-  const c=CATS.find(x=>x.id===currentSubCat);
-  const v=(k,def)=>t[k]!=null?t[k]:(def||'');
-  const arr=(k,def)=>{
-    const v=t[k]; if(Array.isArray(v))return v.join('、');
-    return def||'';
-  };
-  const planStr=Array.isArray(t.plan)?t.plan.join('\n'):(t.plan||'');
-  return `
-    <div class="field"><label>工作明细（项目名）*</label><input id="md_detail" value="${esc(v('workDetail',v('title')))}" placeholder="如：ISO 9001 质量管理体系认证"></div>
-    <div class="field"><label>项目内容（实施细节）</label><input id="md_content" value="${esc(v('projectContent'))}" placeholder="如：①确认合作范围 ②准备审核材料 ③接受一阶段审核"></div>
-    <div class="field"><label>子分类</label><select id="md_sub">${c.subs.map(s=>`<option ${(t.sub||c.subs[0])===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
-    <div class="field"><label>审核周期</label><input id="md_period" value="${esc(v('period'))}" placeholder="如 1年"></div>
-    ${(currentSubCat==='1'||currentSubCat==='7'||currentSubCat==='8')?`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      ${currentSubCat==='1'?`
-      <div class="field"><label>开始时间</label><input id="md_startDate" type="date" value="${esc(v('startDate',v('firstCert')))}"></div>
-      <div class="field"><label>完成时间</label><input id="md_endDate" type="date" value="${esc(v('endDate',v('expire')))}"></div>`:`
-      <div class="field"><label>有效期</label><input id="md_expire" type="date" value="${esc(v('expire'))}"></div>
-      <div class="field"></div>`}
-    </div>`:''}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      <div class="field"><label>对接机构</label><input id="md_org" value="${esc(v('org'))}" placeholder="如 TUVUL、TUV南德"></div>
-      <div class="field"><label>担当</label><input id="md_lead" value="${esc(v('lead'))}" placeholder="主担当"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-      <div class="field"><label>协力（顿号/逗号分隔）</label><input id="md_supports" value="${esc(arr('supports'))}"></div>
-      <div class="field"><label>确认</label><input id="md_conf" value="${esc(v('confirmer'))}"></div>
-      <div class="field"><label>优先级</label><select id="md_prio">
-        <option value="P2" ${t.prio==='P2'?'selected':''}>P2 普通</option>
-        <option value="P1" ${t.prio==='P1'?'selected':''}>P1 重要</option>
-        <option value="P0" ${t.prio==='P0'?'selected':''}>P0 紧急</option>
-      </select></div>
-    </div>
-    <div class="field"><label>实施计划（每行一项 ①②③…）</label><textarea id="md_plan" rows="4">${esc(planStr)}</textarea></div>
-    <div class="field"><label>备注</label><textarea id="md_note" rows="2">${esc(v('note'))}</textarea></div>
-  `;
-}
-function saveModule(){
-  const id=window._moduleEditId;
-  const c=CATS.find(x=>x.id===currentSubCat);
-  const detail=document.getElementById('md_detail').value.trim();
-  if(!detail){toast('请填写「工作明细」');return;}
-  const obj={
-    cat:currentSubCat,
-    sub:document.getElementById('md_sub').value,
-    workDetail:detail,
-    projectContent:document.getElementById('md_content').value.trim(),
-    period:document.getElementById('md_period').value.trim(),
-    org:document.getElementById('md_org').value.trim(),
-    lead:document.getElementById('md_lead').value.trim(),
-    supports:document.getElementById('md_supports').value.split(/[、,,]/).map(s=>s.trim()).filter(Boolean),
-    confirmer:document.getElementById('md_conf').value.trim(),
-    prio:document.getElementById('md_prio').value,
-    plan:document.getElementById('md_plan').value.split('\n').map(s=>s.trim()).filter(Boolean),
-    note:document.getElementById('md_note').value.trim(),
-    done:false
-  };
-  // 仅 1/7/8 类抽屉里含日期字段
-  const sEl=document.getElementById('md_startDate');
-  const eEl=document.getElementById('md_endDate');
-  const expEl=document.getElementById('md_expire');
-  if(sEl)obj.startDate=sEl.value;
-  if(eEl)obj.endDate=eEl.value;
-  if(expEl)obj.expire=expEl.value;
-  if(id){
-    const i=data.tasks.findIndex(x=>x.id==id);
-    if(i>=0)data.tasks[i]={...data.tasks[i],...obj};
-  }else{
-    obj.id=Date.now();
-    obj.title=obj.workDetail;
-    data.tasks.unshift(obj);
-  }
-  saveData();
-  closeModuleDrawer();
-  renderSubModule();
-  toast(id?'已保存':'已新增');
-}
-
 /* ===== 中方休假记录台账（行内展开版 · cat=11『休假类』任务专用） ===== */
 let vacOpenSet=new Set();
 const _vacKw={};
