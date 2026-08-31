@@ -969,6 +969,37 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .rec-sw.sw-rb:hover{color:#1d4ed8;border-color:#93c5fd;background:#eff6ff}
 .rec-sw.sw-vac:hover{color:#047857;border-color:#86efac;background:#ecfdf5}
 .rec-locked{display:inline-block;font-size:10px;color:#94a3b8;margin-left:4px;cursor:help}
+/* cat=11 数据迁移弹窗（永久工具） */
+.mig-modal{position:fixed;inset:0;background:rgba(13,33,69,.55);z-index:950;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}
+.mig-box{background:#fff;border-radius:12px;width:100%;max-width:780px;box-shadow:0 12px 48px rgba(0,0,0,.18);overflow:hidden}
+.mig-head{padding:14px 18px;background:linear-gradient(135deg,#1e3a8a 0%,#0c4a6e 100%);color:#fff;display:flex;align-items:center;justify-content:space-between}
+.mig-head h3{margin:0;font-size:16px;font-weight:700}
+.mig-close{background:transparent;border:0;color:#fff;font-size:18px;cursor:pointer;padding:0 4px;line-height:1}
+.mig-close:hover{color:#fbbf24}
+.mig-body{padding:16px 18px;max-height:60vh;overflow:auto}
+.mig-intro{color:#475569;margin:0 0 12px 0;font-size:13px;line-height:1.6}
+.mig-intro em{background:#fef3c7;padding:1px 4px;border-radius:3px;font-style:normal;color:#92400e}
+.mig-tbl{width:100%;border-collapse:collapse;font-size:13px}
+.mig-tbl th,.mig-tbl td{padding:9px 10px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:middle}
+.mig-tbl th{background:#f8fafc;font-weight:600;color:#475569;font-size:12px}
+.mig-tbl tr:hover td{background:#f8fafc}
+.mig-tbl input[type=checkbox]{width:18px;height:18px;cursor:pointer}
+.mig-old{color:#94a3b8;text-decoration:line-through;margin-right:6px}
+.mig-arr{color:#94a3b8;margin:0 4px}
+.mig-new{color:#047857;font-weight:600}
+.mig-type-rb{color:#1d4ed8;font-weight:600;font-size:12px}
+.mig-type-vac{color:#047857;font-weight:600;font-size:12px}
+.mig-note{color:#64748b;font-size:12px}
+.mig-empty{text-align:center;color:#94a3b8;padding:24px}
+.mig-foot{padding:12px 18px;border-top:1px solid #e5e7eb;background:#f8fafc;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.mig-tip{color:#64748b;font-size:12px}
+.mig-btn-row{display:flex;gap:8px}
+.mig-btn-cancel{background:#fff;color:#475569;border:1px solid #cbd5e1;padding:8px 14px;border-radius:8px;cursor:pointer;font-size:13px}
+.mig-btn-cancel:hover{background:#f1f5f9}
+.mig-btn-do{background:#2563eb;color:#fff;border:0;padding:8px 18px;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px}
+.mig-btn-do:hover{background:#1d4ed8}
+.mig-btn-do:disabled{background:#94a3b8;cursor:not-allowed}
+.mig-flag{display:inline-block;background:#d1fae5;color:#065f46;font-size:11px;padding:1px 6px;border-radius:8px;margin-left:6px;font-weight:600}
 @media (max-width:768px){
   .vac-toolbar{flex-direction:column;align-items:stretch;gap:8px}
   .vac-tools{justify-content:flex-end}
@@ -1297,7 +1328,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-08-31b';
+const APP_VER='2026-08-31c';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -2143,6 +2174,7 @@ function renderModuleTableHTML(){
     <span class="fchip ${subViewMode==='list'?'active':''}" onclick="setSubView('list')" style="background:#f0f5ff">📋 任务表</span>
     <span class="fchip ${subViewMode==='monthly'?'active':''}" onclick="setSubView('monthly')" style="background:#fef9e8">📅 按月排期</span>
     <button class="btn primary" onclick="openModuleAdd()" style="padding:5px 12px;font-size:12px">＋ 添加条目</button>
+    ${currentSubCat==='11'?`<button class="btn mig-top-btn" onclick="renderMigrationDialog()" style="padding:5px 12px;font-size:12px;background:#f1f5f9;color:#475569;border:1px solid #cbd5e1" title="批量调整 cat=11 任务的标题和模块归属（黄总 2026-08-31 强需求）">🛠️ 数据迁移</button>`:''}
   </div>`;
 
   if(subViewMode==='monthly' && c.cols && c.cols.some(col=>col[0]==='month')){
@@ -3681,6 +3713,106 @@ function recSwitchBtn(t,targetType){
   const tip=isRb?'把这条任务切换为「报销单」模块（弹窗台账 / 导出 Excel）':'把这条任务切换为「休假记录」模块（行内表格 / 天数自动算）';
   return `${lock}<button class="rec-sw ${isRb?'sw-rb':'sw-vac'}" data-task-id="${t.id}" onclick="try{event.stopPropagation();toggleRecType('${t.id}')}catch(e){console.error(e)}" title="${tip}">⇄ 转${isRb?'报销':'休假'}</button>`;
 }
+/* ===== cat=11 数据迁移工具（永久可用，黄总 2026-08-31 强需求） =====
+ * 弹窗列出与黄总预期不符的 cat=11 任务，勾选 → 一键改名+锁定模块+初始化数据结构。
+ * 不动其他任务（默认规则保持不变）。规则按需追加。
+ */
+const MIGRATION_RULES=[
+  // 黄总原话：第 3 行写报销记录，第 2 行写休假记录。两个模块单独分开，单独的程序。
+  { match:'中方休假', newTitle:'报销记录', recType:'rb', note:'第 3 行：标题含"休假"被误判为休假 → 改为报销模块 + 改名' },
+  // { match:'XXX', newTitle:'YYY', recType:'vac', note:'...' },   // 以后有需要再加
+];
+function findMigrationCandidates(){
+  // 列出两种任务：① 标题命中原始规则（待迁）② 标题已是目标 + recType 已锁定（已迁，供确认）
+  const out=[];
+  MIGRATION_RULES.forEach((rule,ri)=>{
+    (data.tasks||[]).forEach((t,ti)=>{
+      if(t.cat!=='11') return;
+      const isOriginal=(t.title===rule.match);
+      const isMigrated=(t.title===rule.newTitle && t.recType===rule.recType);
+      if(!isOriginal && !isMigrated) return;
+      out.push({
+        ri, ti, taskId:t.id,
+        title:t.title,newTitle:rule.newTitle,
+        recType:rule.recType,note:rule.note,
+        currentType:recTypeOf(t),
+        alreadyDone:isMigrated
+      });
+    });
+  });
+  return out;
+}
+function renderMigrationDialog(){
+  closeMigrationDialog();
+  const list=findMigrationCandidates();
+  const rows=list.map((c,i)=>{
+    const checked=c.alreadyDone?'checked disabled':'checked';
+    const flag=c.alreadyDone?'<span class="mig-flag" title="这条任务已是目标标题+目标模块，无需再迁">✓ 已迁移</span>':'';
+    const typeLabel=c.recType==='rb'?'<span class="mig-type-rb">报销单模块</span>':'<span class="mig-type-vac">休假记录模块</span>';
+    return `<tr data-ri="${c.ri}" data-ti="${c.ti}">
+      <td><input type="checkbox" class="mig-chk" data-ri="${c.ri}" data-ti="${c.ti}" ${checked}></td>
+      <td><span class="mig-old">${esc(c.title)}</span><span class="mig-arr">→</span><span class="mig-new">${esc(c.newTitle)}</span>${flag}</td>
+      <td>${typeLabel}</td>
+      <td class="mig-note">${esc(c.note)}</td>
+    </tr>`;
+  }).join('') || `<tr><td colspan="4" class="mig-empty">✅ 没有需要迁移的 cat=11 任务<br><span style="font-size:12px;color:#94a3b8">（所有规则都已匹配且生效，或））<br>（当前 Gist 还没拉到这些任务）</span></td></tr>`;
+  const html=`<div class="mig-modal" onclick="if(event.target===this)closeMigrationDialog()">
+    <div class="mig-box">
+      <div class="mig-head">
+        <h3>🛠️ cat=11 任务数据迁移</h3>
+        <button class="mig-close" onclick="closeMigrationDialog()" title="关闭">✕</button>
+      </div>
+      <div class="mig-body">
+        <p class="mig-intro">
+          检测到以下 cat=11 任务与您预期不符。勾选后点<em>执行迁移</em>会完成<strong>改名 + 锁定模块归属</strong>。<br>
+          已有数据（<code>rbDocs</code> / <code>vacationRows</code>）保留，只是换个模块展示。<br>
+          <strong style="color:#92400e">只改这条任务，其他 cat=11 任务一概不动。</strong>
+        </p>
+        <table class="mig-tbl">
+          <thead><tr><th style="width:32px"></th><th>标题</th><th style="width:130px">目标模块</th><th>说明</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div class="mig-foot">
+        <span class="mig-tip">💡 永久工具：以后想批量迁移其他任务，告诉我加规则即可。</span>
+        <div class="mig-btn-row">
+          <button class="mig-btn-cancel" onclick="closeMigrationDialog()">取消</button>
+          <button class="mig-btn-do" onclick="executeMigration()">执行迁移</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function closeMigrationDialog(){ const m=document.querySelector('.mig-modal'); if(m)m.remove(); }
+function executeMigration(){
+  const chks=[...document.querySelectorAll('.mig-chk:checked:not(:disabled)')];
+  if(!chks.length){toast('没有要迁移的项');return;}
+  const summary=chks.map(c=>{
+    const ti=parseInt(c.getAttribute('data-ti'),10);
+    return data.tasks[ti]?`「${data.tasks[ti].title}」`:'(空)';
+  }).join('、');
+  if(!confirm(`将迁移 ${chks.length} 条 cat=11 任务：\n${summary}\n\n✔ 改名\n✔ 锁定模块归属（recType）\n✔ 初始化目标模块数据结构（rbDocs / vacationRows）\n\n数据会同步到云端 Gist（您的浏览器发起的）。\n\n继续？`)) return;
+  let n=0, names=[];
+  chks.forEach(chk=>{
+    const ri=parseInt(chk.getAttribute('data-ri'),10);
+    const ti=parseInt(chk.getAttribute('data-ti'),10);
+    const rule=MIGRATION_RULES[ri];
+    const t=data.tasks[ti];
+    if(!t||!rule) return;
+    t.title=rule.newTitle;
+    t.recType=rule.recType;
+    if(rule.recType==='rb' && !Array.isArray(t.rbDocs)) t.rbDocs=[];
+    if(rule.recType==='vac' && !Array.isArray(t.vacationRows)) t.vacationRows=[];
+    names.push(t.title);
+    n++;
+  });
+  try{ saveData(); }catch(e){console.error('[mig] saveData',e);}
+  try{ renderSubModule(); }catch(e){console.error('[mig] render',e);}
+  closeMigrationDialog();
+  toast(`已迁移 ${n} 条：${names.join('、')}`);
+}
+
 function toggleRecType(taskId){
   const tid=String(taskId);
   const t=data.tasks.find(x=>String(x.id)===tid);
