@@ -962,13 +962,8 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 .phase-btn-vac{background:#fff;border-color:#86efac;color:#047857}
 .phase-btn-vac:hover{background:#ecfdf5;border-color:#34d399}
 .phase-btn-vac.on{background:linear-gradient(180deg,#10b981,#059669);color:#fff;border-color:#047857}
-/* cat=11 模块归属切换（报销单 ⇄ 休假记录） */
+/* cat=11 三行各自独立（按钮名称见 CAT11_ROW_CFG 硬绑定）；不再提供切换入口 */
 .rec-row{display:flex;align-items:center;flex-wrap:wrap;gap:2px}
-.rec-sw{display:inline-flex;align-items:center;gap:3px;background:#fff;color:#64748b;border:1px dashed #cbd5e1;padding:3px 7px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;margin-left:4px;line-height:1.2}
-.rec-sw:hover{background:#f1f5f9;color:#334155;border-color:#94a3b8}
-.rec-sw.sw-rb:hover{color:#1d4ed8;border-color:#93c5fd;background:#eff6ff}
-.rec-sw.sw-vac:hover{color:#047857;border-color:#86efac;background:#ecfdf5}
-.rec-locked{display:inline-block;font-size:10px;color:#94a3b8;margin-left:4px;cursor:help}
 /* cat=11 数据迁移弹窗（永久工具） */
 .mig-modal{position:fixed;inset:0;background:rgba(13,33,69,.55);z-index:950;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}
 .mig-box{background:#fff;border-radius:12px;width:100%;max-width:780px;box-shadow:0 12px 48px rgba(0,0,0,.18);overflow:hidden}
@@ -1328,7 +1323,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-08-31c';
+const APP_VER='2026-08-31d';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -1955,12 +1950,12 @@ let openPhases=new Set();
 let openTaskPhases=new Set();
 let openReimbursementSet=new Set();
 /* ===== 报销单台账（cat=11「中方报销」多单据） ===== */
-let curRbDocId=null;                 // 当前正在查看/编辑的报销单 docId
+let curRbDocMap=new Map();           // 每个任务各自维护当前 docId（三行报销互不干涉）
 function getRbDoc(t,docId){return (t&&t.rbDocs||[]).find(d=>String(d.id)===String(docId))||null;}
 function curRbDoc(taskId){
   const tid=taskId!=null?String(taskId):null;
   const t=data.tasks.find(x=>String(x.id)===tid);
-  return t?getRbDoc(t,curRbDocId):null;
+  return t?getRbDoc(t,curRbDocMap.get(tid)):null;
 }
 function newRbDocName(t){const n=((t&&t.rbDocs)||[]).length+1;return '报销单'+String(n).padStart(3,'0');}
 function nowStamp(){const d=new Date();const p=x=>String(x).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;}
@@ -2232,24 +2227,24 @@ function renderModuleTableHTML(){
       if(k==='startDate'||k==='startTime')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.startDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'startDate',this.value)"></td>`;
       if(k==='endDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.endDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'endDate',this.value)"></td>`;
       if(k==='plan'){
-        // 中方休假记录（独立分支，不与中方报销代码耦合）
-        // cat=11 + 归属『休假』→ 行内展开休假记录面板（表格 CRUD + 天数自动 + 导出汇总 Excel）
-        if(t.cat==='11' && recTypeOf(t)==='vac'){
-          const vOpen=isVacRowOpen(t.id);
-          const rows=Array.isArray(t.vacationRows)?t.vacationRows:[];
-          const vCount=rows.length;
-          const safeClick=`try{event.stopPropagation();toggleVacationRow('${t.id}',this)}catch(e){console.error('[vac]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
-          const swBtn=recSwitchBtn(t,'rb');
-          return `<td class="td-plan"><div class="td-plan-grp"><div class="rec-row"><button class="phase-btn phase-btn-vac ${vOpen?'on':''}" data-task-id="${t.id}" data-vac="1" onclick="${safeClick}" title="点击展开 / 收起休假记录（在该行下方展开，不弹窗）"><span class="arr" id="vac-arrow-${t.id}">${vOpen?'▾':'▸'}</span> 休假记录 ${vCount} 条</button>${swBtn}</div></div></td>`;
-        }
-        // 中方报销（v2026-08-28d 前的样式）：点击弹层 modal
+        // cat=11 三条任务各自独立、互不干涉（黄总 2026-08-31 强需求）
+        // 归属与按钮名称均由 CAT11_ROW_CFG 硬绑定，三行各走各的分支，互不串位
         if(t.cat==='11'){
+          const cfg=CAT11_ROW_CFG[(t.title||'').trim()||'']||null;
+          const isVac=cfg?cfg.type==='vac':(recTypeOf(t)==='vac');
+          const btnName=cfg?cfg.btn:(isVac?'休假记录':'报销单台账');
+          if(isVac){
+            const vOpen=isVacRowOpen(t.id);
+            const rows=Array.isArray(t.vacationRows)?t.vacationRows:[];
+            const vCount=rows.length;
+            const safeClick=`try{event.stopPropagation();toggleVacationRow('${t.id}',this)}catch(e){console.error('[vac]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
+            return `<td class="td-plan"><div class="td-plan-grp"><div class="rec-row"><button class="phase-btn phase-btn-vac ${vOpen?'on':''}" data-task-id="${t.id}" data-vac="1" onclick="${safeClick}" title="点击展开 / 收起休假记录（在该行下方展开，不弹窗）"><span class="arr" id="vac-arrow-${t.id}">${vOpen?'▾':'▸'}</span> ${btnName} ${vCount} 条</button></div></div></td>`;
+          }
           const docs=t.rbDocs||[];
           const rbN=docs.reduce((s,d)=>s+((d.rows&&d.rows.length)||0),0);
           const rbSum=docs.reduce((s,d)=>s+rbDocSum(d),0);
           const safeClick=`try{event.stopPropagation();openReimbursement('${t.id}',null)}catch(e){console.error('[rb]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
-          const swBtn=recSwitchBtn(t,'vac');
-          return `<td class="td-plan"><div class="td-plan-grp"><div class="rec-row"><button class="phase-btn" data-task-id="${t.id}" onclick="${safeClick}" title="点击打开报销单台账弹层"><span class="arr">▸</span> 报销单台账 ${docs.length}单/${rbN}行/¥${rbSum.toFixed(2)}</button>${swBtn}</div></div></td>`;
+          return `<td class="td-plan"><div class="td-plan-grp"><div class="rec-row"><button class="phase-btn" data-task-id="${t.id}" onclick="${safeClick}" title="点击打开报销单台账弹层"><span class="arr">▸</span> ${btnName} ${docs.length}单/${rbN}行/¥${rbSum.toFixed(2)}</button></div></div></td>`;
         }
         return `<td class="td-plan"><div class="td-plan-grp">${planBtn||'—'}</div></td>`;
       }
@@ -2387,7 +2382,7 @@ function openReimbursement(taskId,docId){
   const t=data.tasks.find(x=>String(x.id)===String(taskId));
   if(!t)return;
   if(!Array.isArray(t.rbDocs)||!t.rbDocs.length){ openRbAdd(taskId); return; }
-  curRbDocId = (docId!=null)?docId:t.rbDocs[t.rbDocs.length-1].id;
+  curRbDocMap.set(String(taskId), (docId!=null)?docId:t.rbDocs[t.rbDocs.length-1].id);
   openReimbursementSet.add(taskId);
   renderReimbursementModal(t);
 }
@@ -2397,7 +2392,7 @@ function closeReimbursementModal(){
 }
 function renderReimbursementModal(t){
   closeReimbursementModal();
-  const doc=getRbDoc(t,curRbDocId)||{id:0,name:'报销单',memo:'',createAt:'',status:'待导出',rate:3952.7,rows:[]};
+  const doc=getRbDoc(t,curRbDocMap.get(String(t.id)))||{id:0,name:'报销单',memo:'',createAt:'',status:'待导出',rate:3952.7,rows:[]};
   const rb=doc;
   if(!Array.isArray(rb.rows))rb.rows=[];
   const grandCNY=rbGrandTotal(rb.rows);
@@ -2507,7 +2502,7 @@ async function rbExportExcel(taskId){
     const t=data.tasks.find(x=>String(x.id)===String(taskId));
     if(!t){toast('找不到任务');return;}
     const rb=curRbDoc(taskId)||{rate:0,rows:[]};
-    const doc=getRbDoc(t,curRbDocId);
+    const doc=getRbDoc(t,curRbDocMap.get(String(taskId)));
     if(doc)doc.status='已导出';
     saveData();
     // 生成 xlsx blob
@@ -3694,25 +3689,26 @@ function rbUpdateMemo(taskId,docId,val){
   d.memo=val; saveData();
 }
 /* ===== 中方休假记录台账（行内展开版 · cat=11『休假类』任务专用） ===== */
-/* ===== cat=11 模块归属：报销单 ⇄ 休假记录 =====
- * 黄总 2026-08-31 要求：两条 cat=11 任务各走各的模块，不因改标题而串位。
- * 优先级：① t.recType 显式锁定（'rb' / 'vac'）② 标题或内容含『休假』→ vac ③ 其余 → rb
- * 所有原先用「标题含休假」判断的地方，统一改为 recTypeOf(t)==='vac'。
+/* ===== cat=11 三条任务各自独立、互不干涉（黄总 2026-08-31 强需求） =====
+ * 硬绑定：按任务标题匹配，优先级最高，绕过 recType 与关键词兜底。
+ * 三行各走各的分支，改标题 / 改数据都不会串位，互不影响。
+ * 兼容：若历史迁移把『中方休假』改名成『报销记录』，也一并认作报销模块。
  */
+const CAT11_ROW_CFG = {
+  '客户行程跟进': { type:'rb',  btn:'行程跟进' },
+  '中方休假记录': { type:'vac', btn:'休假记录' },
+  '中方报销':     { type:'rb',  btn:'报销记录' },
+  '报销记录':     { type:'rb',  btn:'报销记录' }   // 兼容历史迁移改名
+};
 function recTypeOf(t){
   if(!t) return 'rb';
+  const cfg=CAT11_ROW_CFG[(t.title||'').trim()];
+  if(cfg) return cfg.type;        // 三行硬绑定，互不干涉
   if(t.recType==='rb') return 'rb';
   if(t.recType==='vac') return 'vac';
   return (((t.title||'')+' '+(t.workDetail||'')).indexOf('休假')>=0) ? 'vac' : 'rb';
 }
-/* 生成「⇄ 转报销 / 转休假」小按钮；已锁定的加 🔒 提示 */
-function recSwitchBtn(t,targetType){
-  const locked=(t.recType==='rb'||t.recType==='vac');
-  const lock=locked?'<span class="rec-locked" title="已手动锁定模块归属，之后改标题也不受影响">🔒</span>':'';
-  const isRb=(targetType==='rb');
-  const tip=isRb?'把这条任务切换为「报销单」模块（弹窗台账 / 导出 Excel）':'把这条任务切换为「休假记录」模块（行内表格 / 天数自动算）';
-  return `${lock}<button class="rec-sw ${isRb?'sw-rb':'sw-vac'}" data-task-id="${t.id}" onclick="try{event.stopPropagation();toggleRecType('${t.id}')}catch(e){console.error(e)}" title="${tip}">⇄ 转${isRb?'报销':'休假'}</button>`;
-}
+/* （已移除「⇄ 转报销 / 转休假」切换按钮：黄总要求三种记录彻底独立、互不干涉，不再提供切换入口） */
 /* ===== cat=11 数据迁移工具（永久可用，黄总 2026-08-31 强需求） =====
  * 弹窗列出与黄总预期不符的 cat=11 任务，勾选 → 一键改名+锁定模块+初始化数据结构。
  * 不动其他任务（默认规则保持不变）。规则按需追加。
@@ -3813,35 +3809,7 @@ function executeMigration(){
   toast(`已迁移 ${n} 条：${names.join('、')}`);
 }
 
-function toggleRecType(taskId){
-  const tid=String(taskId);
-  const t=data.tasks.find(x=>String(x.id)===tid);
-  if(!t){toast('任务不存在');return;}
-  const cur=recTypeOf(t);
-  const next=(cur==='vac')?'rb':'vac';
-  const nm=t.title||t.workDetail||'该任务';
-  const msg=(next==='vac')
-    ? `把「${nm}」切换为「休假记录」模块？
-
-✔ 行内展开表格：休假人 / 起止日期 / 天数自动算 / 地点
-✘ 不再显示报销单台账
-
-（已有数据不会丢失，只是换个模块展示）`
-    : `把「${nm}」切换为「报销单」模块？
-
-✔ 弹窗台账：费用明细 / 多单管理 / 导出 Excel
-✘ 不再显示休假记录
-
-（已有数据不会丢失，只是换个模块展示）`;
-  if(!confirm(msg)) return;
-  t.recType=next;
-  if(next==='rb' && !Array.isArray(t.rbDocs)) t.rbDocs=[];
-  if(next==='vac' && !Array.isArray(t.vacationRows)) t.vacationRows=[];
-  try{ if(vacOpenSet) vacOpenSet.delete(tid); }catch(e){}
-  try{ saveData(); }catch(e){}
-  try{ renderSubModule(); }catch(e){}
-  toast(next==='vac'?'已切换为「休假记录」模块':'已切换为「报销单」模块');
-}
+/* （已移除 toggleRecType：切换入口取消，三条任务归属由 CAT11_ROW_CFG 硬绑定，互不干涉） */
 
 let vacOpenSet=new Set();
 const _vacKw={};
@@ -4822,9 +4790,11 @@ function normalizeData(){
       else if(t.cat==='8') t.phases=[defaultPhases()[0]];
     }
   });
-  // 报销类任务（cat=11 + 标题含「报销」）：迁移为「多报销单」数据结构 t.rbDocs=[{id,name,memo,createAt,status,rate,rows}]
+  // cat=11 任务数据结构初始化：按 recTypeOf（三行硬绑定）分流，互不干涉
   if(Array.isArray(data.tasks))(data.tasks||[]).forEach(t=>{
-    if(t.cat==='11' && (t.title||'').indexOf('报销')>=0){
+    if(t.cat!=='11') return;
+    if(recTypeOf(t)==='rb'){
+      // 报销单台账（弹窗）：初始化 t.rbDocs；兼容旧版单报销单结构
       if(!Array.isArray(t.rbDocs)){
         if(t.reimbursement && Array.isArray(t.reimbursement.rows) && t.reimbursement.rows.length){
           t.rbDocs=[{id:1,name:'报销单001',memo:(t.workDetail||t.title||''),createAt:(t.firstCert||''),status:'已导出',rate:t.reimbursement.rate||3952.7,rows:t.reimbursement.rows}];
@@ -4834,10 +4804,8 @@ function normalizeData(){
         delete t.reimbursement;
       }
     }
-  });
-  // 休假类任务（cat=11 + 标题含「休假」）：初始化 t.vacationRows=[]
-  if(Array.isArray(data.tasks))(data.tasks||[]).forEach(t=>{
-    if(t.cat==='11' && recTypeOf(t)==='vac'){
+    if(recTypeOf(t)==='vac'){
+      // 休假记录（行内）：初始化 t.vacationRows=[]
       if(!Array.isArray(t.vacationRows)) t.vacationRows=[];
     }
   });
