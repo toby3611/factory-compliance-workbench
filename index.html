@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>综合工作台 · 云端版</title>
-<!-- APP_VERSION: 2026-08-28h (报销单改回v2026-08-28d前的modal弹层;删除inline展开函数/CSS/拼接;休假面板保留) -->
+<!-- APP_VERSION: 2026-08-31e (cat=11三行硬绑定改为 workDetail+title+idx 三层容错;旧版title字符串与用户Gist数据不对应致三行全显示"报销单台账",现已修正:第1行程跟进/第2行休假记录/第3行报销记录) -->
 <style>
 :root{
   --primary:#1e6fff;--primary-2:#3b8aff;--primary-soft:#eaf2ff;
@@ -2227,10 +2227,9 @@ function renderModuleTableHTML(){
       if(k==='startDate'||k==='startTime')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.startDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'startDate',this.value)"></td>`;
       if(k==='endDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.endDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'endDate',this.value)"></td>`;
       if(k==='plan'){
-        // cat=11 三条任务各自独立、互不干涉（黄总 2026-08-31 强需求）
-        // 归属与按钮名称均由 CAT11_ROW_CFG 硬绑定，三行各走各的分支，互不串位
+        // cat=11 三条任务各自独立、互不干涉（v2026-08-31e：workDetail+title+idx 三层容错）
         if(t.cat==='11'){
-          const cfg=CAT11_ROW_CFG[(t.title||'').trim()||'']||null;
+          const cfg=CAT11_ROW_CFG[(t.workDetail||t.title||'').trim()] || _cat11CfgByIdx(t) || null;
           const isVac=cfg?cfg.type==='vac':(recTypeOf(t)==='vac');
           const btnName=cfg?cfg.btn:(isVac?'休假记录':'报销单台账');
           if(isVac){
@@ -3694,18 +3693,45 @@ function rbUpdateMemo(taskId,docId,val){
  * 三行各走各的分支，改标题 / 改数据都不会串位，互不影响。
  * 兼容：若历史迁移把『中方休假』改名成『报销记录』，也一并认作报销模块。
  */
+/* === v2026-08-31e 修复：硬绑定改为按 workDetail 字段匹配 + 列表 idx 兜底 ===
+ * 根因：之前按 t.title 字符串匹配（Gist 实际 title 与 cfg key 不一致），
+ *       三行全 miss，fallback 显示"报销单台账"。
+ * 现在：先 workDetail → 再 title → 再 cat=11 列表 idx，三层命中。
+ */
 const CAT11_ROW_CFG = {
-  '客户行程跟进': { type:'rb',  btn:'行程跟进' },
+  // key = t.workDetail 字面值（用户主表"工作明细"列看到的就是这个）
+  '客户行程':     { type:'rb',  btn:'行程跟进' },
   '中方休假记录': { type:'vac', btn:'休假记录' },
-  '中方报销':     { type:'rb',  btn:'报销记录' },
-  '报销记录':     { type:'rb',  btn:'报销记录' }   // 兼容历史迁移改名
+  '中方报销':     { type:'rb',  btn:'报销记录' }
 };
+// 第 idx 条 cat=11 任务兜底（按 ID 升序排，稳态顺序与"插入顺序"通常一致）
+const CAT11_IDX_CFG = [
+  { type:'rb',  btn:'行程跟进' }, // idx=0 第 1 行
+  { type:'vac', btn:'休假记录' }, // idx=1 第 2 行
+  { type:'rb',  btn:'报销记录' }  // idx=2 第 3 行
+];
+function _cat11CfgByIdx(t){
+  if(!t||String(t.cat)!=='11') return null;
+  const list=data.tasks.filter(x=>String(x.cat)==='11');
+  list.sort((a,b)=>{const ka=String(a.id||''),kb=String(b.id||'');return ka<kb?-1:ka>kb?1:0;});
+  const i=list.findIndex(x=>String(x.id)===String(t.id));
+  return (i>=0&&i<CAT11_IDX_CFG.length) ? CAT11_IDX_CFG[i] : { type:'rb', btn:'报销记录' };
+}
 function recTypeOf(t){
   if(!t) return 'rb';
-  const cfg=CAT11_ROW_CFG[(t.title||'').trim()];
-  if(cfg) return cfg.type;        // 三行硬绑定，互不干涉
+  // 1) workDetail 字段精确匹配
+  const wd=(t.workDetail||'').trim();
+  if(CAT11_ROW_CFG[wd]) return CAT11_ROW_CFG[wd].type;
+  // 2) title 字段精确匹配（兼容历史迁移或者同步改名后的兜底）
+  const ttl=(t.title||'').trim();
+  if(CAT11_ROW_CFG[ttl]) return CAT11_ROW_CFG[ttl].type;
+  // 3) cat=11 列表 idx（兜底）
+  const c3=_cat11CfgByIdx(t);
+  if(c3) return c3.type;
+  // 4) recType 标记
   if(t.recType==='rb') return 'rb';
   if(t.recType==='vac') return 'vac';
+  // 5) 关键词兜底
   return (((t.title||'')+' '+(t.workDetail||'')).indexOf('休假')>=0) ? 'vac' : 'rb';
 }
 /* （已移除「⇄ 转报销 / 转休假」切换按钮：黄总要求三种记录彻底独立、互不干涉，不再提供切换入口） */
