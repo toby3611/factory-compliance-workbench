@@ -1323,7 +1323,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-08-31e';
+const APP_VER='2026-08-31f';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -2141,6 +2141,111 @@ function authSetTab(t){authTab=t;renderAuthView();}
 function authSetFilter(f){authFilter=f;renderAuthView();}
 function authSearch(v){authKeyword=v;const w=document.getElementById('authTblWrap');if(w)w.innerHTML=renderAuthTbodyHTML();}
 
+/* ============ 11 大类通用编辑抽屉（v2026-08-31f 补回 v28h 重构时丢失的 5 个函数） ============ */
+function openModuleEdit(id){
+  ensureModuleDrawer();
+  const t=data.tasks.find(x=>x.id==id);
+  if(!t)return;
+  window._moduleEditId=id;
+  document.getElementById('moduleDrawerTitle').textContent='编辑 · '+(t.workDetail||t.title||'条目');
+  document.getElementById('moduleDrawerBody').innerHTML=moduleDrawerBody(t);
+  document.getElementById('moduleMask').classList.remove('hidden');
+  document.getElementById('moduleDrawer').classList.add('on');
+}
+function closeModuleDrawer(){
+  document.getElementById('moduleMask').classList.add('hidden');
+  document.getElementById('moduleDrawer').classList.remove('on');
+}
+function ensureModuleDrawer(){
+  if(document.getElementById('moduleMask'))return;
+  const m=document.createElement('div');m.className='mask hidden';m.id='moduleMask';m.onclick=closeModuleDrawer;
+  const d=document.createElement('div');d.className='drawer';d.id='moduleDrawer';
+  d.innerHTML=`<div class="d-hd"><h3 id="moduleDrawerTitle">编辑</h3><button class="x" onclick="closeModuleDrawer()">×</button></div>
+    <div class="d-bd" id="moduleDrawerBody"></div>
+    <div class="d-ft">
+      <button class="btn" onclick="closeModuleDrawer()">关闭</button>
+      <button class="btn primary" onclick="saveModule()">💾 保存</button>
+    </div>`;
+  document.body.appendChild(m);document.body.appendChild(d);
+}
+function moduleDrawerBody(t){
+  const c=CATS.find(x=>x.id===currentSubCat);
+  const v=(k,def)=>t[k]!=null?t[k]:(def||'');
+  const arr=(k,def)=>{
+    const v=t[k]; if(Array.isArray(v))return v.join('、');
+    return def||'';
+  };
+  const planStr=Array.isArray(t.plan)?t.plan.join('\n'):(t.plan||'');
+  return `
+    <div class="field"><label>工作明细（项目名）*</label><input id="md_detail" value="${esc(v('workDetail',v('title')))}" placeholder="如：ISO 9001 质量管理体系认证"></div>
+    <div class="field"><label>项目内容（实施细节）</label><input id="md_content" value="${esc(v('projectContent'))}" placeholder="如：①确认合作范围 ②准备审核材料 ③接受一阶段审核"></div>
+    <div class="field"><label>子分类</label><select id="md_sub">${c.subs.map(s=>`<option ${(t.sub||c.subs[0])===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+    <div class="field"><label>审核周期</label><input id="md_period" value="${esc(v('period'))}" placeholder="如 1年"></div>
+    ${(currentSubCat==='1'||currentSubCat==='7'||currentSubCat==='8')?`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${currentSubCat==='1'?`
+      <div class="field"><label>开始时间</label><input id="md_startDate" type="date" value="${esc(v('startDate',v('firstCert')))}"></div>
+      <div class="field"><label>完成时间</label><input id="md_endDate" type="date" value="${esc(v('endDate',v('expire')))}"></div>`:`
+      <div class="field"><label>有效期</label><input id="md_expire" type="date" value="${esc(v('expire'))}"></div>
+      <div class="field"></div>`}
+    </div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="field"><label>对接机构</label><input id="md_org" value="${esc(v('org'))}" placeholder="如 TUVUL、TUV南德"></div>
+      <div class="field"><label>担当</label><input id="md_lead" value="${esc(v('lead'))}" placeholder="主担当"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+      <div class="field"><label>协力（顿号/逗号分隔）</label><input id="md_supports" value="${esc(arr('supports'))}"></div>
+      <div class="field"><label>确认</label><input id="md_conf" value="${esc(v('confirmer'))}"></div>
+      <div class="field"><label>优先级</label><select id="md_prio">
+        <option value="P2" ${t.prio==='P2'?'selected':''}>P2 普通</option>
+        <option value="P1" ${t.prio==='P1'?'selected':''}>P1 重要</option>
+        <option value="P0" ${t.prio==='P0'?'selected':''}>P0 紧急</option>
+      </select></div>
+    </div>
+    <div class="field"><label>实施计划（每行一项 ①②③…）</label><textarea id="md_plan" rows="4">${esc(planStr)}</textarea></div>
+    <div class="field"><label>备注</label><textarea id="md_note" rows="2">${esc(v('note'))}</textarea></div>
+  `;
+}
+function saveModule(){
+  const id=window._moduleEditId;
+  const c=CATS.find(x=>x.id===currentSubCat);
+  const detail=document.getElementById('md_detail').value.trim();
+  if(!detail){toast('请填写「工作明细」');return;}
+  const obj={
+    cat:currentSubCat,
+    sub:document.getElementById('md_sub').value,
+    workDetail:detail,
+    projectContent:document.getElementById('md_content').value.trim(),
+    period:document.getElementById('md_period').value.trim(),
+    org:document.getElementById('md_org').value.trim(),
+    lead:document.getElementById('md_lead').value.trim(),
+    supports:document.getElementById('md_supports').value.split(/[、,]/).map(s=>s.trim()).filter(Boolean),
+    confirmer:document.getElementById('md_conf').value.trim(),
+    prio:document.getElementById('md_prio').value,
+    plan:document.getElementById('md_plan').value.split('\n').map(s=>s.trim()).filter(Boolean),
+    note:document.getElementById('md_note').value.trim(),
+    done:false
+  };
+  const sEl=document.getElementById('md_startDate');
+  const eEl=document.getElementById('md_endDate');
+  const expEl=document.getElementById('md_expire');
+  if(sEl)obj.startDate=sEl.value;
+  if(eEl)obj.endDate=eEl.value;
+  if(expEl)obj.expire=expEl.value;
+  if(id){
+    const i=data.tasks.findIndex(x=>x.id==id);
+    if(i>=0)data.tasks[i]={...data.tasks[i],...obj};
+  }else{
+    obj.id=Date.now();
+    obj.title=obj.workDetail;
+    data.tasks.unshift(obj);
+  }
+  saveData();
+  closeModuleDrawer();
+  renderSubModule();
+  toast(id?'已保存':'已新增');
+}
+
 /* ============ 11 大类通用表格视图（按图 1 模板） ============ */
 function renderModuleTableHTML(){
   const c=CATS.find(x=>x.id===currentSubCat);
@@ -2234,16 +2339,11 @@ function renderModuleTableHTML(){
           const btnName=cfg?cfg.btn:(isVac?'休假记录':'报销单台账');
           if(isVac){
             const vOpen=isVacRowOpen(t.id);
-            const rows=Array.isArray(t.vacationRows)?t.vacationRows:[];
-            const vCount=rows.length;
             const safeClick=`try{event.stopPropagation();toggleVacationRow('${t.id}',this)}catch(e){console.error('[vac]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
-            return `<td class="td-plan"><div class="td-plan-grp"><div class="rec-row"><button class="phase-btn phase-btn-vac ${vOpen?'on':''}" data-task-id="${t.id}" data-vac="1" onclick="${safeClick}" title="点击展开 / 收起休假记录（在该行下方展开，不弹窗）"><span class="arr" id="vac-arrow-${t.id}">${vOpen?'▾':'▸'}</span> ${btnName} ${vCount} 条</button></div></div></td>`;
+            return `<td class="td-plan"><div class="td-plan-grp"><div class="rec-row"><button class="phase-btn phase-btn-vac ${vOpen?'on':''}" data-task-id="${t.id}" data-vac="1" onclick="${safeClick}" title="点击展开 / 收起休假记录（在该行下方展开，不弹窗）"><span class="arr" id="vac-arrow-${t.id}">${vOpen?'▾':'▸'}</span> ${btnName}</button></div></div></td>`;
           }
-          const docs=t.rbDocs||[];
-          const rbN=docs.reduce((s,d)=>s+((d.rows&&d.rows.length)||0),0);
-          const rbSum=docs.reduce((s,d)=>s+rbDocSum(d),0);
           const safeClick=`try{event.stopPropagation();openReimbursement('${t.id}',null)}catch(e){console.error('[rb]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
-          return `<td class="td-plan"><div class="td-plan-grp"><div class="rec-row"><button class="phase-btn" data-task-id="${t.id}" onclick="${safeClick}" title="点击打开报销单台账弹层"><span class="arr">▸</span> ${btnName} ${docs.length}单/${rbN}行/¥${rbSum.toFixed(2)}</button></div></div></td>`;
+          return `<td class="td-plan"><div class="td-plan-grp"><div class="rec-row"><button class="phase-btn" data-task-id="${t.id}" onclick="${safeClick}" title="点击打开报销单台账弹层"><span class="arr">▸</span> ${btnName}</button></div></div></td>`;
         }
         return `<td class="td-plan"><div class="td-plan-grp">${planBtn||'—'}</div></td>`;
       }
