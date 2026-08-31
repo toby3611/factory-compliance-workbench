@@ -1290,7 +1290,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-08-28h';
+const APP_VER='2026-08-31a';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -2463,7 +2463,7 @@ async function rbExportExcel(taskId){
   if(btn){ btn.disabled=true; btn.innerHTML='⏳ 正在生成 Excel…'; }
   try{
     await new Promise(r=>setTimeout(r,30));
-    const t=data.tasks.find(x=>x.id===taskId);
+    const t=data.tasks.find(x=>String(x.id)===String(taskId));
     if(!t){toast('找不到任务');return;}
     const rb=curRbDoc(taskId)||{rate:0,rows:[]};
     const doc=getRbDoc(t,curRbDocId);
@@ -2879,7 +2879,7 @@ function buildWorkbook(sheetName){
   return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
           xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <bookViews><workbookView xWindow="0" yWindow="0" windowWidth="0" windowHeight="0" showGridLines="0" activeTab="0"/></bookViews>
+  <bookViews><workbookView xWindow="0" yWindow="0" windowWidth="0" windowHeight="0" activeTab="0"/></bookViews>
   <sheets><sheet name="${xmlEsc(sn)}" sheetId="1" r:id="rId1"/></sheets>
 </workbook>`;
 }
@@ -3082,8 +3082,8 @@ function buildRbXlsx(t, rb, sheetName){
       const v = cellVal(row, k);
       if(numKeys.has(k)){
         const n = parseFloat(v)||0;
-        total += n;
-        if(k!=='days') grand += n;
+        // 天数只用于展示，不能计入金额（须与页面预览 rbRowTotal 保持一致，否则导出的 Excel 与预览对不上）
+        if(k!=='days'){ total += n; grand += n; }
         xml += (n===0 && k==='days') ? txt(ref, numS, '') : num(ref, numS, n);
       }else{
         xml += txt(ref, txtS, v);
@@ -3153,7 +3153,7 @@ function buildRbXlsx(t, rb, sheetName){
   <sheetFormatPr defaultRowHeight="15.75" defaultColWidth="0"/>
   ${colsXml}
   <sheetData>${rows.join('')}${[...Array(1005).keys()].map(i=>`<row r="${i+20}" ht="0" hidden="1"/>`).join('')}</sheetData>
-  <printOptions showGridLines="0" gridLines="0" horizontalCentered="0" verticalCentered="0" headings="0"/>
+  <printOptions gridLines="0" horizontalCentered="0" verticalCentered="0" headings="0"/>
   <pageMargins left="0.5" right="0.5" top="0.5" bottom="0.5" header="0" footer="0"/>
   <pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0" horizontalDpi="300" verticalDpi="300"/>
   ${mergesXml}
@@ -3235,13 +3235,15 @@ function buildVacationXlsx(){
     const rowNum=5+i;
     const bg=(i%2===0)?2:3; // 偶数行=2，奇数行=3（条纹）
     let s=`<row r="${rowNum}" ht="20" customHeight="1">`;
-    s+=tx('A',rowNum,String(r.idx),bg);
+    s+=num('A',rowNum,r.idx,bg);   // 序号用数字，便于筛选排序
     s+=tx('B',rowNum,r.taskName,bg);
     s+=tx('C',rowNum,r.name,bg);
     s+=tx('D',rowNum,r.dept,bg);
     s+=tx('E',rowNum,r.startDate,bg);
     s+=tx('F',rowNum,r.endDate,bg);
-    s+=tx('G',rowNum,r.days,bg);
+    // 天数写成数字单元格（否则 Excel 里无法求和/筛选）；空值留空
+    const daysNum=parseInt(r.days,10);
+    s+= (r.days===''||r.days==null||isNaN(daysNum)) ? tx('G',rowNum,'',bg) : num('G',rowNum,daysNum,bg);
     s+=tx('H',rowNum,r.place,bg);
     s+=tx('I',rowNum,r.createAt,bg);
     s+=tx('J',rowNum,r.note,bg);
@@ -3460,14 +3462,14 @@ function renderRbExcelPreview(t,rb){
   `;
 }
 function rbAddRow(taskId){
-  const t=data.tasks.find(x=>x.id===taskId);
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
   const d=curRbDoc(taskId);
   if(!t||!d)return;
   d.rows.push({name:'',dept:'',applyDate:'',startTime:'',endTime:'',days:'',purpose:'',destination:'',transport:'',room:'',meal:'',hospitality:'',fuel:'',other:''});
   renderReimbursementModal(t);
 }
 function rbDelRow(taskId,rowIdx){
-  const t=data.tasks.find(x=>x.id===taskId);
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
   const d=curRbDoc(taskId);
   if(!t||!d)return;
   if(!confirm('确定删除该报销行？'))return;
@@ -3475,7 +3477,7 @@ function rbDelRow(taskId,rowIdx){
   renderReimbursementModal(t);
 }
 function rbUpdate(taskId,rowIdx,key,value){
-  const t=data.tasks.find(x=>x.id===taskId);
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
   const d=curRbDoc(taskId);
   if(!t||!d)return;
   d.rows[rowIdx][key]=value;
@@ -3489,7 +3491,7 @@ function rbUpdate(taskId,rowIdx,key,value){
   const trs=modal.querySelectorAll('tbody tr');
   if(trs[rowIdx]){
     const tds=trs[rowIdx].querySelectorAll('td');
-    // 倒数第 2 是 total, 倒数第 3 是 vnd
+    // 数据行 17 个 td：倒数第 3 个是 total，倒数第 2 个是 vnd
     const totalTd=tds[tds.length-3], vndTd=tds[tds.length-2];
     if(totalTd)totalTd.innerHTML=`¥${tot.toFixed(2)}`;
     if(vndTd)vndTd.innerHTML=vnd.toLocaleString('vi-VN',{maximumFractionDigits:0});
@@ -3498,13 +3500,17 @@ function rbUpdate(taskId,rowIdx,key,value){
   const foot=modal.querySelector('tfoot tr');
   if(foot){
     const ftd=foot.querySelectorAll('td');
-    ftd[ftd.length-2].innerHTML=`<b>¥${rbGrandTotal(d.rows).toFixed(2)}</b>`;
-    ftd[ftd.length-1].innerHTML=`<b style="color:#000">${rbGrandVnd(d.rows,d.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
+    // tfoot 固定 4 个 td：[0]=label(colspan14) [1]=人民币合计 [2]=越南盾 [3]=占位
+    // 不能用 length-2/length-1（那是 17 列数据行的偏移），否则 CNY 会被写进 VND 格
+    if(ftd.length>=3){
+      ftd[ftd.length-3].innerHTML=`¥${rbGrandTotal(d.rows).toFixed(2)}`;
+      ftd[ftd.length-2].innerHTML=`<span style="color:#000">${rbGrandVnd(d.rows,d.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</span>`;
+    }
   }
 }
 function rbUpdateLive(taskId,rowIdx,key,value){
   // 实时刷新 total/vnd（不调 saveData，避免频繁落库）
-  const t=data.tasks.find(x=>x.id===taskId);
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
   const d=curRbDoc(taskId);
   if(!t||!d)return;
   d.rows[rowIdx][key]=value;
@@ -3523,12 +3529,16 @@ function rbUpdateLive(taskId,rowIdx,key,value){
   const foot=modal.querySelector('tfoot tr');
   if(foot){
     const ftd=foot.querySelectorAll('td');
-    ftd[ftd.length-2].innerHTML=`<b>¥${rbGrandTotal(d.rows).toFixed(2)}</b>`;
-    ftd[ftd.length-1].innerHTML=`<b style="color:#000">${rbGrandVnd(d.rows,d.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</b>`;
+    // tfoot 固定 4 个 td：[0]=label(colspan14) [1]=人民币合计 [2]=越南盾 [3]=占位
+    // 不能用 length-2/length-1（那是 17 列数据行的偏移），否则 CNY 会被写进 VND 格
+    if(ftd.length>=3){
+      ftd[ftd.length-3].innerHTML=`¥${rbGrandTotal(d.rows).toFixed(2)}`;
+      ftd[ftd.length-2].innerHTML=`<span style="color:#000">${rbGrandVnd(d.rows,d.rate).toLocaleString('vi-VN',{maximumFractionDigits:0})}</span>`;
+    }
   }
 }
 function rbUpdateRate(taskId){
-  const t=data.tasks.find(x=>x.id===taskId);
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
   const d=curRbDoc(taskId);
   if(!t||!d)return;
   const inp=document.getElementById('rb-rate-'+taskId);
