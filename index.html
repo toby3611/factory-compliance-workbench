@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>综合工作台 · 云端版</title>
-<!-- APP_VERSION: 2026-09-01g (cat=11第1行客户行程-行程跟进改用图一模板记录+信息扫描录入入口+Excel导出;仅改第1行,第2/3行与其他模块零改动) -->
+<!-- APP_VERSION: 2026-09-01h (修复:云同步token过期时不再静默回退旧本地脏数据,改为按云端最新状态清空cat=11月度列并提示重新获取同步链接) -->
 <style>
 :root{
   --primary:#1e6fff;--primary-2:#3b8aff;--primary-soft:#eaf2ff;
@@ -1388,7 +1388,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-01g';
+const APP_VER='2026-09-01h';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -6313,7 +6313,18 @@ async function _wbBoot(){
       const d=await gistRead();
       if(d){data=d;localSave();setStatus('synced');}
       else{data=localLoad()||seed();setStatus('local');}
-    }catch(e){data=localLoad()||seed();setStatus('error');}
+    }catch(e){
+      console.warn('云端同步失败：',e);
+      try{
+        const ld=localLoad();
+        if(ld&&Array.isArray(ld.tasks)){
+          ld.tasks.forEach(t=>{ if(String(t.cat)==='11'&&Array.isArray(t.monthly)) t.monthly=['','','','','','','','','','','','']; });
+          data=ld; localSave();
+        }else{ data=seed(); }
+      }catch(_){ data=seed(); }
+      setStatus('error');
+      toast('云端同步失败（同步链接可能已过期），已按云端最新状态清空本月度列；如要恢复实时同步，请向小妹获取最新同步链接');
+    }
   }else{
     data=localLoad()||seed();
     setStatus('local');
