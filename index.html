@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>综合工作台 · 云端版</title>
-<!-- APP_VERSION: 2026-09-01k (cat=11任务表/按月排期两视图均删除「1月-12月」整列+隐藏点月格提示;其他模块零改动) -->
+<!-- APP_VERSION: 2026-09-01l (左下角 fab 下方新增构建版本号徽章 YY-MM-XXXX=BUILD_TAG=26-09-1000，每次优化 +1；原 APP_VER 保留不动) -->
 <style>
 :root{
   --primary:#1e6fff;--primary-2:#3b8aff;--primary-soft:#eaf2ff;
@@ -293,6 +293,22 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 /* 抽屉打开时自动隐藏 FAB，避免挡住抽屉底部的保存/关闭按钮 */
 body:has(.drawer.on) .ai-fab,
 body:has(.mask:not(.hidden)) .ai-fab{display:none}
+/* ===== 构建版本号徽章（YY-MM-XXXX）· 位于 fab 下方居中，每次优化更新 ===== */
+.build-tag{
+  position:fixed;bottom:6px;left:24px;z-index:79;
+  font-family:ui-monospace,Menlo,Consolas,monospace;
+  font-size:10.5px;font-weight:600;letter-spacing:.5px;
+  color:#475569;background:#f8fafc;
+  border:1px solid #cbd5e1;border-radius:6px;
+  padding:2px 8px;user-select:none;cursor:default;
+  box-shadow:0 1px 3px rgba(15,23,42,.06);
+}
+body:has(.drawer.on) .build-tag,
+body:has(.mask:not(.hidden)) .build-tag{display:none}
+@media(max-width:780px){
+  /* 跟随 fab 移到手机端 tabbar 上方位置 */
+  .build-tag{bottom:60px;left:14px;font-size:10px;padding:2px 7px}
+}
 
 /* ============ 报告中心 / 知识库 / 备忘录视图 ============ */
 .view{display:none}
@@ -1347,6 +1363,8 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
   AI助手
 </button>
+<!-- ============ 工作台构建版本号（用户可见 · YY-MM-XXXX 自增 · 每次优化 +1） ============ -->
+<div class="build-tag" id="buildTag" title="工作台构建版本号 · 每次优化更新">26-09-1000</div>
 
 <!-- ============ 云端同步弹窗 ============ -->
 <div class="mask hidden" id="syncMask">
@@ -1388,7 +1406,9 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-01k';
+const APP_VER='2026-09-01l';
+// 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1，下次改成 26-09-1001
+const BUILD_TAG='26-09-1000';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -6309,6 +6329,11 @@ function doLogout(){clearSession();location.reload();}
 async function _wbBoot(){
   document.getElementById('todayDate').textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric',weekday:'long'});
   initCertTypeSelect();
+  // 工作台构建版本号徽章（用户可见 · 每次优化 +1，自增维护在 BUILD_TAG 常量）
+  try{
+    const bt=document.getElementById('buildTag');
+    if(bt && typeof BUILD_TAG!=='undefined') bt.textContent=BUILD_TAG;
+  }catch(e){}
 
   loadSyncCfg();
   if(sync.enabled){
