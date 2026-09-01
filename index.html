@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APP_VERSION: 2026-09-01p (cat=5 演习进度抽屉→行内展开[第1行下方/第2行下方…]；表头 th-progress/th-drill 颜色统一继承默认；cat=5 删 1月-12月 列+按月排期视图同步排除；BUILD_TAG 26-09-1003→26-09-1004) -->
+<!-- APP_VERSION: 2026-09-01q (隐藏 cat=5 等无月度格模块的「按月排期」按钮[该按钮此前是死按钮]；cat=5 顶部新增「部门演习完成度」banner X/Y 阶段 + 进度条；BUILD_TAG 26-09-1004→26-09-1005) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -641,7 +641,19 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 .drill-ct{font-size:11.5px;padding:1px 6px;border-radius:8px;background:rgba(255,255,255,.7);font-weight:700;margin-left:2px}
 .drill-tier-mid .drill-ct{background:#fff;color:#c2410c}
 .drill-tier-full .drill-ct{background:#fff;color:#166534}
-@media (max-width:768px){.drill-cards{padding:10px 10px;gap:8px}.drill-card-hd{padding:8px 12px;flex-wrap:wrap}.drill-card-tip{width:100%}.drill-expand-hd{padding:8px 12px}.drill-expand-ft{padding:8px 12px}.drill-progress-bar{width:90px}}
+@media (max-width:768px){.drill-cards{padding:10px 10px;gap:8px}.drill-card-hd{padding:8px 12px;flex-wrap:wrap}.drill-card-tip{width:100%}.drill-expand-hd{padding:8px 12px}.drill-expand-ft{padding:8px 12px}.drill-progress-bar{width:90px}.drill-banner{flex-wrap:wrap;gap:6px;padding:8px 10px}.drill-banner .db-tip{width:100%;font-size:11px}}
+/* ===== cat=5 顶部「部门演习完成度」banner ===== */
+.drill-banner{display:flex;align-items:center;gap:12px;padding:9px 14px;background:linear-gradient(135deg,#fef2f2 0%,#fff7e8 100%);border:1px solid #fecaca;border-radius:8px;margin-bottom:12px;font-size:13px;flex-wrap:wrap}
+.drill-banner .db-ic{font-size:18px;flex-shrink:0}
+.drill-banner .db-txt{font-weight:700;color:#991b1b;flex-shrink:0}
+.drill-banner .db-num{font-size:13px;color:#475569;flex-shrink:0;font-variant-numeric:tabular-nums}
+.drill-banner .db-num b{font-size:15px;margin-right:1px}
+.drill-banner .db-pct{font-weight:700;color:#dc2626;font-size:15px;flex-shrink:0;font-variant-numeric:tabular-nums}
+.drill-banner.full .db-pct{color:#16a34a}
+.drill-banner .db-bar{flex:1;height:8px;background:#fee2e2;border-radius:4px;overflow:hidden;border:1px solid #fecaca;min-width:120px;max-width:280px}
+.drill-banner .db-bar i{display:block;height:100%;background:linear-gradient(90deg,#dc2626 0%,#f97316 100%);transition:width .3s}
+.drill-banner .db-bar.full i{background:linear-gradient(90deg,#16a34a 0%,#22c55e 100%)}
+.drill-banner .db-tip{font-size:11.5px;color:#64748b;flex-shrink:0;margin-left:auto}
 /* ===== 行程台账 modal（cat=11 第 1 行专用，与 .rb-modal 视觉一致但用 it- 前缀不污染） ===== */
 .it-modal{position:fixed;inset:0;background:rgba(13,33,69,.55);z-index:900;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}
 .it-box{background:#fff;border-radius:12px;width:100%;max-width:1240px;box-shadow:0 20px 50px rgba(0,0,0,.18);overflow:hidden;display:flex;flex-direction:column}
@@ -1490,9 +1502,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-01p';
+const APP_VER='2026-09-01q';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1004';
+const BUILD_TAG='26-09-1005';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -2431,18 +2443,40 @@ function renderModuleTableHTML(){
     `<span>待办 <b style="color:var(--amber)">${items.filter(x=>!x.done).length}</b></span>`;
 
   // 子分类筛选 chips + 视图切换
-  const chips=`<div class="sub-filter">
+  // cat=5 顶部加「部门演习完成度」banner（仅在有 4 阶段演练模块时显示）
+  const drillBanner=(currentSubCat==='5')?(()=>{
+    const tasks=data.tasks.filter(t=>String(t.cat)==='5');
+    let doneSum=0,totSum=0;
+    tasks.forEach(t=>{
+      const dp=ensureDrillPhases(t);
+      DRILL_PHASE_LIST.forEach(p=>{ if(dp[p.key]&&dp[p.key].done) doneSum++; });
+      totSum+=DRILL_PHASE_LIST.length;
+    });
+    if(!totSum)return '';
+    const pct=Math.round(doneSum*100/totSum);
+    const isFull=(doneSum===totSum);
+    return `<div class="drill-banner">
+      <span class="db-ic">🚨</span>
+      <span class="db-txt">本部门演习完成度</span>
+      <span class="db-num"><b style="color:${isFull?'#16a34a':'#dc2626'}">${doneSum}</b> / ${totSum} 阶段</span>
+      <span class="db-pct">${pct}%</span>
+      <span class="db-bar ${isFull?'full':''}"><i style="width:${pct}%"></i></span>
+      <span class="db-tip">点击每行「▸ 演习进度」按钮行内展开演练流程</span>
+    </div>`;
+  })():'';
+  const hasMonthCol=(c.cols&&c.cols.some(x=>x[0]==='month'));
+  const chips=drillBanner+`<div class="sub-filter">
     <span class="fchip ${!currentSubFilter?'active':''}" onclick="filterSub(null)">全部 (${items.length})</span>
     ${c.subs.map(s=>{
       const ct=items.filter(x=>x.sub===s).length;
       return `<span class="fchip ${currentSubFilter===s?'active':''}" onclick="filterSub('${s.replace(/'/g,"\\'")}')">${esc(s)} (${ct})</span>`;
     }).join('')}
     <span style="flex:1"></span>
-    ${(c.cols&&c.cols.some(x=>x[0]==='month') && currentSubCat!=='11')?`<span class="fchip" style="background:#fff7e8;color:#92400e;border:1px solid #fde68a" title="操作提示：单击月份格直接输入信息">
+    ${(hasMonthCol && currentSubCat!=='11')?`<span class="fchip" style="background:#fff7e8;color:#92400e;border:1px solid #fde68a" title="操作提示：单击月份格直接输入信息">
       ✏️ 点月格输入（客户名 / done / 日期）
     </span>`:''}
     <span class="fchip ${subViewMode==='list'?'active':''}" onclick="setSubView('list')" style="background:#f0f5ff">📋 任务表</span>
-    <span class="fchip ${subViewMode==='monthly'?'active':''}" onclick="setSubView('monthly')" style="background:#fef9e8">📅 按月排期</span>
+    ${hasMonthCol?`<span class="fchip ${subViewMode==='monthly'?'active':''}" onclick="setSubView('monthly')" style="background:#fef9e8">📅 按月排期</span>`:''}
     <button class="btn primary" onclick="openModuleAdd()" style="padding:5px 12px;font-size:12px">＋ 添加条目</button>
     ${currentSubCat==='11'?`<button class="btn mig-top-btn" onclick="renderMigrationDialog()" style="padding:5px 12px;font-size:12px;background:#f1f5f9;color:#475569;border:1px solid #cbd5e1" title="批量调整 cat=11 任务的标题和模块归属（黄总 2026-08-31 强需求）">🛠️ 数据迁移</button>`:''}
   </div>`;
@@ -5361,6 +5395,28 @@ function refreshDrillBtn(taskId){
   btn.classList.remove('drill-tier-full','drill-tier-mid','drill-tier-zero');
   btn.classList.add(d===4?'drill-tier-full':d>=1?'drill-tier-mid':'drill-tier-zero');
 }
+function refreshDrillBanner(){
+  // cat=5 顶部 banner 实时刷新（X/Y 阶段 + 进度条 + 数字）
+  const banner=document.querySelector('.drill-banner');
+  if(!banner)return;
+  const tasks=data.tasks.filter(t=>String(t.cat)==='5');
+  let doneSum=0,totSum=0;
+  tasks.forEach(t=>{
+    const dp=ensureDrillPhases(t);
+    DRILL_PHASE_LIST.forEach(p=>{ if(dp[p.key]&&dp[p.key].done) doneSum++; });
+    totSum+=DRILL_PHASE_LIST.length;
+  });
+  if(!totSum){banner.remove();return;}
+  const pct=Math.round(doneSum*100/totSum);
+  const isFull=(doneSum===totSum);
+  const numEl=banner.querySelector('.db-num');
+  if(numEl)numEl.innerHTML=`<b style="color:${isFull?'#16a34a':'#dc2626'}">${doneSum}</b> / ${totSum} 阶段`;
+  const pctEl=banner.querySelector('.db-pct');
+  if(pctEl)pctEl.textContent=pct+'%';
+  const bar=banner.querySelector('.db-bar');
+  if(bar){bar.classList.toggle('full',isFull);const i=bar.querySelector('i');if(i)i.style.width=pct+'%';}
+  banner.classList.toggle('full',isFull);
+}
 function drillToggleDone(taskId,key,val,cardId){
   const t=data.tasks.find(x=>String(x.id)===String(taskId));
   if(!t)return;
@@ -5372,6 +5428,7 @@ function drillToggleDone(taskId,key,val,cardId){
   const sumEl=document.getElementById('drill-summary-'+taskId);
   if(sumEl)sumEl.innerHTML=renderDrillSummary(t);
   refreshDrillBtn(taskId);
+  refreshDrillBanner();
 }
 function drillUpdateField(taskId,key,field,val){
   const t=data.tasks.find(x=>String(x.id)===String(taskId));
@@ -5393,6 +5450,7 @@ function saveDrillProgress(taskId){
   toast('✅ 已保存演练进度');
   closeDrillDrawer();
   if(typeof renderSubModule==='function')renderSubModule();
+  if(typeof refreshDrillBanner==='function')refreshDrillBanner();
 }
 function refreshAuthTbody(){const w=document.getElementById('authTblWrap');if(w)w.innerHTML=renderAuthTbodyHTML();}
 function togglePhaseRow(id){
