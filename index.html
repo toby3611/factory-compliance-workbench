@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- APP_VERSION: 2026-09-01o (cat=5 EHS安全应急演习模块「实施要求」后新增「演习进度」列；4 行各自独立抽屉：演习计划/演习通知/演习实操/演习记录；每行 drillPhases 完全独立、零关联) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -595,6 +596,46 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 .rb-save{background:#10b981;color:#fff;border:0;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600}
 .rb-save:hover{background:#059669}
 @media (max-width:768px){.rb-modal{padding:8px 4px}.rb-head{padding:10px 12px}.rb-rate{width:100%;margin-left:0;justify-content:space-between}.rb-rate input{width:90px}.rb-tbl{font-size:11px}.rb-tbl thead th,.rb-tbl tbody td{padding:4px 3px}}
+/* ===== 应急演习进度抽屉（cat=5 各行独立） ===== */
+.drill-modal{position:fixed;inset:0;background:rgba(13,33,69,.55);z-index:900;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}
+.drill-box{background:#fff;border-radius:12px;width:100%;max-width:780px;box-shadow:0 20px 50px rgba(0,0,0,.18);overflow:hidden;display:flex;flex-direction:column}
+.drill-head{background:linear-gradient(135deg,#fef2f2 0%,#fff 100%);border-bottom:1px solid #fecaca;padding:14px 18px;display:flex;align-items:center;gap:12px}
+.drill-title{font-size:17px;font-weight:700;color:#991b1b;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drill-title .drill-sub{font-size:11px;color:#dc2626;font-weight:500;margin-left:8px;padding:2px 8px;border-radius:10px;background:#fee2e2;letter-spacing:.5px}
+.drill-close{background:transparent;border:0;font-size:22px;color:#64748b;cursor:pointer;padding:0 8px;line-height:1}
+.drill-close:hover{color:#dc2626}
+.drill-cards{padding:16px 18px;display:flex;flex-direction:column;gap:12px;background:#fafafa}
+.drill-card{background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;transition:.2s}
+.drill-card.done{border-color:#86efac;background:linear-gradient(180deg,#f0fdf4 0%,#fff 100%);box-shadow:0 1px 4px rgba(22,163,74,.08)}
+.drill-card-hd{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid #f1f5f9;background:#fff}
+.drill-card.done .drill-card-hd{background:linear-gradient(180deg,#f0fdf4 0%,#fff 100%);border-bottom-color:#bbf7d0}
+.drill-card-no{width:26px;height:26px;border-radius:50%;background:#dc2626;color:#fff;font-weight:700;display:inline-flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.drill-card.done .drill-card-no{background:#16a34a}
+.drill-card-ic{font-size:18px;flex-shrink:0}
+.drill-card-name{font-size:14.5px;font-weight:700;color:#0f172a;flex-shrink:0}
+.drill-card.done .drill-card-name{color:#166534}
+.drill-card-tip{font-size:11.5px;color:#64748b;font-weight:400;margin-left:4px}
+.drill-card-bd{padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.drill-card-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.drill-card-chk{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;font-weight:600;color:#475569;user-select:none}
+.drill-card-chk input[type=checkbox]{width:18px;height:18px;cursor:pointer;accent-color:#dc2626}
+.drill-card.done .drill-card-chk input[type=checkbox]{accent-color:#16a34a}
+.drill-card-date{border:1px solid #d1d5db;border-radius:6px;padding:6px 10px;font-size:12.5px;color:#0f172a;background:#fff;min-width:140px}
+.drill-card-date:focus{outline:none;border-color:#dc2626;box-shadow:0 0 0 2px rgba(220,38,38,.1)}
+.drill-card-note{width:100%;min-height:54px;max-height:120px;border:1px solid #e5e7eb;border-radius:6px;padding:8px 10px;font-size:12.5px;color:#0f172a;background:#fff;resize:vertical;font-family:inherit;line-height:1.5}
+.drill-card-note:focus{outline:none;border-color:#dc2626;box-shadow:0 0 0 2px rgba(220,38,38,.1)}
+.drill-card.done .drill-card-note{background:#f0fdf4}
+.drill-foot{padding:14px 18px;background:#fff;border-top:1px solid var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.drill-summary{font-size:13px;color:#475569;font-weight:600;display:flex;align-items:center;gap:8px}
+.drill-progress-bar{display:inline-flex;width:140px;height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden;border:1px solid #d1d5db}
+.drill-progress-bar i{display:block;height:100%;background:linear-gradient(90deg,#dc2626 0%,#f97316 100%);transition:width .3s}
+.drill-progress-bar.full i{background:linear-gradient(90deg,#16a34a 0%,#22c55e 100%)}
+.drill-cancel{background:#f1f5f9;border:1px solid var(--line);border-radius:6px;padding:8px 16px;cursor:pointer;font-size:13px;color:#475569;font-weight:600}
+.drill-cancel:hover{background:#e2e8f0}
+.drill-save{background:#dc2626;color:#fff;border:0;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;transition:.15s}
+.drill-save:hover{background:#b91c1c;box-shadow:0 2px 8px rgba(220,38,38,.25)}
+.drill-foot-info{font-size:11.5px;color:#64748b;width:100%;margin-top:6px;padding-top:8px;border-top:1px dashed #e2e8f0;line-height:1.5}
+@media (max-width:768px){.drill-modal{padding:8px 4px}.drill-head{padding:10px 12px}.drill-cards{padding:12px 12px;gap:10px}.drill-card-hd{padding:10px 12px;flex-wrap:wrap}.drill-card-tip{width:100%}.drill-foot{padding:10px 12px}.drill-progress-bar{width:100px}}
 /* ===== 行程台账 modal（cat=11 第 1 行专用，与 .rb-modal 视觉一致但用 it- 前缀不污染） ===== */
 .it-modal{position:fixed;inset:0;background:rgba(13,33,69,.55);z-index:900;display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}
 .it-box{background:#fff;border-radius:12px;width:100%;max-width:1240px;box-shadow:0 20px 50px rgba(0,0,0,.18);overflow:hidden;display:flex;flex-direction:column}
@@ -838,6 +879,20 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 .mt-tbl .td-note{color:var(--muted);font-size:11.5px;min-width:80px;max-width:140px}
 .mt-tbl .td-progress{min-width:110px;max-width:140px;padding:6px 8px}
 .th-progress{text-align:center!important;font-weight:600;color:var(--primary,#3b82f6)}
+/* ===== 演习进度表头 + 按钮（cat=5 专用） ===== */
+.th-drill{text-align:center!important;font-weight:600;color:#dc2626;background:#fef2f2}
+.mt-tbl .td-drill{padding:4px 6px;min-width:130px;text-align:center}
+.drill-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #fca5a5;background:#fff;background:linear-gradient(180deg,#fff 0%,#fff5f5 100%);color:#991b1b;transition:all .15s}
+.drill-btn:hover{background:linear-gradient(180deg,#fff5f5 0%,#ffe4e4 100%);border-color:#f87171;transform:translateY(-1px);box-shadow:0 2px 6px rgba(220,38,38,.15)}
+.drill-btn .arr{font-size:11px;color:#dc2626}
+.drill-btn .drill-ct{font-size:11px;opacity:.85;font-variant-numeric:tabular-nums;padding:1px 5px;border-radius:3px;background:rgba(220,38,38,.08)}
+.drill-btn.drill-tier-full{background:linear-gradient(180deg,#f0fdf4 0%,#dcfce7 100%);border-color:#86efac;color:#166534}
+.drill-btn.drill-tier-full .arr{color:#16a34a}
+.drill-btn.drill-tier-full .drill-ct{background:rgba(22,163,74,.15);color:#166534}
+.drill-btn.drill-tier-mid{background:linear-gradient(180deg,#fffbeb 0%,#fef3c7 100%);border-color:#fcd34d;color:#92400e}
+.drill-btn.drill-tier-mid .arr{color:#d97706}
+.drill-btn.drill-tier-zero{background:linear-gradient(180deg,#fff 0%,#f8fafc 100%);border-color:#e2e8f0;color:#64748b}
+.drill-btn.drill-tier-zero .arr{color:#94a3b8}
 .prog-cell{display:flex;flex-direction:column;align-items:center;gap:4px}
 .prog-num{font-weight:700;font-size:13px;letter-spacing:.3px;line-height:1;font-variant-numeric:tabular-nums}
 .prog-num .prog-sep{color:var(--muted);font-weight:400;margin:0 1px}
@@ -1431,9 +1486,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-01n';
-// 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1，下次改成 26-09-1003
-const BUILD_TAG='26-09-1002';
+const APP_VER='2026-09-01o';
+// 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
+const BUILD_TAG='26-09-1003';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -1455,7 +1510,7 @@ const CATS=[
   {id:'5',name:'EHS安全应急演习',color:'c-red',short:'EHS安全应急演习',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z"/></svg>',
    subs:['消防演习','应急演习'],
-   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['progress','进度'],['plan','实施要求'],['org','对接部门/人'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['progress','进度'],['plan','实施要求'],['drill','演习进度'],['org','对接部门/人'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
   {id:'6',name:'本部门日常检查',color:'c-purple',short:'本部门日常检查',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z M9 22V12h6v10"/></svg>',
    subs:['每周检查','季度检查'],
@@ -2399,6 +2454,7 @@ function renderModuleTableHTML(){
     if(k==='num')return `<th class="num">${t}</th>`;
     if(k==='month')return MONTH_LABELS.map((m,mi)=>`<th class="mth mth-tbl" title="月份排期">${m}</th>`).join('');
     if(k==='progress')return `<th class="th-progress" title="按月打勾完成度（X/12）">${t}</th>`;
+    if(k==='drill')return `<th class="th-drill" title="应急演习 4 阶段进度（计划→通知→实操→记录），点击进入该行独立抽屉">${t}</th>`;
     if(k==='first'||k==='expire')return `<th class="sm">${t}</th>`;
     if(k==='note')return `<th>${t}</th>`;
     return `<th>${t}</th>`;
@@ -2470,7 +2526,7 @@ function renderModuleTableHTML(){
       if(k==='conf')return `<td>${conf?`<span class="mt-person conf">${esc(conf)}</span>`:'—'}</td>`;
       if(k==='note')return `<td class="td-note" title="${esc(note)}">${esc(note.slice(0,20))}${note.length>20?'…':''}</td>`;
       if(k==='progress'){
-        // cat=3 实时完成度：统计 t.monthly[1..12] 中 'done' 的个数 / 12
+        // cat=3/4/5/6/9 实时完成度：统计 t.monthly[1..12] 中 'done' 的个数 / 12
         const ms=(t.monthly&&t.monthly.length===12)?t.monthly:new Array(12).fill('');
         const doneN=ms.filter(v=>v==='done').length;
         const pct=Math.round(doneN*100/12);
@@ -2489,6 +2545,15 @@ function renderModuleTableHTML(){
         if(v)return `<td class="mc mc-mini note" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]}：${esc(v)}。点击编辑">${esc(v.slice(0,2))}</td>`;
         return `<td class="mc mc-mini empty" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} ✏️ 点击输入（客户名 / done / 日期）">✏️</td>`;
       }).join('');
+      if(k==='drill'){
+        // 应急演习进度抽屉（仅 cat=5）：每行独立 4 阶段，零关联
+        if(t.cat!=='5')return `<td>—</td>`;
+        const dDone=drillCount(t);
+        const dTot=4;
+        const tier=dDone===dTot?'full':dDone>=1?'mid':'zero';
+        const safeClick=`try{event.stopPropagation();openDrillDrawer('${t.id}')}catch(e){console.error('[drill]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
+        return `<td class="td-drill"><button class="drill-btn drill-tier-${tier}" data-task-id="${t.id}" onclick="${safeClick}" title="点击打开本行独立的「应急演习流程」抽屉：演习计划→演习通知→演习实操→演习记录（按顺序打勾）"><span class="arr">▸</span> 演习进度 <span class="drill-ct">${dDone}/${dTot}</span></button></td>`;
+      }
       return `<td>—</td>`;
     }).join('');
     return `<tr class="${doneCls}" onclick="openModuleEdit(${t.id})" title="单击编辑详情">
@@ -5171,6 +5236,141 @@ function renderPhasePanel(a){
       </div>`;
     }).join('')}
   </div>`;
+}
+/* ============ 应急演习进度抽屉（cat=5 专用）============ */
+/* 设计原则：每条 cat=5 任务挂自己的 drillPhases 对象，
+   4 阶段顺序：plan 演习计划 → notify 演习通知 → drill 演习实操 → record 演习记录。
+   任意阶段都可独立打勾/编辑/备注，不依赖其他阶段状态。
+   每行 taskData 互不相通，0 共享状态。*/
+const DRILL_PHASE_LIST=[
+  {key:'plan',  no:1, ic:'📋', name:'演习计划', tip:'制定演习方案：目标/范围/参与部门/脚本'},
+  {key:'notify',no:2, ic:'📢', name:'演习通知', tip:'通报所有参与部门和人员、车辆、集合点'},
+  {key:'drill', no:3, ic:'🚨', name:'演习实操', tip:'按预案组织实际演习、灭火/疏散/封堵等'},
+  {key:'record',no:4, ic:'📝', name:'演习记录', tip:'记录演习过程、问题与改进项，形成报告'}
+];
+function ensureDrillPhases(t){
+  if(!t || typeof t!=='object')return null;
+  if(!t.drillPhases || typeof t.drillPhases!=='object')t.drillPhases={};
+  DRILL_PHASE_LIST.forEach(p=>{
+    if(!t.drillPhases[p.key] || typeof t.drillPhases[p.key]!=='object'){
+      t.drillPhases[p.key]={done:false,date:'',note:''};
+    } else {
+      const ph=t.drillPhases[p.key];
+      if(typeof ph.done!=='boolean')ph.done=!!ph.done;
+      if(typeof ph.date!=='string')ph.date='';
+      if(typeof ph.note!=='string')ph.note='';
+    }
+  });
+  return t.drillPhases;
+}
+function drillCount(t){
+  const dp=ensureDrillPhases(t);
+  if(!dp)return 0;
+  return DRILL_PHASE_LIST.filter(p=>dp[p.key]&&dp[p.key].done).length;
+}
+function renderDrillCards(t){
+  const dp=ensureDrillPhases(t);
+  return DRILL_PHASE_LIST.map(p=>{
+    const ph=dp[p.key];
+    const doneClass=ph.done?'done':'';
+    return `<div class="drill-card ${doneClass}" id="drill-card-${p.key}-${t.id}">
+      <div class="drill-card-hd">
+        <span class="drill-card-no">${p.no}</span>
+        <span class="drill-card-ic">${p.ic}</span>
+        <span class="drill-card-name">${esc(p.name)}</span>
+        <span class="drill-card-tip">· ${esc(p.tip)}</span>
+      </div>
+      <div class="drill-card-bd">
+        <div class="drill-card-row">
+          <label class="drill-card-chk" onclick="event.stopPropagation()">
+            <input type="checkbox" id="drill-done-${p.key}-${t.id}" ${ph.done?'checked':''}
+                   onchange="drillToggleDone(${t.id},'${p.key}',this.checked,'drill-card-${p.key}-${t.id}',this.checked)">
+            <span>已完成</span>
+          </label>
+          <span style="color:#94a3b8">|</span>
+          <span style="font-size:12px;color:#64748b">完成日期：</span>
+          <input type="date" class="drill-card-date" id="drill-date-${p.key}-${t.id}"
+                 value="${esc(ph.date||'')}"
+                 onchange="drillUpdateField(${t.id},'${p.key}','date',this.value)"
+                 onclick="event.stopPropagation()" placeholder="选择日期">
+        </div>
+        <textarea class="drill-card-note" id="drill-note-${p.key}-${t.id}"
+                  onchange="drillUpdateField(${t.id},'${p.key}','note',this.value)"
+                  onclick="event.stopPropagation()"
+                  placeholder="备注（如：参与人员/演习结果/改进点 — 留空也行）">${esc(ph.note||'')}</textarea>
+      </div>
+    </div>`;
+  }).join('');
+}
+function renderDrillSummary(t){
+  const dp=ensureDrillPhases(t);
+  const dDone=DRILL_PHASE_LIST.filter(p=>dp[p.key]&&dp[p.key].done).length;
+  const dTot=DRILL_PHASE_LIST.length;
+  const pct=Math.round(dDone*100/dTot);
+  const tierClass=dDone===dTot?'full':'';
+  return `<span>已完成 <b style="color:#16a34a">${dDone}</b> / ${dTot}（${pct}%）</span>
+    <span class="drill-progress-bar ${tierClass}"><i style="width:${pct}%"></i></span>`;
+}
+function openDrillDrawer(taskId){
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
+  if(!t){alert('找不到对应任务，请刷新后重试');return;}
+  ensureDrillPhases(t);
+  closeDrillDrawer();
+  const html=`<div id="drill-modal" class="drill-modal" data-task-id="${t.id}" onclick="if(event.target===this)closeDrillDrawer()">
+    <div class="drill-box">
+      <div class="drill-head">
+        <div class="drill-title">🚨 ${esc(t.workDetail||t.title||'应急演习')} <span class="drill-sub">应急演习流程 · 4 阶段独立抽屉</span></div>
+        <button class="drill-close" onclick="closeDrillDrawer()" title="关闭">✕</button>
+      </div>
+      <div class="drill-cards">
+        ${renderDrillCards(t)}
+      </div>
+      <div class="drill-foot">
+        <div class="drill-summary" id="drill-summary-${t.id}">${renderDrillSummary(t)}</div>
+        <div style="flex:1"></div>
+        <button class="drill-cancel" onclick="closeDrillDrawer()">取消</button>
+        <button class="drill-save" onclick="saveDrillProgress(${t.id})">💾 保存</button>
+        <div class="drill-foot-info">💡 每行任务各自独立的数据（drillPhases 对象），互不关联；保存后自动同步至云端 Gist，电脑手机一致。</div>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML('beforeend',html);
+}
+function closeDrillDrawer(){
+  const m=document.getElementById('drill-modal');
+  if(m)m.remove();
+}
+function drillToggleDone(taskId,key,val,cardId){
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
+  if(!t)return;
+  ensureDrillPhases(t);
+  t.drillPhases[key].done=!!val;
+  // 即时视觉反馈（保存前不写盘）
+  const card=document.getElementById(cardId);
+  if(card)card.classList.toggle('done',!!val);
+  const sumEl=document.getElementById('drill-summary-'+taskId);
+  if(sumEl)sumEl.innerHTML=renderDrillSummary(t);
+}
+function drillUpdateField(taskId,key,field,val){
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
+  if(!t)return;
+  ensureDrillPhases(t);
+  t.drillPhases[key][field]=val;
+}
+function saveDrillProgress(taskId){
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
+  if(!t)return;
+  // 数据已通过 onchange / oninput 实时写到 t.drillPhases，这里只需落盘 + 关闭 + 刷新外层
+  try{
+    saveData();
+  }catch(e){
+    console.error('[drill-save]',e);
+    toast('保存失败，请重试');
+    return;
+  }
+  toast('✅ 已保存演练进度');
+  closeDrillDrawer();
+  if(typeof renderSubModule==='function')renderSubModule();
 }
 function refreshAuthTbody(){const w=document.getElementById('authTblWrap');if(w)w.innerHTML=renderAuthTbodyHTML();}
 function togglePhaseRow(id){
