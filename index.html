@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>综合工作台 · 云端版</title>
-<!-- APP_VERSION: 2026-09-01i (cat=11三行按月排期空月格去掉✏️占位符,完全空白,点格子仍可输入) -->
+<!-- APP_VERSION: 2026-09-01j (cat=11模块按月排期视图整列删除「1月-12月」(表头+数据格+完成统计);其他模块零改动) -->
 <style>
 :root{
   --primary:#1e6fff;--primary-2:#3b8aff;--primary-soft:#eaf2ff;
@@ -1388,7 +1388,7 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-01i';
+const APP_VER='2026-09-01j';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -2453,19 +2453,21 @@ function bindModuleTable(){ /* 预留 */ }
 const MONTH_LABELS=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 function setSubView(m){subViewMode=m;renderSubModule()}
 function renderMonthlyViewHTML(filterItems){
+  const isCat11=String(currentSubCat)==='11';
+  const monthHeads=isCat11?'':MONTH_LABELS.map((m,i)=>`<th class="mth">${m}</th>`).join('');
   const head='<th class="num">序号</th><th>工作明细</th><th class="sm">周期</th><th>担当</th>'+
-    MONTH_LABELS.map((m,i)=>`<th class="mth">${m}</th>`).join('')+
+    monthHeads+
     '<th class="mth" style="text-align:right">操作</th>';
   const body=filterItems.map((t,i)=>{
     const monthly=(t.monthly && t.monthly.length===12)?t.monthly:new Array(12).fill('');
-    const cells=monthly.map((v,mi)=>{
+    const cells=isCat11?'':monthly.map((v,mi)=>{
       if(v==='done') return `<td class="mc done" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} 已完成。点击编辑">✓</td>`;
       if(v && /^\d{4}-\d{2}-\d{2}$/.test(v)) return `<td class="mc date" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} 计划：${v}。点击编辑">${v.slice(5)}</td>`;
       if(v) return `<td class="mc note" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]}：${esc(v)}。点击编辑">${esc(v.slice(0,4))}</td>`;
-      if(String(t.cat)==='11') return `<td class="mc empty it-empty" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} ✏️ 点击输入（客户名 / done / 日期）">&nbsp;</td>`;
       return `<td class="mc empty" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} ✏️ 点击输入（客户名 / done / 日期）">✏️</td>`;
     }).join('');
-    const completed=monthly.filter(v=>v==='done').length;
+    const completed=isCat11?0:monthly.filter(v=>v==='done').length;
+    const monthStat=isCat11?'':`<span class="month-stat" style="font-size:11px;color:${completed?'var(--green)':'var(--muted)'};margin-right:6px">${completed}/12</span>`;
     return `<tr>
       <td class="num">${i+1}</td>
       <td class="td-detail" title="${esc(t.workDetail||'')}">${esc(t.workDetail||'')}</td>
@@ -2473,7 +2475,7 @@ function renderMonthlyViewHTML(filterItems){
       <td>${t.lead?`<span class="mt-person lead">${esc(t.lead)}</span>`:'—'}</td>
       ${cells}
       <td class="td-ops" onclick="event.stopPropagation()">
-        <span class="month-stat" style="font-size:11px;color:${completed?'var(--green)':'var(--muted)'};margin-right:6px">${completed}/12</span>
+        ${monthStat}
         <button title="编辑" onclick="openModuleEdit(${t.id})">✎</button>
       </td>
     </tr>`;
@@ -2481,7 +2483,7 @@ function renderMonthlyViewHTML(filterItems){
   return `<div class="mt-wrap">
     <table class="mt-tbl mv-tbl">
       <thead><tr>${head}</tr></thead>
-      <tbody>${body||`<tr><td colspan="17" class="mt-empty">暂无条目</td></tr>`}</tbody>
+      <tbody>${body||`<tr><td colspan="${isCat11?5:17}" class="mt-empty">暂无条目</td></tr>`}</tbody>
     </table>
   </div>
   <div class="auth-foot">💡 点击月份格切换完成/未完成；显示日期为该月计划执行日；显示文字为该月备注。</div>`;
