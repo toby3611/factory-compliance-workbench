@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>综合工作台 · 云端版</title>
-<!-- APP_VERSION: 2026-09-01l (左下角 fab 下方新增构建版本号徽章 YY-MM-XXXX=BUILD_TAG=26-09-1000，每次优化 +1；原 APP_VER 保留不动) -->
+<!-- APP_VERSION: 2026-09-01m (cat=3 平台数据上传模块「备注」前新增「进度」列，X/12 实时统计 done 次数) -->
 <style>
 :root{
   --primary:#1e6fff;--primary-2:#3b8aff;--primary-soft:#eaf2ff;
@@ -836,6 +836,21 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 .mt-tbl .td-org{color:#6366f1;font-weight:500;font-size:12px;min-width:90px}
 .mt-tbl .td-sup{display:flex;flex-wrap:wrap;gap:3px;min-width:110px;max-width:180px}
 .mt-tbl .td-note{color:var(--muted);font-size:11.5px;min-width:80px;max-width:140px}
+.mt-tbl .td-progress{min-width:110px;max-width:140px;padding:6px 8px}
+.th-progress{text-align:center!important;font-weight:600;color:var(--primary,#3b82f6)}
+.prog-cell{display:flex;flex-direction:column;align-items:center;gap:4px}
+.prog-num{font-weight:700;font-size:13px;letter-spacing:.3px;line-height:1;font-variant-numeric:tabular-nums}
+.prog-num .prog-sep{color:var(--muted);font-weight:400;margin:0 1px}
+.prog-num.prog-full{color:var(--green)}
+.prog-num.prog-mid{color:var(--primary,#3b82f6)}
+.prog-num.prog-low{color:#f59e0b}
+.prog-num.prog-zero{color:var(--muted,#94a3b8)}
+.prog-bar{display:block;width:100%;height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;border:1px solid #e2e8f0}
+.prog-fill{display:block;height:100%;border-radius:3px;transition:width .25s ease}
+.prog-fill-full{background:linear-gradient(90deg,#10b981,#059669)}
+.prog-fill-mid{background:linear-gradient(90deg,#60a5fa,#3b82f6)}
+.prog-fill-low{background:linear-gradient(90deg,#fbbf24,#f59e0b)}
+.prog-fill-zero{background:#e2e8f0}
 .mt-tbl .td-ops{white-space:nowrap;text-align:right;width:60px}
 .mt-tbl .td-ops button{background:transparent;border:0;cursor:pointer;padding:3px 5px;border-radius:4px;color:var(--muted);font-size:13px}
 .mt-tbl .td-ops button:hover{background:#e0e7ff;color:var(--primary)}
@@ -1416,9 +1431,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-01l';
-// 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1，下次改成 26-09-1001
-const BUILD_TAG='26-09-1000';
+const APP_VER='2026-09-01m';
+// 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1，下次改成 26-09-1002
+const BUILD_TAG='26-09-1001';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -1432,7 +1447,7 @@ const CATS=[
   {id:'3',name:'平台数据上传',color:'c-teal',short:'平台数据上传',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>',
    subs:['化学品平台','品牌系统','Higg上报'],
-   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['progress','进度'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
   {id:'4',name:'数据统计',color:'c-amber',short:'数据统计',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg>',
    subs:['化学品','能源水','费用','客户数据'],
@@ -2383,6 +2398,7 @@ function renderModuleTableHTML(){
     const [k,t]=col;
     if(k==='num')return `<th class="num">${t}</th>`;
     if(k==='month')return MONTH_LABELS.map((m,mi)=>`<th class="mth mth-tbl" title="月份排期">${m}</th>`).join('');
+    if(k==='progress')return `<th class="th-progress" title="按月打勾完成度（X/12）">${t}</th>`;
     if(k==='first'||k==='expire')return `<th class="sm">${t}</th>`;
     if(k==='note')return `<th>${t}</th>`;
     return `<th>${t}</th>`;
@@ -2453,6 +2469,20 @@ function renderModuleTableHTML(){
       if(k==='sup')return `<td class="td-sup">${(t.supports||[]).map(n=>`<span class="mt-person stack">${esc(n)}</span>`).join('')||'—'}</td>`;
       if(k==='conf')return `<td>${conf?`<span class="mt-person conf">${esc(conf)}</span>`:'—'}</td>`;
       if(k==='note')return `<td class="td-note" title="${esc(note)}">${esc(note.slice(0,20))}${note.length>20?'…':''}</td>`;
+      if(k==='progress'){
+        // cat=3 实时完成度：统计 t.monthly[1..12] 中 'done' 的个数 / 12
+        const ms=(t.monthly&&t.monthly.length===12)?t.monthly:new Array(12).fill('');
+        const doneN=ms.filter(v=>v==='done').length;
+        const pct=Math.round(doneN*100/12);
+        const tier=doneN===12?'full':doneN>=7?'mid':doneN>=1?'low':'zero';
+        const tag=doneN===12?'✅ ':'';
+        return `<td class="td-progress" title="已完成 ${doneN}/12（${pct}%）">
+          <div class="prog-cell">
+            <span class="prog-num prog-${tier}">${tag}${doneN}<span class="prog-sep">/</span>12</span>
+            <span class="prog-bar"><span class="prog-fill prog-fill-${tier}" style="width:${pct}%"></span></span>
+          </div>
+        </td>`;
+      }
       if(k==='month')return monthly.map((v,mi)=>{
         if(v==='done')return `<td class="mc mc-mini done" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} 已完成。点击编辑">✓</td>`;
         if(v && /^\d{4}-\d{2}-\d{2}$/.test(v))return `<td class="mc mc-mini date" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} 计划：${v}。点击编辑">${v.slice(5)}</td>`;
