@@ -292,10 +292,19 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .ai-fab svg{margin-bottom:1px}
 /* 抽屉打开时自动隐藏 FAB，避免挡住抽屉底部的保存/关闭按钮 */
 body:has(.drawer.on) .ai-fab,
-body:has(.mask:not(.hidden)) .ai-fab{display:none}
-/* ===== 构建版本号徽章（YY-MM-XXXX）· 位于 fab 下方居中，每次优化更新 ===== */
+body:has(.mask:not(.hidden)) .ai-fab,
+body:has(.drawer.on) .build-tag,
+body:has(.mask:not(.hidden)) .build-tag,
+body:has(.drawer.on) .fab-wrap,
+body:has(.mask:not(.hidden)) .fab-wrap{display:none}
+/* ===== 构建版本号徽章 + fab 容器（垂直堆叠、永远左下角不冲突）===== */
+.fab-wrap{
+  position:fixed;bottom:20px;left:24px;z-index:80;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+/* wrapper 内部：fab 改相对定位（取消原全局 fixed），让 flex 真正控制位置 */
+.fab-wrap .ai-fab{position:relative;bottom:auto;left:auto;right:auto;top:auto;width:60px;height:60px}
 .build-tag{
-  position:fixed;bottom:6px;left:24px;z-index:79;
   font-family:ui-monospace,Menlo,Consolas,monospace;
   font-size:10.5px;font-weight:600;letter-spacing:.5px;
   color:#475569;background:#f8fafc;
@@ -303,11 +312,10 @@ body:has(.mask:not(.hidden)) .ai-fab{display:none}
   padding:2px 8px;user-select:none;cursor:default;
   box-shadow:0 1px 3px rgba(15,23,42,.06);
 }
-body:has(.drawer.on) .build-tag,
-body:has(.mask:not(.hidden)) .build-tag{display:none}
 @media(max-width:780px){
   /* 跟随 fab 移到手机端 tabbar 上方位置 */
-  .build-tag{bottom:60px;left:14px;font-size:10px;padding:2px 7px}
+  .fab-wrap{bottom:74px;left:14px}
+  .build-tag{font-size:10px;padding:2px 7px}
 }
 
 /* ============ 报告中心 / 知识库 / 备忘录视图 ============ */
@@ -1358,13 +1366,15 @@ body:has(.mask:not(.hidden)) .build-tag{display:none}
 </main>
 </div>
 
-<!-- ============ AI 助手悬浮按钮 ============ -->
-<button class="ai-fab" onclick="aiHelp()" title="AI 助手">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-  AI助手
-</button>
-<!-- ============ 工作台构建版本号（用户可见 · YY-MM-XXXX 自增 · 每次优化 +1） ============ -->
-<div class="build-tag" id="buildTag" title="工作台构建版本号 · 每次优化更新">26-09-1000</div>
+<!-- ============ AI 助手悬浮按钮 + 构建版本号（垂直堆叠 · 紧贴底部左下） ============ -->
+<div class="fab-wrap">
+  <button class="ai-fab" onclick="aiHelp()" title="AI 助手">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    AI助手
+  </button>
+  <!-- ============ 工作台构建版本号（用户可见 · YY-MM-XXXX 自增 · 每次优化 +1） ============ -->
+  <div class="build-tag" id="buildTag" title="工作台构建版本号 · 每次优化更新">26-09-1000</div>
+</div>
 
 <!-- ============ 云端同步弹窗 ============ -->
 <div class="mask hidden" id="syncMask">
