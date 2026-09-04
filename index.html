@@ -641,6 +641,23 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 .drill-ct{font-size:11.5px;padding:1px 6px;border-radius:8px;background:rgba(255,255,255,.7);font-weight:700;margin-left:2px}
 .drill-tier-mid .drill-ct{background:#fff;color:#c2410c}
 .drill-tier-full .drill-ct{background:#fff;color:#166534}
+/* ===== cat=5 演习记录「现场照片」上传 ===== */
+.drill-photos{margin-top:8px;padding:10px;border:1px dashed #fca5a5;border-radius:8px;background:#fff8f8}
+.drill-photos-hd{display:flex;align-items:center;gap:10px;font-size:12.5px}
+.drill-photos-hd .dp-ic{font-weight:700;color:#991b1b}
+.drill-photos-hd .dp-meta{color:#64748b;font-weight:500}
+.drill-photos-hd .dp-add{margin-left:auto;background:#dc2626;color:#fff;font-size:12px;font-weight:600;padding:4px 12px;border-radius:6px;cursor:pointer;transition:.15s}
+.drill-photos-hd .dp-add:hover{background:#b91c1c}
+.drill-photos-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.drill-photo{position:relative;width:92px;height:92px;border-radius:6px;overflow:hidden;border:1px solid #fecaca;background:#f1f5f9;cursor:zoom-in}
+.drill-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.drill-photo-x{position:absolute;top:3px;right:3px;width:20px;height:20px;border:0;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:12px;line-height:20px;text-align:center;cursor:pointer;padding:0}
+.drill-photo-x:hover{background:#dc2626}
+.drill-photos-empty{margin-top:8px;font-size:12px;color:#94a3b8;text-align:center;padding:8px;background:#f8fafc;border-radius:6px}
+.drill-photo-overlay{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:20px}
+.drill-photo-overlay .dpo-inner{max-width:92vw;max-height:82vh;display:flex;flex-direction:column;align-items:center;gap:8px}
+.drill-photo-overlay img{max-width:92vw;max-height:78vh;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.5);object-fit:contain}
+.drill-photo-overlay .dpo-tip{color:#e2e8f0;font-size:12px;background:rgba(0,0,0,.4);padding:3px 10px;border-radius:10px}
 @media (max-width:768px){.drill-cards{padding:10px 10px;gap:8px}.drill-card-hd{padding:8px 12px;flex-wrap:wrap}.drill-card-tip{width:100%}.drill-expand-hd{padding:8px 12px}.drill-expand-ft{padding:8px 12px}.drill-progress-bar{width:90px}.drill-banner{flex-wrap:wrap;gap:6px;padding:8px 10px}.drill-banner .db-tip{width:100%;font-size:11px}}
 /* ===== cat=5 顶部「部门演习完成度」banner ===== */
 .drill-banner{display:flex;align-items:center;gap:12px;padding:9px 14px;background:linear-gradient(135deg,#fef2f2 0%,#fff7e8 100%);border:1px solid #fecaca;border-radius:8px;margin-bottom:12px;font-size:13px;flex-wrap:wrap}
@@ -1502,9 +1519,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-01q';
+const APP_VER='2026-09-01r';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1005';
+const BUILD_TAG='26-09-1006';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -5295,11 +5312,13 @@ function ensureDrillPhases(t){
   DRILL_PHASE_LIST.forEach(p=>{
     if(!t.drillPhases[p.key] || typeof t.drillPhases[p.key]!=='object'){
       t.drillPhases[p.key]={done:false,date:'',note:''};
+      if(p.key==='record')t.drillPhases[p.key].photos=[]; // 演习记录阶段独有：现场照片
     } else {
       const ph=t.drillPhases[p.key];
       if(typeof ph.done!=='boolean')ph.done=!!ph.done;
       if(typeof ph.date!=='string')ph.date='';
       if(typeof ph.note!=='string')ph.note='';
+      if(p.key==='record' && !Array.isArray(ph.photos))ph.photos=[];
     }
   });
   return t.drillPhases;
@@ -5339,6 +5358,7 @@ function renderDrillCards(t){
                   onchange="drillUpdateField(${t.id},'${p.key}','note',this.value)"
                   onclick="event.stopPropagation()"
                   placeholder="备注（如：参与人员/演习结果/改进点 — 留空也行）">${esc(ph.note||'')}</textarea>
+        ${p.key==='record'?drillPhotosHTML(t):''}
       </div>
     </div>`;
   }).join('');
@@ -5451,6 +5471,99 @@ function saveDrillProgress(taskId){
   closeDrillDrawer();
   if(typeof renderSubModule==='function')renderSubModule();
   if(typeof refreshDrillBanner==='function')refreshDrillBanner();
+}
+/* ============ cat=5 演习记录「现场照片」上传（C 项）============ */
+/* 设计：照片 base64 压缩后存 t.drillPhases.record.photos，随 Gist 云端同步跨设备可用。
+   压缩 maxW=720 / jpeg 0.6，单张约 40-90KB；本阶段 >1.5MB 时提示偏多。*/
+function drillPhotosHTML(t){
+  const ph=t.drillPhases.record;
+  const photos=Array.isArray(ph.photos)?ph.photos:[];
+  const kb=Math.round(photos.reduce(function(s,p){return s+(p.data?p.data.length:0);},0)*0.75/1024);
+  let html='<div class="drill-photos" id="drill-photos-'+t.id+'">';
+  html+='<div class="drill-photos-hd">'
+      + '<span class="dp-ic">📷 现场照片</span>'
+      + '<span class="dp-meta">'+photos.length+' 张 · 约 '+kb+' KB</span>'
+      + '<label class="dp-add" onclick="event.stopPropagation()">＋ 添加<input type="file" accept="image/*" multiple style="display:none" onchange="drillAddPhotos('+t.id+',this.files)"></label>'
+      + '</div>';
+  if(photos.length){
+    html+='<div class="drill-photos-grid">';
+    photos.forEach(function(p,idx){
+      html+='<div class="drill-photo">'
+          + '<img src="'+esc(p.data)+'" onclick="drillPreviewPhoto(this.src)" alt="现场照片">'
+          + '<button class="drill-photo-x" title="删除" onclick="event.stopPropagation();drillRemovePhoto('+t.id+','+idx+')">✕</button>'
+          + '</div>';
+    });
+    html+='</div>';
+  } else {
+    html+='<div class="drill-photos-empty">尚未上传现场照片（演习记录建议附现场图作为凭证）</div>';
+  }
+  html+='</div>';
+  return html;
+}
+function compressImageFile(file,maxW,quality){
+  return new Promise(function(resolve,reject){
+    if(!file||!file.type||file.type.indexOf('image/')!==0){reject(new Error('not image'));return;}
+    const reader=new FileReader();
+    reader.onload=function(){
+      const img=new Image();
+      img.onload=function(){
+        let w=img.width,h=img.height;
+        if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+        const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+        const ctx=cv.getContext('2d');ctx.drawImage(img,0,0,w,h);
+        let dataUrl;
+        try{dataUrl=cv.toDataURL('image/jpeg',quality);}catch(e){dataUrl=String(reader.result);}
+        if(!dataUrl||dataUrl.length<20)dataUrl=String(reader.result);
+        resolve({name:file.name||('photo_'+Date.now()),data:dataUrl});
+      };
+      img.onerror=function(){reject(new Error('img load fail'));};
+      img.src=String(reader.result);
+    };
+    reader.onerror=function(){reject(new Error('read fail'));};
+    reader.readAsDataURL(file);
+  });
+}
+async function drillAddPhotos(taskId,files){
+  const t=data.tasks.find(function(x){return String(x.id)===String(taskId);});
+  if(!t)return;
+  ensureDrillPhases(t);
+  const ph=t.drillPhases.record;
+  if(!Array.isArray(ph.photos))ph.photos=[];
+  const arr=Array.from(files||[]);
+  if(!arr.length)return;
+  let added=0;
+  for(let i=0;i<arr.length;i++){
+    try{const r=await compressImageFile(arr[i],720,0.6);ph.photos.push({name:r.name,data:r.data});added++;}catch(e){console.error('[drill-photo]',e);}
+  }
+  const box=document.getElementById('drill-photos-'+taskId);
+  if(box)box.outerHTML=drillPhotosHTML(t);
+  const kb=Math.round(ph.photos.reduce(function(s,p){return s+(p.data?p.data.length:0);},0)*0.75/1024);
+  if(kb>1500){toast('已添加 '+added+' 张，本阶段约 '+kb+' KB，偏多可能影响同步，建议精简');}
+  else{toast('已添加 '+added+' 张，本阶段约 '+kb+' KB（保存后同步云端）');}
+}
+function drillRemovePhoto(taskId,idx){
+  const t=data.tasks.find(function(x){return String(x.id)===String(taskId);});
+  if(!t)return;
+  ensureDrillPhases(t);
+  const ph=t.drillPhases.record;
+  if(!Array.isArray(ph.photos))return;
+  ph.photos.splice(idx,1);
+  const box=document.getElementById('drill-photos-'+taskId);
+  if(box)box.outerHTML=drillPhotosHTML(t);
+  toast('已删除 1 张照片');
+}
+function drillPreviewPhoto(src){
+  let ov=document.getElementById('drillPhotoOverlay');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='drillPhotoOverlay';
+    ov.className='drill-photo-overlay';
+    ov.innerHTML='<div class="dpo-inner"><img id="dpoImg" src="" alt="现场照片"><div class="dpo-tip">点击空白处关闭</div></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
+  }
+  const im=ov.querySelector('#dpoImg');if(im)im.src=String(src);
+  ov.style.display='flex';
 }
 function refreshAuthTbody(){const w=document.getElementById('authTblWrap');if(w)w.innerHTML=renderAuthTbodyHTML();}
 function togglePhaseRow(id){
