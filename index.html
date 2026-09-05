@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<!-- APP_VERSION: 2026-09-01q (隐藏 cat=5 等无月度格模块的「按月排期」按钮[该按钮此前是死按钮]；cat=5 顶部新增「部门演习完成度」banner X/Y 阶段 + 进度条；BUILD_TAG 26-09-1004→26-09-1005) -->
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+<!-- APP_VERSION: 2026-09-05a (cat=7 检测校准管理：每条 task 新增「完成进度」按钮，行内展开独立子项列表[独立打勾+日期+标签+增删]，顶部完成度 banner 实时刷新；BUILD_TAG 26-09-1006→26-09-1007) -->
+<html lang="zh-CN" data-page-node-id="yFozsu0bwy8ee7XiYUjcQv">
+<head data-page-node-id="FjW1epA4w1116VMFBMfDog">
+<meta charset="UTF-8" data-page-node-id="xuDC073VYPYDuAlUiO2vVN">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" data-page-node-id="cewqAqLSHnFCXCSqeCqHPF">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" data-page-node-id="CsMDJmGa062yfBxBvaJWPg">
+<meta http-equiv="Pragma" content="no-cache" data-page-node-id="pVzdVmUL2m6i1NTawkv87v">
+<meta http-equiv="Expires" content="0" data-page-node-id="vLfDFZRzre3HfbIkDHLPW7">
 <title>综合工作台 · 云端版</title>
 <!-- APP_VERSION: 2026-09-01n (cat=3/4/5/6/9 月度模块「备注」前统一新增「进度」列 X/12 实时统计) -->
 <style>
@@ -659,6 +659,65 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 .drill-photo-overlay img{max-width:92vw;max-height:78vh;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.5);object-fit:contain}
 .drill-photo-overlay .dpo-tip{color:#e2e8f0;font-size:12px;background:rgba(0,0,0,.4);padding:3px 10px;border-radius:10px}
 @media (max-width:768px){.drill-cards{padding:10px 10px;gap:8px}.drill-card-hd{padding:8px 12px;flex-wrap:wrap}.drill-card-tip{width:100%}.drill-expand-hd{padding:8px 12px}.drill-expand-ft{padding:8px 12px}.drill-progress-bar{width:90px}.drill-banner{flex-wrap:wrap;gap:6px;padding:8px 10px}.drill-banner .db-tip{width:100%;font-size:11px}}
+/* ===== cat=7 检测校准「完成进度」按钮 + 行内展开 + banner（绿色调，参照 cat=1/2 phases 视觉） ===== */
+.td-check{padding:6px 4px}
+.check-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;color:#475569;font-size:11.5px;cursor:pointer;font-weight:600;transition:all .15s;font-family:inherit}
+.check-btn:hover{background:#f1f5f9;border-color:#94a3b8}
+.check-btn.on{background:#ecfeff;border-color:#67e8f9;color:#0e7490}
+.check-btn .arr{font-size:10px;color:#64748b;transition:transform .15s;display:inline-block;width:10px}
+.check-btn.on .arr{transform:rotate(0deg);color:#0891b2}
+.check-ct{display:inline-block;padding:1px 6px;border-radius:8px;background:rgba(100,116,139,.15);font-size:10.5px;font-weight:700;font-variant-numeric:tabular-nums;color:#475569;margin-left:2px}
+.check-tier-zero{background:#f8fafc;border-color:#cbd5e1;color:#94a3b8}
+.check-tier-zero .check-ct{background:rgba(148,163,184,.2);color:#64748b}
+.check-tier-mid{background:#fef9e8;border-color:#fde68a;color:#92400e}
+.check-tier-mid .check-ct{background:rgba(217,119,6,.15);color:#b45309}
+.check-tier-full{background:linear-gradient(180deg,#f0fdf4 0%,#dcfce7 100%);border-color:#86efac;color:#166534}
+.check-tier-full .arr{color:#16a34a}
+.check-tier-full .check-ct{background:rgba(22,163,74,.15);color:#166534}
+.check-expand-row >td{background:#ecfeff;padding:0 16px 14px;border-bottom:2px solid #a5f3fc}
+.check-expand-inner{background:#fff;border:1px solid #a5f3fc;border-radius:10px;overflow:hidden;margin:8px 0 4px 0}
+.check-expand-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:linear-gradient(135deg,#ecfeff 0%,#f0fdf4 100%);border-bottom:1px solid #cffafe}
+.check-expand-title{font-weight:700;color:#0e7490;font-size:13px}
+.check-expand-title .check-sub{font-weight:400;color:#0891b2;font-size:11px;margin-left:8px;opacity:.85}
+.check-expand-x{background:transparent;border:1px solid #cbd5e1;color:#64748b;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-family:inherit}
+.check-expand-x:hover{background:#f1f5f9;color:#1e293b}
+.check-items{padding:8px 14px;display:flex;flex-direction:column;gap:6px}
+.check-items-empty{padding:18px 12px;text-align:center;color:#94a3b8;font-size:12px;background:#f8fafc;border-radius:6px;border:1px dashed #cbd5e1}
+.check-item{display:grid;grid-template-columns:24px 1fr 130px 110px 30px;gap:8px;align-items:center;padding:6px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fff;transition:all .15s}
+.check-item:hover{border-color:#a5f3fc;box-shadow:0 1px 4px rgba(6,182,212,.08)}
+.check-item.done{background:#f0fdf4;border-color:#bbf7d0}
+.check-item.done .check-name{text-decoration:line-through;color:#64748b}
+.check-ck{display:flex;align-items:center;justify-content:center;cursor:pointer;width:22px;height:22px}
+.check-ck input{position:absolute;opacity:0;width:0;height:0}
+.check-ck-box{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:2px solid #cbd5e1;border-radius:4px;background:#fff;font-size:12px;font-weight:700;color:transparent;cursor:pointer;transition:all .15s}
+.check-ck:hover .check-ck-box{border-color:#0891b2}
+.check-item.done .check-ck-box{background:#16a34a;border-color:#16a34a;color:#fff}
+.check-name{padding:5px 8px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;font-family:inherit;background:#fff;outline:none;min-width:0}
+.check-name:focus{border-color:#0891b2;background:#fffbe8}
+.check-date{padding:5px 6px;border:1px solid #e2e8f0;border-radius:5px;font-size:12px;font-family:inherit;background:#fff;outline:none;color:#334155}
+.check-date:focus{border-color:#0891b2}
+.check-tag{padding:5px 6px;border:1px solid #e2e8f0;border-radius:5px;font-size:11.5px;font-family:inherit;background:#fff;outline:none;color:#475569}
+.check-tag:focus{border-color:#0891b2}
+.check-del{background:transparent;border:1px solid #fecaca;color:#dc2626;width:28px;height:28px;border-radius:5px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
+.check-del:hover{background:#fef2f2}
+.check-expand-ft{display:flex;align-items:center;gap:10px;padding:8px 14px;background:#f8fafc;border-top:1px solid #e2e8f0}
+.check-summary{font-size:12px;color:#475569}
+.check-add{background:#fff;border:1px solid #0891b2;color:#0891b2;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;font-family:inherit}
+.check-add:hover{background:#ecfeff}
+.check-save{background:linear-gradient(135deg,#0891b2 0%,#0e7490 100%);border:1px solid #0e7490;color:#fff;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12.5px;font-weight:600;font-family:inherit}
+.check-save:hover{box-shadow:0 2px 8px rgba(8,145,178,.3)}
+.check-banner{display:flex;align-items:center;gap:12px;padding:9px 14px;background:linear-gradient(135deg,#ecfeff 0%,#f0fdf4 100%);border:1px solid #a5f3fc;border-radius:8px;margin-bottom:12px;font-size:13px;flex-wrap:wrap}
+.check-banner .cb-ic{font-size:18px;flex-shrink:0}
+.check-banner .cb-txt{font-weight:700;color:#0e7490;flex-shrink:0}
+.check-banner .cb-num{font-size:13px;color:#475569;flex-shrink:0;font-variant-numeric:tabular-nums}
+.check-banner .cb-num b{font-size:15px;margin-right:1px}
+.check-banner .cb-pct{font-weight:700;color:#0891b2;font-size:15px;flex-shrink:0;font-variant-numeric:tabular-nums}
+.check-banner.full .cb-pct{color:#16a34a}
+.check-banner .cb-bar{flex:1;height:8px;background:#cffafe;border-radius:4px;overflow:hidden;border:1px solid #a5f3fc;min-width:120px;max-width:280px}
+.check-banner .cb-bar i{display:block;height:100%;background:linear-gradient(90deg,#0891b2 0%,#0e7490 100%);transition:width .3s}
+.check-banner .cb-bar.full i{background:linear-gradient(90deg,#16a34a 0%,#22c55e 100%)}
+.check-banner .cb-tip{font-size:11.5px;color:#64748b;flex-shrink:0;margin-left:auto}
+@media (max-width:768px){.check-item{grid-template-columns:22px 1fr 110px 90px 28px;gap:6px;padding:5px 8px}.check-expand-hd{padding:8px 12px}.check-expand-ft{padding:8px 12px;flex-wrap:wrap}.check-banner{flex-wrap:wrap;gap:6px;padding:8px 10px}.check-banner .cb-tip{width:100%;font-size:11px}.check-items{padding:8px 10px}}
 /* ===== cat=5 顶部「部门演习完成度」banner ===== */
 .drill-banner{display:flex;align-items:center;gap:12px;padding:9px 14px;background:linear-gradient(135deg,#fef2f2 0%,#fff7e8 100%);border:1px solid #fecaca;border-radius:8px;margin-bottom:12px;font-size:13px;flex-wrap:wrap}
 .drill-banner .db-ic{font-size:18px;flex-shrink:0}
@@ -1208,320 +1267,320 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 </style>
 </head>
-<body>
+<body data-page-node-id="RqC6TacEnP5cpu08FJyHhj">
 
 <!-- ============ 登录挡板（必须在脚本之前定义，否则首屏启动 getElementById 会返回 null） ============ -->
-<div class="auth-gate" id="authGate">
-  <div class="auth-card">
-    <div class="auth-ico">🔐</div>
-    <h2 id="agTitle">🔐 登录综合工作台</h2>
-    <p id="agSub" class="auth-sub">请输入账号和密码</p>
-    <div class="auth-field" id="setupRow">
-      <label>账号</label>
-      <input id="agUser" type="text" placeholder="如：黄总" autocomplete="username" onkeydown="if(event.key==='Enter')submitAuth()">
+<div class="auth-gate" id="authGate" data-page-node-id="9ISPNTNPxm1pLLyJPCilvk">
+  <div class="auth-card" data-page-node-id="hZshLxDTDbGJAUUR72QtDU">
+    <div class="auth-ico" data-page-node-id="3c15bn5VEBXC9I1RYsdkoV">🔐</div>
+    <h2 id="agTitle" data-page-node-id="cr5OZXB4VoozG58BkMujGd">🔐 登录综合工作台</h2>
+    <p id="agSub" class="auth-sub" data-page-node-id="mHKbPTL7ytFMm6cno1np2L">请输入账号和密码</p>
+    <div class="auth-field" id="setupRow" data-page-node-id="k2ANds7Rx6xD2Dbl8VJvri">
+      <label data-page-node-id="FGj12bYUM8mPJ3VkujIrl0">账号</label>
+      <input id="agUser" type="text" placeholder="如：黄总" autocomplete="username" onkeydown="if(event.key==='Enter')submitAuth()" data-page-node-id="zpzwO5mlMp8eFdTkrJqTDR">
     </div>
-    <div class="auth-field">
-      <label>密码</label>
-      <input id="agPwd" type="password" placeholder="请输入密码" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAuth()">
+    <div class="auth-field" data-page-node-id="CaD6dVXbF0hnI7Prv5jkft">
+      <label data-page-node-id="7PGfWFf7gMrwig5LGE1SRI">密码</label>
+      <input id="agPwd" type="password" placeholder="请输入密码" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAuth()" data-page-node-id="p5EXrCicZaTf42M71u8S4V">
     </div>
-    <div class="auth-field" id="setupRow2">
-      <label>确认密码</label>
-      <input id="agPwd2" type="password" placeholder="再次输入密码" onkeydown="if(event.key==='Enter')submitAuth()">
+    <div class="auth-field" id="setupRow2" data-page-node-id="1lMYsng6n6HewAg3XiFYuF">
+      <label data-page-node-id="c1gNqDJMBIRTjmgibC9g4v">确认密码</label>
+      <input id="agPwd2" type="password" placeholder="再次输入密码" onkeydown="if(event.key==='Enter')submitAuth()" data-page-node-id="KTB1hWc08vuXITrNskwGwh">
     </div>
-    <label class="auth-remember"><input id="agRemember" type="checkbox" checked> 记住本设备 7 天</label>
-    <div id="agErr" class="auth-err"></div>
-    <button class="auth-btn" onclick="submitAuth()">进入工作台</button>
-    <p class="auth-tip">数据存于你的私有云端。本登录仅防止他人随意打开工作台。</p>
+    <label class="auth-remember" data-page-node-id="2hDdfqQG4mmLF8PHMOrpwC"><input id="agRemember" type="checkbox" checked data-page-node-id="J7z8TEx8vpu8yfgPdmH1pT"> 记住本设备 7 天</label>
+    <div id="agErr" class="auth-err" data-page-node-id="akUPx2slmmkMVQH5SPLC0W"></div>
+    <button class="auth-btn" onclick="submitAuth()" data-page-node-id="iHhbfuBDEInx3M17kd7VOW">进入工作台</button>
+    <p class="auth-tip" data-page-node-id="MAW9OyWl0vOxQsU7pFd0kD">数据存于你的私有云端。本登录仅防止他人随意打开工作台。</p>
   </div>
 </div>
 
 <!-- ============ 顶蓝条 ============ -->
-<header class="topbar">
-  <div class="brand">
-    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></div>
-    <div>
-      <h1>综合工作台</h1>
-      <div class="tagline">纺织工厂合规管理 · 云端版 · 电脑手机通用 · 换设备零迁移</div>
+<header class="topbar" data-page-node-id="17hONJu8wyUoVvTcLjVv0I">
+  <div class="brand" data-page-node-id="CwcdoDv2har1o7EzdJVR39">
+    <div class="logo" data-page-node-id="N9g4pAJE81J3Zo3aTMyImC"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" data-page-node-id="Y8VT43DfhcUtgjIpXaEKrj"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" data-page-node-id="6beSKxNea193fxMRSIApdf"/></svg></div>
+    <div data-page-node-id="HBp6c8BrXsnYUoPrZEqxDa">
+      <h1 data-page-node-id="g0TIVdN2U9hrBDMwLXcLSR">综合工作台</h1>
+      <div class="tagline" data-page-node-id="yVWSpRtFDDOQ2CYZEK6vuj">纺织工厂合规管理 · 云端版 · 电脑手机通用 · 换设备零迁移</div>
     </div>
   </div>
-  <div class="actions">
-    <span id="syncBadge" onclick="openSync()" style="font-size:12px;padding:5px 11px;border-radius:14px;background:rgba(255,255,255,.16);cursor:pointer;font-weight:600">☁ 本地模式</span>
-    <button class="icon-btn hide-mobile" id="expBtn" title="导出备份"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg></button>
-    <button class="icon-btn hide-mobile" id="impBtn" title="导入备份"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21V9m0 0l-4 4m4-4l4 4M5 3h14"/></svg></button>
-    <input type="file" id="impFile" accept="application/json" hidden>
-    <button class="icon-btn hide-mobile" onclick="loadFromCloud(true)" title="刷新云端"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5"/></svg></button>
-    <button class="icon-btn" onclick="doLogout()" title="退出登录"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg></button>
-    <span id="verTag" class="ver-tag" title="工作台版本号 · 若与此不一致请 Ctrl+F5 强刷到最新版">v—</span>
-    <div class="avatar">黄</div>
+  <div class="actions" data-page-node-id="Syna15nHO948ZZCWI0UalH">
+    <span id="syncBadge" onclick="openSync()" style="font-size:12px;padding:5px 11px;border-radius:14px;background:rgba(255,255,255,.16);cursor:pointer;font-weight:600" data-page-node-id="Uyu19RE8L4DVjsjFYW7SWX">☁ 本地模式</span>
+    <button class="icon-btn hide-mobile" id="expBtn" title="导出备份" data-page-node-id="FzeVFudr8cURkOq4fG8MDZ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="ZuPG9tTTFrgKFZZCCHo6eo"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" data-page-node-id="Y8sz5eFgF0WR2ByCH9BG2l"/></svg></button>
+    <button class="icon-btn hide-mobile" id="impBtn" title="导入备份" data-page-node-id="DxrUBdjUoZQrh7KiDFGAmu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="zGMscFiqFmANfl62VGZKns"><path d="M12 21V9m0 0l-4 4m4-4l4 4M5 3h14" data-page-node-id="ZMZ0k9C2oRRbAvnTcwyshA"/></svg></button>
+    <input type="file" id="impFile" accept="application/json" hidden data-page-node-id="O8WuA7wrnjn2xpefHSEPyW">
+    <button class="icon-btn hide-mobile" onclick="loadFromCloud(true)" title="刷新云端" data-page-node-id="Y76qfchLKCV2C9ke4ZzDfk"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="CEOKjiwraaItEgCRdNzKJb"><path d="M21 12a9 9 0 11-3-6.7M21 4v5h-5" data-page-node-id="TyLnH3GjYZ71FbREdoa4LI"/></svg></button>
+    <button class="icon-btn" onclick="doLogout()" title="退出登录" data-page-node-id="dqeXE3HiTPOxYyPKMYiaRi"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="SupfHCPsaWzt98mnXeD5Mk"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" data-page-node-id="DkDeOaVhJnjzl9ewYnAned"/></svg></button>
+    <span id="verTag" class="ver-tag" title="工作台版本号 · 若与此不一致请 Ctrl+F5 强刷到最新版" data-page-node-id="3S41IqXXWxEBGh01wobRGC">v—</span>
+    <div class="avatar" data-page-node-id="yz5c2NGcN67pmno3HfhFuA">黄</div>
   </div>
 </header>
 
-<div class="layout">
+<div class="layout" data-page-node-id="qPanV2QQEJARmVmbBLA1yb">
 
   <!-- ============ 左侧栏 ============ -->
-  <aside class="sidebar">
-    <div class="sidebar-section">主导航</div>
-    <div class="nav-item active" data-view="home" onclick="showView('home')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
-      <span>工作台首页</span>
+  <aside class="sidebar" data-page-node-id="6kE18cRoL09H3hPsVpbaj2">
+    <div class="sidebar-section" data-page-node-id="HpJyCpszReyoiyWBZwCCrK">主导航</div>
+    <div class="nav-item active" data-view="home" onclick="showView('home')" data-page-node-id="EUNR4PoY8gDPq3xLAuvyQN">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="NVYWmE93UAtfHQFKz01XJQ"><path d="M3 12l9-9 9 9M5 10v10h14V10" data-page-node-id="2huaAC1IXrMDjMYU3q7RDr"/></svg>
+      <span data-page-node-id="qRObAVxDsZ8mcsHJJCDloB">工作台首页</span>
     </div>
 
-    <div class="sidebar-section">业务模块</div>
-    <div id="sideCats"></div>
+    <div class="sidebar-section" data-page-node-id="QKBN2B2JAD7XGprbDdZKcK">业务模块</div>
+    <div id="sideCats" data-page-node-id="hFJ4OeyOwj9vmIxPzjFaht"></div>
 
-    <div class="sidebar-section">工具</div>
-    <div class="nav-item" data-view="report" onclick="showView('report')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V10zM14 3v6h6M8 13h8M8 17h5"/></svg>
-      <span>报告中心</span>
+    <div class="sidebar-section" data-page-node-id="yPNJ4aF8JyVgVtfdNZXMQ9">工具</div>
+    <div class="nav-item" data-view="report" onclick="showView('report')" data-page-node-id="iUhxIgxPQfPDRfuMYx9WyI">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="KV5KsvdTMQb2QbI0JzdmKG"><path d="M14 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V10zM14 3v6h6M8 13h8M8 17h5" data-page-node-id="fs3b5po0lE2YejajHctaLu"/></svg>
+      <span data-page-node-id="mC6SFav0FIPgoheLv5NHCB">报告中心</span>
     </div>
-    <div class="nav-item" data-view="kb" onclick="showView('kb')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h12a4 4 0 014 4v10H8a4 4 0 01-4-4V5zM4 5v10a4 4 0 004 4"/></svg>
-      <span>知识库</span>
+    <div class="nav-item" data-view="kb" onclick="showView('kb')" data-page-node-id="WU879NNTJmTBcZ023Zkn8y">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="XB2TPxHLjIVM9H4rv9dRjl"><path d="M4 5h12a4 4 0 014 4v10H8a4 4 0 01-4-4V5zM4 5v10a4 4 0 004 4" data-page-node-id="gwmn01iFuIJK68ITPwGlY6"/></svg>
+      <span data-page-node-id="uj6PjIPOi69DlHFHERLXN5">知识库</span>
     </div>
-    <div class="nav-item" data-view="memo" onclick="showView('memo')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>
-      <span>备忘录</span>
+    <div class="nav-item" data-view="memo" onclick="showView('memo')" data-page-node-id="BghbHhZX67VTz95rg9r1xs">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="0lzP2Y8hclfUpbkYuuk8te"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3" data-page-node-id="spKJHuiekU0NEkKREouXAe"/></svg>
+      <span data-page-node-id="84FFSDM8OV2OnDQcEJPT8P">备忘录</span>
     </div>
-    <div class="nav-item" data-view="cert" onclick="showView('cert')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6zM15 2v5h5M9 13h6M9 17h6"/></svg>
-      <span>证书库</span>
+    <div class="nav-item" data-view="cert" onclick="showView('cert')" data-page-node-id="CtV6AjWqzTdBGKn2ael4p8">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="7gZDaDvwvEqh9AbGFL35Df"><path d="M6 2h9l5 5v15H6zM15 2v5h5M9 13h6M9 17h6" data-page-node-id="cpw8BhKITtYEN3oiB5vDOJ"/></svg>
+      <span data-page-node-id="ojGUHHa4PFmBHCAEG7b2ox">证书库</span>
     </div>
-    <div class="nav-item" data-view="dashboard" onclick="showView('dashboard')">
-      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/><circle cx="7" cy="14" r="0"/></svg>
-      <span>可视化大屏</span>
+    <div class="nav-item" data-view="dashboard" onclick="showView('dashboard')" data-page-node-id="qAN3N48dNGVIRDn7MwKsRt">
+      <svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="eGwPfmZcKkjm8AAeCzMFhI"><path d="M3 3v18h18M7 14l4-4 4 4 5-5" data-page-node-id="1GzwwVJL7vhKIG4X3jC1R3"/><circle cx="7" cy="14" r="0" data-page-node-id="zgKKrw3f7MUeyHMQkVMSGm"/></svg>
+      <span data-page-node-id="6Xax3WspYaIpKPQAI3D0cS">可视化大屏</span>
     </div>
   </aside>
 
   <!-- ============ 主区 ============ -->
-  <main class="main">
+  <main class="main" data-page-node-id="3RmnPdwjQAqx7oMvYcMydx">
 
     <!-- 工作台首页 -->
-    <div class="view active" id="view-home">
-      <div class="greeting-bar">
-        <div>
-          <h2>欢迎回来，<span class="name">黄总</span> 👋</h2>
-          <div class="greet-meta" id="greetMeta">今天 <span id="todayDate"></span> · 6 个业务模块待您处理</div>
+    <div class="view active" id="view-home" data-page-node-id="TUi4Ub3tAUz2B0vmXDz7iN">
+      <div class="greeting-bar" data-page-node-id="6vDVxzNEY1DyiDmmeouhkt">
+        <div data-page-node-id="VA7LguaZcF3X69xwDJdqjF">
+          <h2 data-page-node-id="Dibdi5mum7UZrjMhsw4APP">欢迎回来，<span class="name" data-page-node-id="dttzxWWuhjNbHZ58cOXbL3">黄总</span> 👋</h2>
+          <div class="greet-meta" id="greetMeta" data-page-node-id="JbhZWlWHxwoZOkf1oSe7ij">今天 <span id="todayDate" data-page-node-id="PiXJkW2TOtFQHnYA3Jgrg1"></span> · 6 个业务模块待您处理</div>
         </div>
-        <button class="today-btn" onclick="scrollToToday()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>
-          今日待办 <span class="num" id="todayCount">0</span> →
+        <button class="today-btn" onclick="scrollToToday()" data-page-node-id="xAcrR6OUPL606ymaZBtfhs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="26k5b1kPh0EISQhvR1Dveb"><path d="M12 7v5l3 2" data-page-node-id="MTOYUgHe9BxmARSCnj8PrZ"/><circle cx="12" cy="12" r="9" data-page-node-id="wQ0AahXa8MkWoCIhYNmeS3"/></svg>
+          今日待办 <span class="num" id="todayCount" data-page-node-id="Q63RCDNwZqbPGCC8zXPHRf">0</span> →
         </button>
       </div>
 
-      <div class="cards-grid" id="cardsGrid"></div>
+      <div class="cards-grid" id="cardsGrid" data-page-node-id="R0PZf70ItxJSzfHb9V3T16"></div>
 
-      <div class="card" id="todayCard">
-        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今日要处理</h2>
-        <div class="today-range" id="todayRange">
-          <button class="rchip" data-r="today" onclick="setTodayRange('today')">今日</button>
-          <button class="rchip" data-r="week" onclick="setTodayRange('week')">本周</button>
-          <button class="rchip" data-r="7" onclick="setTodayRange('7')">7天</button>
-          <button class="rchip" data-r="30" onclick="setTodayRange('30')">30天</button>
-          <button class="rchip" data-r="all" onclick="setTodayRange('all')">全部积压</button>
+      <div class="card" id="todayCard" data-page-node-id="Axs3Ic3vBy0BBuCV1LxUrR">
+        <h2 data-page-node-id="wKiJf6JeAV7r6KZGRlCot6"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="LGBCc7D8oGswbMnPtX3aKD"><circle cx="12" cy="12" r="9" data-page-node-id="JQ7UDAqiTGZurpGH4iCRmZ"/><path d="M12 7v5l3 2" data-page-node-id="TbMpoKvam5UwFI2tgOn904"/></svg>今日要处理</h2>
+        <div class="today-range" id="todayRange" data-page-node-id="rNI26SXDxkm1nuEEk3qsiq">
+          <button class="rchip" data-r="today" onclick="setTodayRange('today')" data-page-node-id="MsGbejj4LdvRnKDnvisnjm">今日</button>
+          <button class="rchip" data-r="week" onclick="setTodayRange('week')" data-page-node-id="GsIHOaE2gfOpu8jgtZVWxZ">本周</button>
+          <button class="rchip" data-r="7" onclick="setTodayRange('7')" data-page-node-id="n9UCNMuhXJmAlf3FzMhVsi">7天</button>
+          <button class="rchip" data-r="30" onclick="setTodayRange('30')" data-page-node-id="2qJ3jHG2suYUPfTECFJjcS">30天</button>
+          <button class="rchip" data-r="all" onclick="setTodayRange('all')" data-page-node-id="oMLPTZ7xpsVqEJ4zpaLZWt">全部积压</button>
         </div>
-        <div class="today-upd" id="todayUpd"></div>
-        <div id="todayList"></div>
+        <div class="today-upd" id="todayUpd" data-page-node-id="7sdiDiPBMU2texGYHMR4Sd"></div>
+        <div id="todayList" data-page-node-id="LLoHguAKFglWMgQKfRYN3G"></div>
       </div>
 
-      <div class="center" style="margin-top:18px;text-align:center">
-        <button class="dash-cta" onclick="showView('dashboard')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg>
+      <div class="center" style="margin-top:18px;text-align:center" data-page-node-id="0TzOFJRylRSnWXBk7z6EKg">
+        <button class="dash-cta" onclick="showView('dashboard')" data-page-node-id="Ow9cxVWqdsJtR1OF4peGPd">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="qpo7KiRuaJ7mDnYsQG1zAb"><path d="M3 3v18h18M7 14l4-4 4 4 5-5" data-page-node-id="NeK6s9R2JAjvgFFeYeQRkJ"/></svg>
           可视化大屏
-          <span class="dash-cta-arrow">→</span>
+          <span class="dash-cta-arrow" data-page-node-id="ofcbAuPaI9KJMhWBGtB1Hx">→</span>
         </button>
       </div>
 
-      <div class="center" style="margin-top:14px;text-align:center">
-        <button class="btn" id="clearBtn" style="color:var(--red);border-color:#ffd0d2">重置为示例数据</button>
+      <div class="center" style="margin-top:14px;text-align:center" data-page-node-id="EviSuSihmk5i0k9ZDJxGLb">
+        <button class="btn" id="clearBtn" style="color:var(--red);border-color:#ffd0d2" data-page-node-id="eAZGO5ITkVHfTlprLXM7Ae">重置为示例数据</button>
       </div>
     </div>
 
     <!-- 报告中心 -->
-    <div class="view" id="view-report">
-      <div class="greeting-bar">
-        <div>
-          <h2>报告中心</h2>
-          <div class="greet-meta">按 6 大业务模块自动汇总本周工作</div>
+    <div class="view" id="view-report" data-page-node-id="wsYST9C1mjtxDjhSOyfLl0">
+      <div class="greeting-bar" data-page-node-id="qeSLBS4RuRwIhAjj0SyAaN">
+        <div data-page-node-id="S9FEioBchcXCJq3ev4ble5">
+          <h2 data-page-node-id="etluPlNUosn6jqxYkicqIh">报告中心</h2>
+          <div class="greet-meta" data-page-node-id="HoSoeQx7fjHNVnsdnyXukp">按 6 大业务模块自动汇总本周工作</div>
         </div>
-        <button class="today-btn" onclick="genWeekReport()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        <button class="today-btn" onclick="genWeekReport()" data-page-node-id="iyVpa7gwP6CczoX4YL9BEF">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="uCIrDMsDFnEzOLvy0sfj2w"><path d="M12 5v14M5 12h14" data-page-node-id="V4ir7qI9kHy9MPF91zDJVr"/></svg>
           一键生成本周报告
         </button>
       </div>
-      <div class="card">
-        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5"/></svg>本周工作报告（可编辑复制）</h2>
+      <div class="card" data-page-node-id="jfPwLqVCZRqglvfG3QbrMY">
+        <h2 data-page-node-id="Gy4aCINEzfYKuLVhZTZKXI"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="xJw526HvNMA32VQQb5bJEj"><path d="M4 4h16v16H4zM8 9h8M8 13h8M8 17h5" data-page-node-id="DXerT6YdEITKjBiDw7Y4Kg"/></svg>本周工作报告（可编辑复制）</h2>
         <textarea id="weekOut" class="report-textarea" placeholder="点击右上角「一键生成本周报告」自动汇总…"></textarea>
       </div>
-      <div class="card">
-        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 3 3 5-6"/></svg>六大模块完成率</h2>
-        <div id="metrics" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+      <div class="card" data-page-node-id="H9Bfai1jQBc7uZpDngoAqE">
+        <h2 data-page-node-id="7i8RbQYDGDkA3NY8S4o3fZ"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="Zds9F30CRTdyxH8tCyB4t3"><path d="M3 3v18h18M7 14l4-4 3 3 5-6" data-page-node-id="OffEn1ZExOGrejXsdG5BnY"/></svg>六大模块完成率</h2>
+        <div id="metrics" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px" data-page-node-id="TLAUPWGf3YsS3ZCDGWJTDX"></div>
       </div>
     </div>
 
     <!-- 知识库 -->
-    <div class="view" id="view-kb">
-      <div class="greeting-bar">
-        <div>
-          <h2>知识库</h2>
-          <div class="greet-meta">认证资料 / 客户信息 / 流程 SOP / 联系人 / 模板</div>
+    <div class="view" id="view-kb" data-page-node-id="pMlvGw5aKUxQVcE3U7N8M2">
+      <div class="greeting-bar" data-page-node-id="k6HjfBU6WhQGbYvtpjIl7d">
+        <div data-page-node-id="kbmaS6sr2AORQ7cfWZ8qAQ">
+          <h2 data-page-node-id="BOIlgCRUEL1wcJ6zkT0UDI">知识库</h2>
+          <div class="greet-meta" data-page-node-id="Ahg2HX5D3kiC7s4GaZevHw">认证资料 / 客户信息 / 流程 SOP / 联系人 / 模板</div>
         </div>
       </div>
-      <div class="card">
-        <input id="kbSearch" placeholder="搜索标题 / 内容…" style="width:100%;margin-bottom:10px">
-        <form id="kbForm" style="display:grid;gap:8px;margin-bottom:12px">
-          <div class="row">
-            <input id="kbTitle" placeholder="标题…" style="flex:2;min-width:140px">
-            <select id="kbCat" style="flex:1;min-width:110px">
-              <option>认证资料</option><option>客户信息</option><option>流程SOP</option>
-              <option>联系人</option><option>模板文档</option><option>其他</option>
+      <div class="card" data-page-node-id="BIOedoowtlU8NeNz54oFb7">
+        <input id="kbSearch" placeholder="搜索标题 / 内容…" style="width:100%;margin-bottom:10px" data-page-node-id="HlXrMGDDuX3ySwC789cvlu">
+        <form id="kbForm" style="display:grid;gap:8px;margin-bottom:12px" data-page-node-id="Ew7b0NtgdI2pZ8XVvo7sN1">
+          <div class="row" data-page-node-id="Qdo0N3P8gXbxvpHmH4ZmF1">
+            <input id="kbTitle" placeholder="标题…" style="flex:2;min-width:140px" data-page-node-id="YDSpn8rhGYs13NIJ3BaLMB">
+            <select id="kbCat" style="flex:1;min-width:110px" data-page-node-id="EXH6XUzxm4j2v1AGFiENLe">
+              <option data-page-node-id="Cdz2kw6iuQXgTGanJwthsa">认证资料</option><option data-page-node-id="9PBJlUn7Cd1oC7ar5ztBQB">客户信息</option><option data-page-node-id="J37uXbjueBRFmJszxoIrWA">流程SOP</option>
+              <option data-page-node-id="xI0p3orns1JRBdMOvEJ93c">联系人</option><option data-page-node-id="jcgkLGI2c9ICw7JCLgfokz">模板文档</option><option data-page-node-id="lJKW1QG9hyRojMqjpBQhEb">其他</option>
             </select>
           </div>
           <textarea id="kbContent" placeholder="内容 / 要点…" style="min-height:90px"></textarea>
-          <input id="kbUrl" placeholder="相关链接（可选）…">
-          <div>
-            <label class="btn" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z M9 12l2 2 4-4"/></svg>
+          <input id="kbUrl" placeholder="相关链接（可选）…" data-page-node-id="sX8mIA4sbIl3bgKu5Ygm74">
+          <div data-page-node-id="uPklAJu5Fv4S9JjVC6YnDv">
+            <label class="btn" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer" data-page-node-id="ymCTUDwaXLC0Y7EpQ9pEck">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="wT3gtMcPcKvPtFWEEb86MA"><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z M9 12l2 2 4-4" data-page-node-id="8LrCzuVmXEE6QQTn7DbsFI"/></svg>
               添加附件（图片自动压缩 / 单个 ≤500KB）
-              <input id="kbFiles" type="file" accept="image/*,application/pdf" multiple hidden>
+              <input id="kbFiles" type="file" accept="image/*,application/pdf" multiple hidden data-page-node-id="CeebT0egMRwCwCPNKJLyhl">
             </label>
-            <div id="kbFileChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+            <div id="kbFileChips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px" data-page-node-id="YJqnDedZaE4To7iOxckFKC"></div>
           </div>
-          <button class="btn primary" type="submit">添加条目</button>
+          <button class="btn primary" type="submit" data-page-node-id="CAr6e1lRmGyjSjE0PGsDaD">添加条目</button>
         </form>
-        <div id="kbList"></div>
+        <div id="kbList" data-page-node-id="BhoP01B2S4RV192e6UpigR"></div>
       </div>
     </div>
 
     <!-- 备忘录 -->
-    <div class="view" id="view-memo">
-      <div class="greeting-bar">
-        <div>
-          <h2>备忘录</h2>
-          <div class="greet-meta">随手记 · 置顶 · 跨设备同步</div>
+    <div class="view" id="view-memo" data-page-node-id="HOzRP719IxFYVyBnCX5BKS">
+      <div class="greeting-bar" data-page-node-id="7h6Od6dQcqVedPCA9k2OM0">
+        <div data-page-node-id="1BoVbPhsbCvaNlgh0qalfB">
+          <h2 data-page-node-id="pdJs8vYP3T7426DXJBHtIB">备忘录</h2>
+          <div class="greet-meta" data-page-node-id="nUW1JdIEs2nDCf3uMzFwRa">随手记 · 置顶 · 跨设备同步</div>
         </div>
       </div>
-      <div class="card">
-        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>添加新备忘</h2>
+      <div class="card" data-page-node-id="3jJ1Es7mISdmzsxOXxWJcF">
+        <h2 data-page-node-id="oSd4xuqZnf39dMSBigryf1"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="dyiwNXze992nQnT3NdHZKh"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3" data-page-node-id="BFydDkaOIo2rrtF4j3hESD"/></svg>添加新备忘</h2>
         <textarea id="memoInput" placeholder="随手记一条…（Ctrl/⌘+Enter 保存）" style="min-height:80px"></textarea>
-        <div style="margin-top:8px"><button class="btn primary" onclick="addMemo()">+ 添加备忘录</button></div>
+        <div style="margin-top:8px" data-page-node-id="XwdrKrA6FlaqCE8N6zsMpP"><button class="btn primary" onclick="addMemo()" data-page-node-id="tFMoHqHkit1XYstOsAT12v">+ 添加备忘录</button></div>
       </div>
-      <div class="card">
-        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 7"/></svg>我的备忘</h2>
-<div id="memoList"></div>
+      <div class="card" data-page-node-id="1gUkd1CXZR3NmL8Ga13oGw">
+        <h2 data-page-node-id="nUPGDiWNrzKn6DIoXTYBhA"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="rAFnoqnUtsDo88r4B3wkIX"><path d="M5 12l4 4L19 7" data-page-node-id="2Y1qpDStYQiH5AIQU3Wgw8"/></svg>我的备忘</h2>
+<div id="memoList" data-page-node-id="vd93MIWOsUq0aJdMDJOnxu"></div>
     </div>
   </div>
 
     <!-- 证书库 -->
-    <div class="view" id="view-cert">
-      <div class="greeting-bar">
-        <div>
-          <h2>证书库</h2>
-          <div class="greet-meta">上传 GRS / GOTS 等证书原件 · 自动记录到期 · 跨设备同步</div>
+    <div class="view" id="view-cert" data-page-node-id="B6H2jKKThAgl5zzrb9onx8">
+      <div class="greeting-bar" data-page-node-id="K6SAq3M5AsXq0TnzuzeL4J">
+        <div data-page-node-id="o5ZJtuu60xRE9cBJjCqaiR">
+          <h2 data-page-node-id="1CXSTBRxtr4s38qebeeL1L">证书库</h2>
+          <div class="greet-meta" data-page-node-id="ChJcMb0Y1DtSQqJus9wjUu">上传 GRS / GOTS 等证书原件 · 自动记录到期 · 跨设备同步</div>
         </div>
-        <button class="today-btn" onclick="document.getElementById('certFile').click()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        <button class="today-btn" onclick="document.getElementById('certFile').click()" data-page-node-id="qKEg68pJtML38XDMNmEexX">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="KIkEl4BrzyzClS18CRd3iM"><path d="M12 5v14M5 12h14" data-page-node-id="1tYDqmsqE3iv3S5DslnBld"/></svg>
           上传证书
         </button>
       </div>
-      <input type="file" id="certFile" accept="image/*,application/pdf" hidden onchange="onCertFile(this)">
-      <div class="card">
-        <div id="certFormWrap" style="display:none">
-          <h2>填写证书信息（自动抓取的会预填，请核对）</h2>
-          <form id="certForm" style="display:grid;gap:8px;margin:10px 0">
-            <div class="row">
-              <select id="certType" style="flex:1;min-width:120px"></select>
-              <input id="certNo" placeholder="证书编号…" style="flex:2;min-width:140px">
+      <input type="file" id="certFile" accept="image/*,application/pdf" hidden onchange="onCertFile(this)" data-page-node-id="xiBgJKweHP9ZxkGlEUCF5i">
+      <div class="card" data-page-node-id="P3xf28I5mRe5qUjqezVwdt">
+        <div id="certFormWrap" style="display:none" data-page-node-id="RTVGOWEj8Zc7SzhYHwlomt">
+          <h2 data-page-node-id="AFH45HFvA8DwOSSZDwTscx">填写证书信息（自动抓取的会预填，请核对）</h2>
+          <form id="certForm" style="display:grid;gap:8px;margin:10px 0" data-page-node-id="XBtfP4Q7mglwBtwUuq8qsm">
+            <div class="row" data-page-node-id="X7VEHN3lQl94H1EFNDBgsN">
+              <select id="certType" style="flex:1;min-width:120px" data-page-node-id="eRTl716vlW3dh321ycHSzD"></select>
+              <input id="certNo" placeholder="证书编号…" style="flex:2;min-width:140px" data-page-node-id="la7L8MeFM0JSOL22ufDC86">
             </div>
-            <input id="certIssuer" placeholder="发证机构…">
-            <div class="row">
-              <input id="certIssued" type="date" title="签发日期" style="flex:1">
-              <input id="certExpiry" type="date" title="到期日期" style="flex:1">
+            <input id="certIssuer" placeholder="发证机构…" data-page-node-id="IlV2lGUq44g0nXRp3kKfjM">
+            <div class="row" data-page-node-id="F2FiEid60USVQKNfPD833R">
+              <input id="certIssued" type="date" title="签发日期" style="flex:1" data-page-node-id="gjP2bES1jwhwlbQFlMgSON">
+              <input id="certExpiry" type="date" title="到期日期" style="flex:1" data-page-node-id="vBHhZFoMJE6ht5aa6ju8V0">
             </div>
-            <input id="certScope" placeholder="范围 / 产品（可选）…">
-            <div id="certFileMeta" style="font-size:12px;color:var(--muted)"></div>
-            <div style="display:flex;gap:8px">
-              <button class="btn primary" type="submit">保存证书</button>
-              <button class="btn" type="button" onclick="cancelCert()">取消</button>
+            <input id="certScope" placeholder="范围 / 产品（可选）…" data-page-node-id="RYbJAMk8gGY1E7pZZsiDgV">
+            <div id="certFileMeta" style="font-size:12px;color:var(--muted)" data-page-node-id="PrYGhX9XheLvNTA9Y8FTQZ"></div>
+            <div style="display:flex;gap:8px" data-page-node-id="9wN8xnXvGlq2kqfrOZgHmB">
+              <button class="btn primary" type="submit" data-page-node-id="UQ4wei7ABJA1p7syKmeHL7">保存证书</button>
+              <button class="btn" type="button" onclick="cancelCert()" data-page-node-id="4eIhyvS2temS7vH4lVeAHJ">取消</button>
             </div>
           </form>
         </div>
-        <div id="certList"></div>
+        <div id="certList" data-page-node-id="FEbPeCnoU0yJiiemBJetRk"></div>
       </div>
     </div>
 
     <!-- 可视化大屏 -->
-    <div class="view" id="view-dashboard">
-      <div id="dashRoot"></div>
+    <div class="view" id="view-dashboard" data-page-node-id="143BooiFNEuecQFnOEKtEF">
+      <div id="dashRoot" data-page-node-id="fpzPPHXORrU6PkUhSa09qr"></div>
     </div>
 
   <!-- 子模块视图（左侧栏始终保留，可直接切换其他模块） -->
-  <div class="view" id="view-sub">
-    <div class="sub-hd">
-      <button class="sub-back" onclick="showView('home')">← 返回首页</button>
-      <div style="flex:1;min-width:0">
-        <h2 id="subName">—</h2>
-        <div class="sub-stats" id="subStats"></div>
+  <div class="view" id="view-sub" data-page-node-id="k4jveOuWGkpMEFoVQ21eVF">
+    <div class="sub-hd" data-page-node-id="nTAJCjun0TtAGqoeKZc9kL">
+      <button class="sub-back" onclick="showView('home')" data-page-node-id="9NwYd76Eld02thzW9rhGwt">← 返回首页</button>
+      <div style="flex:1;min-width:0" data-page-node-id="yHgn4HwdMQJ9LRHP7NwuMw">
+        <h2 id="subName" data-page-node-id="O8clx1Og9Ci6nj1Lkm5lJf">—</h2>
+        <div class="sub-stats" id="subStats" data-page-node-id="u09XxH5fwm3Qecsf6MnB30"></div>
       </div>
     </div>
-    <div class="sub-body" id="subBody"></div>
+    <div class="sub-body" id="subBody" data-page-node-id="t2tQ5ohGUbVfDmPutvfVtW"></div>
   </div>
 
 </main>
 </div>
 
 <!-- ============ AI 助手悬浮按钮 + 构建版本号（垂直堆叠 · 紧贴底部左下） ============ -->
-<div class="fab-wrap">
-  <button class="ai-fab" onclick="aiHelp()" title="AI 助手">
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+<div class="fab-wrap" data-page-node-id="8jJxkCxNM0sTE9ckopqVmc">
+  <button class="ai-fab" onclick="aiHelp()" title="AI 助手" data-page-node-id="qJNC1q1iJbQgPaWbQRFrPA">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="WXHVNTcr9ExrtBVlvYh2oY"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" data-page-node-id="QWmdH4cDHSLSQkrOJM7FSK"/></svg>
     AI助手
   </button>
   <!-- ============ 工作台构建版本号（用户可见 · YY-MM-XXXX 自增 · 每次优化 +1） ============ -->
-  <div class="build-tag" id="buildTag" title="工作台构建版本号 · 每次优化更新">26-09-1000</div>
+  <div class="build-tag" id="buildTag" title="工作台构建版本号 · 每次优化更新" data-page-node-id="qrU7dd5ajeDa4Mzp1P70mb">26-09-1000</div>
 </div>
 
 <!-- ============ 云端同步弹窗 ============ -->
-<div class="mask hidden" id="syncMask">
-  <div class="modal">
-    <h3>云端同步设置</h3>
-    <p>数据保存在你的私有云端（GitHub Gist），换电脑 / 手机打开同一链接即可同步，无需拷贝文件。<br>① 在 github.com → Settings → Developer settings → Personal access tokens 生成一个带 <b>gist</b> 权限的 Token；<br>② 粘贴到下方。留空 Gist ID 会自动新建私有 Gist。</p>
-    <div class="field">
-      <label>GitHub Token（必填，仅存你本地/链接里）</label>
-      <input id="syncToken" type="password" placeholder="ghp_..." style="width:100%">
+<div class="mask hidden" id="syncMask" data-page-node-id="V0CbEwB8Y9aeaFlCtwhcUi">
+  <div class="modal" data-page-node-id="4GkAt4cFXpjJu2nCGT7Xxb">
+    <h3 data-page-node-id="ypbNX5sEaNMEUK2i1DpUbq">云端同步设置</h3>
+    <p data-page-node-id="0OB4vCo2kK3Y74Uk4b6xUb">数据保存在你的私有云端（GitHub Gist），换电脑 / 手机打开同一链接即可同步，无需拷贝文件。<br data-page-node-id="RNLR2ypHkxSxIbsDrHqpDs">① 在 github.com → Settings → Developer settings → Personal access tokens 生成一个带 <b data-page-node-id="5YTCZ6V2PkaY6G9DZmAAtb">gist</b> 权限的 Token；<br data-page-node-id="nsuxhPRvEZOHPpB6ARCeqF">② 粘贴到下方。留空 Gist ID 会自动新建私有 Gist。</p>
+    <div class="field" data-page-node-id="H6bzEezurPZ8348rmJBx1P">
+      <label data-page-node-id="LbgIfsoKUj5OAkdLysvkU5">GitHub Token（必填，仅存你本地/链接里）</label>
+      <input id="syncToken" type="password" placeholder="ghp_..." style="width:100%" data-page-node-id="KLnIlXEVootd5DFEJSEMzg">
     </div>
-    <div class="field">
-      <label>Gist ID（留空=自动新建私有 Gist）</label>
-      <input id="syncGist" placeholder="如 a1b2c3d4e5f6..." style="width:100%">
+    <div class="field" data-page-node-id="92vfLhH9R1EFANQPZbiTvS">
+      <label data-page-node-id="zAGfiNYqa6ppVqoXyLZxtB">Gist ID（留空=自动新建私有 Gist）</label>
+      <input id="syncGist" placeholder="如 a1b2c3d4e5f6..." style="width:100%" data-page-node-id="zNrqxK8cXH65U4xIntc2IE">
     </div>
-    <div class="field">
-      <label>文件上传 Token（可选，public_repo 权限）</label>
-      <input id="syncUploadToken" type="password" placeholder="ghp_... 留空则附件仍内嵌 Gist（约 1MB 上限）" style="width:100%">
-      <p style="margin:4px 0 0;font-size:11px;color:var(--muted)">配置后，知识库/证书附件改为存到本仓库 <code>files/</code> 目录，容量从 1MB 提升到单文件几十 MB。注意：公开仓库里的文件任何人凭链接都能下载。</p>
+    <div class="field" data-page-node-id="3OUvik9R8qRidVjz8QDHaZ">
+      <label data-page-node-id="z8o5Xw67FkaqhKaOfYZ2RP">文件上传 Token（可选，public_repo 权限）</label>
+      <input id="syncUploadToken" type="password" placeholder="ghp_... 留空则附件仍内嵌 Gist（约 1MB 上限）" style="width:100%" data-page-node-id="I6RZbsIQmVOlLkD72xPFtI">
+      <p style="margin:4px 0 0;font-size:11px;color:var(--muted)" data-page-node-id="8usWYmdED8q0lwhnYIXbtL">配置后，知识库/证书附件改为存到本仓库 <code data-page-node-id="oDQ2yFH4BzDwr4HTBJiGaV">files/</code> 目录，容量从 1MB 提升到单文件几十 MB。注意：公开仓库里的文件任何人凭链接都能下载。</p>
     </div>
-    <div class="row">
-      <button class="btn primary" style="flex:1" onclick="saveSync()">保存并连接</button>
-      <button class="btn" onclick="closeSync()">取消</button>
+    <div class="row" data-page-node-id="uyvmT9vTiEtknmvIJKYoIi">
+      <button class="btn primary" style="flex:1" onclick="saveSync()" data-page-node-id="XXr775v0ZmfVzK1VDd3hXz">保存并连接</button>
+      <button class="btn" onclick="closeSync()" data-page-node-id="No3W546ki2XGZXLXjgupWS">取消</button>
     </div>
-    <div id="syncErr" class="err"></div>
-    <div id="syncActions" style="margin-top:14px;display:none;border-top:1px solid var(--line);padding-top:12px">
-      <p style="margin-bottom:8px;font-size:12px;color:var(--muted)">已连接云端。换设备时复制下面的同步链接（含令牌），在新电脑/手机浏览器打开即自动配置：</p>
-      <div class="row">
-        <input id="syncLink" readonly style="flex:1;font-size:12px">
-        <button class="btn sm" onclick="copySyncLink()">复制</button>
+    <div id="syncErr" class="err" data-page-node-id="8gxXmllpndbIBZToBOuOwG"></div>
+    <div id="syncActions" style="margin-top:14px;display:none;border-top:1px solid var(--line);padding-top:12px" data-page-node-id="AEwQiHCXDDw1Jof6ugJSbB">
+      <p style="margin-bottom:8px;font-size:12px;color:var(--muted)" data-page-node-id="VpzlbTl5tawlLkUWGqjlMT">已连接云端。换设备时复制下面的同步链接（含令牌），在新电脑/手机浏览器打开即自动配置：</p>
+      <div class="row" data-page-node-id="NaawEssaGexi7j6C0OOffa">
+        <input id="syncLink" readonly style="flex:1;font-size:12px" data-page-node-id="DQPqlXsG3XIxC7nQCbCQhq">
+        <button class="btn sm" onclick="copySyncLink()" data-page-node-id="lVEzGejCp3TaX2WGoGoOTN">复制</button>
       </div>
-      <div class="row" style="margin-top:8px">
-        <button class="btn sm" onclick="disconnectSync()" style="color:var(--red);border-color:#ffd0d2">断开云端（转本地）</button>
+      <div class="row" style="margin-top:8px" data-page-node-id="hSMxYSoLAE7GD3ytjrxGnz">
+        <button class="btn sm" onclick="disconnectSync()" style="color:var(--red);border-color:#ffd0d2" data-page-node-id="J41H0QS4VdEWxNLsXUcYC8">断开云端（转本地）</button>
       </div>
     </div>
   </div>
 </div>
 
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast" data-page-node-id="wIHTrs7gI1UtnOlo1Yt2gq"></div>
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-01r';
+const APP_VER='2026-09-05a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1006';
+const BUILD_TAG='26-09-1007';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -1551,7 +1610,7 @@ const CATS=[
   {id:'7',name:'检测校准管理',color:'c-cyan',short:'检测校准管理',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2v6h6V2M7 2h10M5 8h14v14H5z"/></svg>',
    subs:['废水检测','仪器校准','人员检测'],
-   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['expire','有效期'],['month','1月-12月'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['expire','有效期'],['month','1月-12月'],['plan','实施要求'],['check','完成进度'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
   {id:'8',name:'会员会费管理',color:'c-pink',short:'会员会费管理',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12M12 22v-6M2 7h20v5H2zM12 7V3M8 3h8"/></svg>',
    subs:['会员续费','系统账户'],
@@ -2147,6 +2206,7 @@ let authKeyword='';
 let openPhases=new Set();
 let openTaskPhases=new Set();
 let openDrillTasks=new Set();     // cat=5 每行 4 阶段进度独立展开状态（行内展开）
+let openCheckTasks=new Set();     // cat=7 每行「完成进度」子项列表独立展开状态（行内展开）
 let openReimbursementSet=new Set();
 /* ===== 报销单台账（cat=11「中方报销」多单据） ===== */
 let curRbDocMap=new Map();           // 每个任务各自维护当前 docId（三行报销互不干涉）
@@ -2481,8 +2541,29 @@ function renderModuleTableHTML(){
       <span class="db-tip">点击每行「▸ 演习进度」按钮行内展开演练流程</span>
     </div>`;
   })():'';
+  // cat=7 检测校准「完成进度」banner：实时汇总该模块所有 task 的 checkPhases 子项完成度
+  const checkBanner=(currentSubCat==='7')?(()=>{
+    const tasks=data.tasks.filter(t=>String(t.cat)==='7');
+    let doneSum=0,totSum=0;
+    tasks.forEach(t=>{
+      const cp=ensureCheckPhases(t);
+      cp.forEach(it=>{ if(it&&it.done) doneSum++; });
+      totSum+=cp.length;
+    });
+    if(!totSum)return '';
+    const pct=Math.round(doneSum*100/totSum);
+    const isFull=(doneSum===totSum);
+    return `<div class="check-banner">
+      <span class="cb-ic">✅</span>
+      <span class="cb-txt">本模块检测校准完成度</span>
+      <span class="cb-num"><b style="color:${isFull?'#16a34a':'#0e7490'}">${doneSum}</b> / ${totSum} 子项</span>
+      <span class="cb-pct">${pct}%</span>
+      <span class="cb-bar ${isFull?'full':''}"><i style="width:${pct}%"></i></span>
+      <span class="cb-tip">点击每行「▸ 完成进度」按钮行内展开子项列表（每项独立打勾+日期+标签+可删/可加）</span>
+    </div>`;
+  })():'';
   const hasMonthCol=(c.cols&&c.cols.some(x=>x[0]==='month'));
-  const chips=drillBanner+`<div class="sub-filter">
+  const chips=drillBanner+checkBanner+`<div class="sub-filter">
     <span class="fchip ${!currentSubFilter?'active':''}" onclick="filterSub(null)">全部 (${items.length})</span>
     ${c.subs.map(s=>{
       const ct=items.filter(x=>x.sub===s).length;
@@ -2611,6 +2692,16 @@ function renderModuleTableHTML(){
         const safeClick=`try{event.stopPropagation();toggleDrillRow('${t.id}')}catch(e){console.error('[drill]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
         return `<td class="td-drill"><button class="drill-btn drill-tier-${tier} ${isDrillOn?'on':''}" data-task-id="${t.id}" onclick="${safeClick}" title="点击在该行下方展开 / 折叠「应急演习流程」：演习计划→演习通知→演习实操→演习记录（按顺序打勾）"><span class="arr">▸</span> 演习进度 <span class="drill-ct">${dDone}/${dTot}</span></button></td>`;
       }
+      if(k==='check'){
+        // cat=7 检测校准「完成进度」：每行独立子项数组（参考 cat=1/2 phases 视觉：勾选+日期+标签+删除），零关联
+        if(t.cat!=='7')return `<td>—</td>`;
+        const cp=ensureCheckPhases(t);
+        const cDone=cp.filter(x=>x&&x.done).length, cTot=cp.length;
+        const tier=cTot>0&&cDone===cTot?'full':cDone>0?'mid':'zero';
+        const isCheckOn=openCheckTasks.has(String(t.id));
+        const safeClick=`try{event.stopPropagation();toggleCheckRow('${t.id}')}catch(e){console.error('[check]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
+        return `<td class="td-check"><button class="check-btn check-tier-${tier} ${isCheckOn?'on':''}" data-task-id="${t.id}" onclick="${safeClick}" title="在该行下方展开/折叠「完成进度」子项列表（每项独立打勾+记日期+加标签+可删/可加）"><span class="arr">${isCheckOn?'▾':'▸'}</span> 完成进度 <span class="check-ct">${cDone}/${cTot}</span></button></td>`;
+      }
       return `<td>—</td>`;
     }).join('');
     return `<tr class="${doneCls}" onclick="openModuleEdit(${t.id})" title="单击编辑详情">
@@ -2620,7 +2711,7 @@ function renderModuleTableHTML(){
         <button title="编辑" onclick="openModuleEdit(${t.id})">✎</button>
         <button title="删除" onclick="del(${t.id})">🗑</button>
       </td>
-    </tr>${isYc && tIsOpen?`<tr class="phase-row" id="pr-t-${t.id}"><td colspan="${colCount}"><div class="phase-inner">${renderPhasePanel(t)}</div></td></tr>`:''}${t.cat==='11' && recTypeOf(t)==='vac' && isVacRowOpen(t.id)?`<tr class="vac-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderVacationPanel(t.id)}</td></tr>`:''}${t.cat==='5' && openDrillTasks.has(String(t.id))?`<tr class="drill-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderDrillExpandInner(t)}</td></tr>`:''}`;
+    </tr>${isYc && tIsOpen?`<tr class="phase-row" id="pr-t-${t.id}"><td colspan="${colCount}"><div class="phase-inner">${renderPhasePanel(t)}</div></td></tr>`:''}${t.cat==='11' && recTypeOf(t)==='vac' && isVacRowOpen(t.id)?`<tr class="vac-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderVacationPanel(t.id)}</td></tr>`:''}${t.cat==='5' && openDrillTasks.has(String(t.id))?`<tr class="drill-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderDrillExpandInner(t)}</td></tr>`:''}${t.cat==='7' && openCheckTasks.has(String(t.id))?`<tr class="check-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderCheckExpandInner(t)}</td></tr>`:''}`;
   }).join('');
 
   return `${chips}<div class="mt-wrap">
@@ -5565,6 +5656,154 @@ function drillPreviewPhoto(src){
   const im=ov.querySelector('#dpoImg');if(im)im.src=String(src);
   ov.style.display='flex';
 }
+/* ============ cat=7 检测校准「完成进度」（每行独立子项，零牵连）============ */
+/* 设计：t.checkPhases = [{name,date,tag,done}] 数组，每行 task 各自独立；视觉参照 cat=1/2 phases 与参考图（绿勾+日期+标签+删除+添加项）。
+   行内展开（紧跟本行下），勾选 / 改字段 / 加项 / 删项 即时刷新顶部 banner。*/
+function ensureCheckPhases(t){
+  if(!Array.isArray(t.checkPhases))t.checkPhases=[];
+  return t.checkPhases;
+}
+function checkCount(t){
+  const cp=ensureCheckPhases(t);
+  return {done:cp.filter(x=>x&&x.done).length,total:cp.length};
+}
+function renderCheckItems(t){
+  const cp=ensureCheckPhases(t);
+  if(!cp.length)return '<div class="check-items-empty">还没有项，点底部「＋ 添加项」开始记录</div>';
+  return cp.map((it,idx)=>{
+    const done=!!(it&&it.done);
+    const rowId=`check-row-${t.id}-${idx}`;
+    return `<div class="check-item ${done?'done':''}" id="${rowId}">
+      <label class="check-ck" onclick="event.stopPropagation()">
+        <input type="checkbox" ${done?'checked':''} onchange="checkToggleDone(${t.id},${idx},this.checked,'${rowId}')" title="标记完成">
+        <span class="check-ck-box">${done?'✓':''}</span>
+      </label>
+      <input class="check-name" type="text" value="${esc(it.name||'')}" placeholder="子项名称（如：取样 / 送检 / 出报告）" onclick="event.stopPropagation()" onchange="checkUpdateField(${t.id},${idx},'name',this.value)">
+      <input class="check-date" type="date" value="${esc(it.date||'')}" onclick="event.stopPropagation()" onchange="checkUpdateField(${t.id},${idx},'date',this.value)" title="完成日期">
+      <input class="check-tag" type="text" value="${esc(it.tag||'')}" placeholder="标签/编号" onclick="event.stopPropagation()" onchange="checkUpdateField(${t.id},${idx},'tag',this.value)">
+      <button class="check-del" title="删除本项" onclick="event.stopPropagation();checkRemoveItem(${t.id},${idx})">🗑</button>
+    </div>`;
+  }).join('');
+}
+function renderCheckSummary(t){
+  const c=checkCount(t);
+  const pct=c.total?Math.round(c.done*100/c.total):0;
+  return `已完成 <b style="color:#0e7490">${c.done}</b> / ${c.total}（${pct}%）`;
+}
+function renderCheckExpandInner(t){
+  ensureCheckPhases(t);
+  return `<div class="check-expand-inner" data-task-id="${t.id}">
+    <div class="check-expand-hd">
+      <div class="check-expand-title">📋 ${esc(t.workDetail||t.title||'检测校准')} <span class="check-sub">完成进度 · 行内展开 · 子项独立</span></div>
+      <button class="check-expand-x" onclick="closeCheckRow()" title="折叠本行（不保存修改）">✕ 折叠</button>
+    </div>
+    <div class="check-items" id="check-items-${t.id}">${renderCheckItems(t)}</div>
+    <div class="check-expand-ft">
+      <div class="check-summary" id="check-summary-${t.id}">${renderCheckSummary(t)}</div>
+      <div style="flex:1"></div>
+      <button class="check-add" onclick="checkAddItem(${t.id})">＋ 添加项</button>
+      <button class="check-save" onclick="saveCheckProgress(${t.id})">💾 保存进度</button>
+    </div>
+  </div>`;
+}
+function toggleCheckRow(taskId){
+  const k=String(taskId);
+  if(openCheckTasks.has(k))openCheckTasks.delete(k);
+  else openCheckTasks.add(k);
+  if(typeof renderSubModule==='function')renderSubModule();
+}
+function closeCheckRow(){
+  openCheckTasks.clear();
+  if(typeof renderSubModule==='function')renderSubModule();
+}
+function checkToggleDone(taskId,idx,val,rowId){
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
+  if(!t)return;
+  const cp=ensureCheckPhases(t);
+  if(!cp[idx])return;
+  cp[idx].done=!!val;
+  // 即时视觉反馈（保存前不写盘）
+  const row=document.getElementById(rowId);
+  if(row)row.classList.toggle('done',!!val);
+  const ckBox=row?row.querySelector('.check-ck-box'):null;
+  if(ckBox)ckBox.textContent=val?'✓':'';
+  const sumEl=document.getElementById('check-summary-'+taskId);
+  if(sumEl)sumEl.innerHTML=renderCheckSummary(t);
+  refreshCheckBtn(taskId);
+  refreshCheckBanner();
+}
+function checkUpdateField(taskId,idx,field,val){
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
+  if(!t)return;
+  const cp=ensureCheckPhases(t);
+  if(!cp[idx])return;
+  cp[idx][field]=val;
+}
+function checkAddItem(taskId){
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
+  if(!t)return;
+  const cp=ensureCheckPhases(t);
+  cp.push({name:'',date:'',tag:'',done:false});
+  const box=document.getElementById('check-items-'+taskId);
+  if(box)box.innerHTML=renderCheckItems(t);
+  const sumEl=document.getElementById('check-summary-'+taskId);
+  if(sumEl)sumEl.innerHTML=renderCheckSummary(t);
+  refreshCheckBtn(taskId);
+  refreshCheckBanner();
+}
+function checkRemoveItem(taskId,idx){
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
+  if(!t)return;
+  const cp=ensureCheckPhases(t);
+  if(idx<0||idx>=cp.length)return;
+  cp.splice(idx,1);
+  const box=document.getElementById('check-items-'+taskId);
+  if(box)box.innerHTML=renderCheckItems(t);
+  const sumEl=document.getElementById('check-summary-'+taskId);
+  if(sumEl)sumEl.innerHTML=renderCheckSummary(t);
+  refreshCheckBtn(taskId);
+  refreshCheckBanner();
+}
+function saveCheckProgress(taskId){
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
+  if(!t)return;
+  try{saveData();}
+  catch(e){console.error('[check-save]',e);toast('保存失败，请重试');return;}
+  toast('✅ 已保存完成进度');
+  closeCheckRow();
+}
+function refreshCheckBtn(taskId){
+  const t=data.tasks.find(x=>String(x.id)===String(taskId));
+  if(!t)return;
+  const btn=document.querySelector(`.check-btn[data-task-id="${taskId}"]`);
+  if(!btn)return;
+  const ct=btn.querySelector('.check-ct');
+  const c=checkCount(t);
+  if(ct)ct.textContent=`${c.done}/${c.total}`;
+  btn.classList.remove('check-tier-full','check-tier-mid','check-tier-zero');
+  btn.classList.add(c.total>0&&c.done===c.total?'check-tier-full':c.done>0?'check-tier-mid':'check-tier-zero');
+}
+function refreshCheckBanner(){
+  const banner=document.querySelector('.check-banner');
+  if(!banner)return;
+  const tasks=data.tasks.filter(t=>String(t.cat)==='7');
+  let doneSum=0,totSum=0;
+  tasks.forEach(t=>{
+    const cp=ensureCheckPhases(t);
+    cp.forEach(it=>{ if(it&&it.done) doneSum++; });
+    totSum+=cp.length;
+  });
+  if(!totSum){banner.remove();return;}
+  const pct=Math.round(doneSum*100/totSum);
+  const isFull=(doneSum===totSum);
+  const numEl=banner.querySelector('.cb-num');
+  if(numEl)numEl.innerHTML=`<b style="color:${isFull?'#16a34a':'#0e7490'}">${doneSum}</b> / ${totSum} 子项`;
+  const pctEl=banner.querySelector('.cb-pct');
+  if(pctEl)pctEl.textContent=pct+'%';
+  const bar=banner.querySelector('.cb-bar');
+  if(bar){bar.classList.toggle('full',isFull);const i=bar.querySelector('i');if(i)i.style.width=pct+'%';}
+  banner.classList.toggle('full',isFull);
+}
 function refreshAuthTbody(){const w=document.getElementById('authTblWrap');if(w)w.innerHTML=renderAuthTbodyHTML();}
 function togglePhaseRow(id){
   if(openPhases.has(id))openPhases.delete(id);else openPhases.add(id);
@@ -6812,30 +7051,30 @@ async function _wbBoot(){
 </script>
 
 <!-- 手机端底部 tabbar（App 风格 5 标签） -->
-<nav class="mobile-tabbar" id="mobileTabbar">
-  <button class="tab active" data-view="home" onclick="showView('home')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
-    <span>首页</span>
+<nav class="mobile-tabbar" id="mobileTabbar" data-page-node-id="KtEFMNihCiVXeZWi0mEPEw">
+  <button class="tab active" data-view="home" onclick="showView('home')" data-page-node-id="8lzGHjoHwRSZ2cehCF2h2r">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="OZVsPLkpXRt2ZO8xhalBQX"><path d="M3 12l9-9 9 9M5 10v10h14V10" data-page-node-id="SkCAKCYvmCsQm5wBYcLbiy"/></svg>
+    <span data-page-node-id="ouoaevsxMiRJv0btH2r9tm">首页</span>
   </button>
-  <button class="tab" data-view="report" onclick="showView('report')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V10zM14 3v6h6M8 13h8M8 17h5"/></svg>
-    <span>报告</span>
+  <button class="tab" data-view="report" onclick="showView('report')" data-page-node-id="1eNPjbSFHAa4f9Gvt2AIpY">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="LuKM5KNgr7pR5Vcuy7gaZj"><path d="M14 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V10zM14 3v6h6M8 13h8M8 17h5" data-page-node-id="MwZBU9MM7JMiuutRDMGgxU"/></svg>
+    <span data-page-node-id="Hm0XF9ZuGKwykzY3TUJcOw">报告</span>
   </button>
-  <button class="tab" data-view="kb" onclick="showView('kb')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h12a4 4 0 014 4v10H8a4 4 0 01-4-4V5zM4 5v10a4 4 0 004 4"/></svg>
-    <span>知识</span>
+  <button class="tab" data-view="kb" onclick="showView('kb')" data-page-node-id="4AEDEiYbjXNt1ejo33BKCh">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="M67es5Cq0asidCtaKeMgnE"><path d="M4 5h12a4 4 0 014 4v10H8a4 4 0 01-4-4V5zM4 5v10a4 4 0 004 4" data-page-node-id="EwzSxCCP3FD26677bLn983"/></svg>
+    <span data-page-node-id="WzBzkyiZKW1h2Yey5EACq8">知识</span>
   </button>
-  <button class="tab" data-view="memo" onclick="showView('memo')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>
-    <span>备忘</span>
+  <button class="tab" data-view="memo" onclick="showView('memo')" data-page-node-id="MJXNMsATg6pA3UyxOHG49g">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="JWxdXaaugp0G6p9tSxe805"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3" data-page-node-id="D8KXXyoLFreRetPKOkVHJ6"/></svg>
+    <span data-page-node-id="B5AnGAYDDiPixXg4IFx4S5">备忘</span>
   </button>
-  <button class="tab" data-view="cert" onclick="showView('cert')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6zM15 2v5h5M9 13h6M9 17h6"/></svg>
-    <span>证书</span>
+  <button class="tab" data-view="cert" onclick="showView('cert')" data-page-node-id="6grBtC0DZ4iBzsjqTHR8Bm">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="gnmSFi5k2BBDJiVshCZFY6"><path d="M6 2h9l5 5v15H6zM15 2v5h5M9 13h6M9 17h6" data-page-node-id="OYFH23DlxBVPL8EJP8jEHg"/></svg>
+    <span data-page-node-id="ZfMtQVCmEU5bwQbzEDn0Mx">证书</span>
   </button>
-  <button class="tab" data-view="dashboard" onclick="showView('dashboard')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg>
-    <span>大屏</span>
+  <button class="tab" data-view="dashboard" onclick="showView('dashboard')" data-page-node-id="SITM9B4cY7Ujx7nOUJIBdj">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="4pQNFlGtU3453vSSQGSi7q"><path d="M3 3v18h18M7 14l4-4 4 4 5-5" data-page-node-id="4QZ2fSUpJzaLaro9XxDcBN"/></svg>
+    <span data-page-node-id="ZDj9XyTyrgZg2cQHQJGVfM">大屏</span>
   </button>
 </nav>
 
