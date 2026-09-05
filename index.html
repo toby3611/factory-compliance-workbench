@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APP_VERSION: 2026-09-05a (cat=7 检测校准管理：每条 task 新增「完成进度」按钮，行内展开独立子项列表[独立打勾+日期+标签+增删]，顶部完成度 banner 实时刷新；BUILD_TAG 26-09-1006→26-09-1007) -->
+<!-- APP_VERSION: 2026-09-05b (cat=7 检测校准管理：每条 task 新增「完成进度」按钮，行内展开独立子项列表[独立打勾+日期+标签+增删]，顶部完成度 banner 实时刷新；修复「完成进度」按钮在窄列里被压成竖排→改为单行长方形[white-space:nowrap+min-width]；BUILD_TAG 26-09-1007→26-09-1008) -->
 <html lang="zh-CN" data-page-node-id="yFozsu0bwy8ee7XiYUjcQv">
 <head data-page-node-id="FjW1epA4w1116VMFBMfDog">
 <meta charset="UTF-8" data-page-node-id="xuDC073VYPYDuAlUiO2vVN">
@@ -661,7 +661,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 @media (max-width:768px){.drill-cards{padding:10px 10px;gap:8px}.drill-card-hd{padding:8px 12px;flex-wrap:wrap}.drill-card-tip{width:100%}.drill-expand-hd{padding:8px 12px}.drill-expand-ft{padding:8px 12px}.drill-progress-bar{width:90px}.drill-banner{flex-wrap:wrap;gap:6px;padding:8px 10px}.drill-banner .db-tip{width:100%;font-size:11px}}
 /* ===== cat=7 检测校准「完成进度」按钮 + 行内展开 + banner（绿色调，参照 cat=1/2 phases 视觉） ===== */
 .td-check{padding:6px 4px}
-.check-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;color:#475569;font-size:11.5px;cursor:pointer;font-weight:600;transition:all .15s;font-family:inherit}
+.check-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc;color:#475569;font-size:11.5px;cursor:pointer;font-weight:600;transition:all .15s;font-family:inherit;white-space:nowrap;flex-wrap:nowrap;min-width:112px;justify-content:center}
 .check-btn:hover{background:#f1f5f9;border-color:#94a3b8}
 .check-btn.on{background:#ecfeff;border-color:#67e8f9;color:#0e7490}
 .check-btn .arr{font-size:10px;color:#64748b;transition:transform .15s;display:inline-block;width:10px}
@@ -1578,9 +1578,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-05a';
+const APP_VER='2026-09-05b';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1007';
+const BUILD_TAG='26-09-1008';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
