@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APP_VERSION: 2026-09-05d (cat=7 检测校准管理：「有效期」拆为「开始时间 + 到期时间」两列，状态仍按到期时间算已过期/有效/即将到期；BUILD_TAG 26-09-1009→26-09-1010) -->
+<!-- APP_VERSION: 2026-09-05e (全局统一优化子模块标题视觉：顶部模块名 .sub-hd h2 升级字号/字重/字间距，子模块 chip .sub-filter .fchip 字号12→13/padding+hover+激活态渐变阴影，主表表头 .mt-tbl th 微调；BUILD_TAG 26-09-1010→26-09-1011) -->
 <html lang="zh-CN" data-page-node-id="yFozsu0bwy8ee7XiYUjcQv">
 <head data-page-node-id="FjW1epA4w1116VMFBMfDog">
 <meta charset="UTF-8" data-page-node-id="xuDC073VYPYDuAlUiO2vVN">
@@ -219,7 +219,7 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
   backdrop-filter:saturate(180%) blur(8px);
 }
 .sub-back{background:none;border:none;color:var(--primary);font-size:22px;cursor:pointer;padding:4px 10px;line-height:1;font-weight:700}
-.sub-hd h2{font-size:17px;font-weight:700;flex:1;min-width:0}
+.sub-hd h2{font-size:19px;font-weight:800;flex:1;min-width:0;letter-spacing:.3px;color:var(--text)}
 .sub-stats{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:4px}
 .sub-stats b{color:var(--text);font-size:14px}
 .sub-body{padding:12px 14px}
@@ -227,8 +227,9 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .sub-section h3{font-size:13px;margin-bottom:10px;display:flex;align-items:center;gap:6px;color:var(--muted);font-weight:600}
 .sub-section h3 .ic{width:16px;height:16px;color:var(--primary)}
 .sub-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.sub-filter .fchip{font-size:12px;padding:5px 12px;border-radius:14px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--text);font-weight:500}
-.sub-filter .fchip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.sub-filter .fchip{font-size:13px;padding:6px 14px;border-radius:14px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--text);font-weight:600;transition:all .15s;letter-spacing:.2px}
+.sub-filter .fchip:hover{background:#f1f6ff;border-color:#93b6f7;color:var(--primary)}
+.sub-filter .fchip.active{background:linear-gradient(135deg,#1e6fff,#3b82f6);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(30,111,255,.35);font-weight:700}
 .add-task-bar{display:flex;gap:6px;flex-wrap:wrap}
 .add-task-bar input[type=text]{flex:1;min-width:160px}
 .add-task-bar select,.add-task-bar input[type=date]{flex:none;min-width:90px}
@@ -957,7 +958,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 .mt-wrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:6px}
 .mt-tbl{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:auto}
 .mt-tbl thead{background:linear-gradient(180deg,#1e293b,#334155);position:sticky;top:0;z-index:2}
-.mt-tbl th{padding:10px 8px;text-align:left;font-weight:700;color:#f8fafc;border-bottom:2px solid var(--primary);white-space:nowrap;font-size:12.5px;letter-spacing:.2px;text-shadow:0 1px 2px rgba(0,0,0,.15)}
+.mt-tbl th{padding:11px 10px;text-align:left;font-weight:700;color:#f8fafc;border-bottom:2px solid var(--primary);white-space:nowrap;font-size:13px;letter-spacing:.3px;text-shadow:0 1px 2px rgba(0,0,0,.15)}
 .mt-tbl td{padding:9px 8px;border-bottom:1px solid #eef0f4;vertical-align:top;line-height:1.5;word-break:break-word}
 .mt-tbl tbody tr{transition:background .12s;cursor:pointer}
 .mt-tbl tbody tr:hover{background:#f5f8ff}
@@ -1578,9 +1579,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-05d';
+const APP_VER='2026-09-05e';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1010';
+const BUILD_TAG='26-09-1011';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
