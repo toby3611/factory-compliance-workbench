@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APP_VERSION: 2026-09-05b (cat=7 检测校准管理：每条 task 新增「完成进度」按钮，行内展开独立子项列表[独立打勾+日期+标签+增删]，顶部完成度 banner 实时刷新；修复「完成进度」按钮在窄列里被压成竖排→改为单行长方形[white-space:nowrap+min-width]；BUILD_TAG 26-09-1007→26-09-1008) -->
+<!-- APP_VERSION: 2026-09-05c (cat=7 检测校准管理：删除「1月-12月」月度勾选列并重新排版表头[实施要求+完成进度紧邻]，改用完成进度子项驱动，隐藏按月排期按钮，完成进度按钮改单行长方形；BUILD_TAG 26-09-1008→26-09-1009) -->
 <html lang="zh-CN" data-page-node-id="yFozsu0bwy8ee7XiYUjcQv">
 <head data-page-node-id="FjW1epA4w1116VMFBMfDog">
 <meta charset="UTF-8" data-page-node-id="xuDC073VYPYDuAlUiO2vVN">
@@ -1578,9 +1578,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-05b';
+const APP_VER='2026-09-05c';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1008';
+const BUILD_TAG='26-09-1009';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
@@ -1610,7 +1610,7 @@ const CATS=[
   {id:'7',name:'检测校准管理',color:'c-cyan',short:'检测校准管理',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 2v6h6V2M7 2h10M5 8h14v14H5z"/></svg>',
    subs:['废水检测','仪器校准','人员检测'],
-   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['expire','有效期'],['month','1月-12月'],['plan','实施要求'],['check','完成进度'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['expire','有效期'],['plan','实施要求'],['check','完成进度'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
   {id:'8',name:'会员会费管理',color:'c-pink',short:'会员会费管理',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12M12 22v-6M2 7h20v5H2zM12 7V3M8 3h8"/></svg>',
    subs:['会员续费','系统账户'],
@@ -2728,7 +2728,7 @@ const MONTH_LABELS=['1月','2月','3月','4月','5月','6月','7月','8月','9�
 function setSubView(m){subViewMode=m;renderSubModule()}
 function renderMonthlyViewHTML(filterItems){
   const curCat=String(currentSubCat);
-  const skipMonth=(curCat==='11'||curCat==='5'); // cat=11 走专属台账、cat=5 走 4 阶段演练，都不要月度循环
+  const skipMonth=(curCat==='11'||curCat==='5'||curCat==='7'); // cat=11 走专属台账、cat=5 走 4 阶段演练、cat=7 走完成进度子项，都不要月度循环
   const monthHeads=skipMonth?'':MONTH_LABELS.map((m,i)=>`<th class="mth">${m}</th>`).join('');
   const head='<th class="num">序号</th><th>工作明细</th><th class="sm">周期</th><th>担当</th>'+
     monthHeads+
