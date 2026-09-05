@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APP_VERSION: 2026-09-05g (主表表头做绝对可见改造：thead 改深蓝三段渐变+投影+ z-index:5, th 字色 #fff、字重 800、金黄色 3px 下边线 #fbbf24、字间距 .8px——让缓存旧版（浅底+深字+2px 下边线）与新版一眼可辨；BUILD_TAG 26-09-1012→26-09-1013) -->
+<!-- APP_VERSION: 2026-09-05h (新增 cat=12「工作备忘录」模块置顶：备忘录表格[工作内容/记录时间/完成时间/倒数提醒/备注]，记录时间自动填当日，倒数提醒按完成时间实时计算[逾期红/今天红/3天内深红/7天内橙/其余蓝]，新增「＋添加条目」弹窗补齐历史死按钮，任务抽屉对 cat=12 双向同步 expire/startDate；BUILD_TAG 26-09-1013→26-09-1014) -->
 <html lang="zh-CN" data-page-node-id="yFozsu0bwy8ee7XiYUjcQv">
 <head data-page-node-id="FjW1epA4w1116VMFBMfDog">
 <meta charset="UTF-8" data-page-node-id="xuDC073VYPYDuAlUiO2vVN">
@@ -659,6 +659,24 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 .drill-photo-overlay .dpo-inner{max-width:92vw;max-height:82vh;display:flex;flex-direction:column;align-items:center;gap:8px}
 .drill-photo-overlay img{max-width:92vw;max-height:78vh;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.5);object-fit:contain}
 .drill-photo-overlay .dpo-tip{color:#e2e8f0;font-size:12px;background:rgba(0,0,0,.4);padding:3px 10px;border-radius:10px}
+/* ===== cat=12 工作备忘录：倒数提醒标签 + 添加条目弹窗 ===== */
+.cd-tag{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;white-space:nowrap;letter-spacing:.2px}
+.cd-idle{background:#f1f5f9;color:#94a3b8}
+.cd-ok{background:#eff6ff;color:#2563eb}
+.cd-p1{background:#fef3c7;color:#b45309}
+.cd-p0{background:#fee2e2;color:#dc2626}
+.cd-today,.cd-over{background:#dc2626;color:#fff;box-shadow:0 1px 4px rgba(220,38,38,.35)}
+.ma-mask{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:90;display:flex;align-items:center;justify-content:center;padding:16px}
+.ma-box{background:#fff;border-radius:14px;width:100%;max-width:430px;box-shadow:0 20px 50px rgba(0,0,0,.25);overflow:hidden}
+.ma-hd{padding:13px 18px;font-weight:800;font-size:15px;border-bottom:1px solid #e2e8f0;background:#f8fafc}
+.ma-bd{padding:14px 18px;display:flex;flex-direction:column;gap:10px;max-height:62vh;overflow:auto}
+.ma-ft{padding:12px 18px;border-top:1px solid #e2e8f0;display:flex;justify-content:flex-end;gap:8px;background:#f8fafc}
+.ma-bd .field{display:flex;flex-direction:column;gap:4px}
+.ma-bd .field label{font-size:12px;font-weight:600;color:#475569}
+.ma-bd .field input,.ma-bd .field select,.ma-bd .field textarea{border:1px solid #cbd5e1;border-radius:8px;padding:7px 9px;font-size:13px;font-family:inherit;width:100%;box-sizing:border-box}
+.ma-bd .field input:focus,.ma-bd .field textarea:focus,.ma-bd .field select:focus{outline:2px solid #c7d2fe;border-color:#6366f1}
+.ma-bd .field-row{display:flex;gap:10px}.ma-bd .field-row .field{flex:1;min-width:0}
+@media (max-width:768px){.ma-box{max-width:100%}.ma-bd{padding:12px 14px}.ma-hd,.ma-ft{padding:11px 14px}}
 @media (max-width:768px){.drill-cards{padding:10px 10px;gap:8px}.drill-card-hd{padding:8px 12px;flex-wrap:wrap}.drill-card-tip{width:100%}.drill-expand-hd{padding:8px 12px}.drill-expand-ft{padding:8px 12px}.drill-progress-bar{width:90px}.drill-banner{flex-wrap:wrap;gap:6px;padding:8px 10px}.drill-banner .db-tip{width:100%;font-size:11px}}
 /* ===== cat=7 检测校准「完成进度」按钮 + 行内展开 + banner（绿色调，参照 cat=1/2 phases 视觉） ===== */
 .td-check{padding:6px 4px}
@@ -1579,11 +1597,15 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-05g';
+const APP_VER='2026-09-05h';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1013';
+const BUILD_TAG='26-09-1014';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
+  {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM4 8h16M9 4v16"/></svg>',
+   subs:['进行中','今日待办','本周待办','已完成','已逾期'],
+   cols:[['num','序号'],['detail','工作内容'],['startDate','记录时间'],['expire','完成时间'],['countdown','倒数提醒'],['note','备注']]},
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>',
    subs:['ISO体系','可持续认证','客户平台验证'],
@@ -2593,7 +2615,7 @@ function renderModuleTableHTML(){
     if(k==='month')return MONTH_LABELS.map((m,mi)=>`<th class="mth mth-tbl" title="月份排期">${m}</th>`).join('');
     if(k==='progress')return `<th title="按月打勾完成度（X/12）">${t}</th>`;
     if(k==='drill')return `<th title="应急演习 4 阶段进度（计划→通知→实操→记录），点击该行按钮行内展开">${t}</th>`;
-    if(k==='first'||k==='expire'||k==='startDate')return `<th class="sm">${t}</th>`;
+    if(k==='first'||k==='expire'||k==='startDate'||k==='countdown')return `<th class="sm">${t}</th>`;
     if(k==='note')return `<th>${t}</th>`;
     return `<th>${t}</th>`;
   }).join('')+'<th style="text-align:right">操作</th>';
@@ -2636,6 +2658,19 @@ function renderModuleTableHTML(){
         return `<td class="sm"><div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><input type="date" class="cell-date" value="${esc(exp)}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'expire',this.value)" title="点击日历修改有效期（续证时改）">${bdg}</div></td>`;
       }
       if(k==='startDate'||k==='startTime')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.startDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'startDate',this.value)"></td>`;
+      if(k==='countdown'){
+        // cat=12 工作备忘录：倒数提醒按「完成时间(expire)」实时计算，与其他模块零关联
+        if(t.cat!=='12')return `<td class="sm">—</td>`;
+        if(!exp)return `<td class="sm"><span class="cd-tag cd-idle">未填完成时间</span></td>`;
+        const dLeft=Math.ceil((new Date(exp+'T00:00:00')-new Date(todayStr()+'T00:00:00'))/864e5);
+        let cdCls,cdTxt;
+        if(dLeft<0){cdCls='cd-over';cdTxt=`已逾期 ${-dLeft} 天`;}
+        else if(dLeft===0){cdCls='cd-today';cdTxt='⏰ 今天到期';}
+        else if(dLeft<=3){cdCls='cd-p0';cdTxt=`仅剩 ${dLeft} 天`;}
+        else if(dLeft<=7){cdCls='cd-p1';cdTxt=`剩 ${dLeft} 天`;}
+        else{cdCls='cd-ok';cdTxt=`剩 ${dLeft} 天`;}
+        return `<td class="sm"><span class="cd-tag ${cdCls}" title="完成时间 ${esc(exp)}">${cdTxt}</span></td>`;
+      }
       if(k==='endDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.endDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'endDate',this.value)"></td>`;
       if(k==='plan'){
         // cat=11 三条任务各自独立、互不干涉（v2026-08-31e：workDetail+title+idx 三层容错）
@@ -2808,6 +2843,57 @@ function updateTaskField(taskId,field,value){
   t[field]=value;
   saveData();
   toast('已保存');
+}
+
+/* ===== ＋ 添加条目 弹窗（模块表格通用；cat=12 备忘录记录时间自动填今天） ===== */
+function openModuleAdd(){
+  const c=CATS.find(x=>x.id===currentSubCat);if(!c)return;
+  const isMemo=String(currentSubCat)==='12';
+  const old=document.getElementById('maModal');if(old)old.remove();
+  const m=document.createElement('div');
+  m.id='maModal';m.className='ma-mask';
+  m.innerHTML=`<div class="ma-box" onclick="event.stopPropagation()">
+    <div class="ma-hd">＋ 添加条目 — ${esc(c.name)}${isMemo?' <span style="font-size:11px;font-weight:600;color:#7c3aed">记录时间自动填今天</span>':''}</div>
+    <div class="ma-bd">
+      <div class="field"><label>${isMemo?'📝 工作内容':'任务标题'}</label><input id="maTitle" placeholder="${isMemo?'要记录的工作信息…':''}"></div>
+      <div class="field-row">
+        <div class="field"><label>子模块</label><select id="maSub">${c.subs.map(s=>`<option ${currentSubFilter===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
+        <div class="field"><label>优先级</label><select id="maPrio"><option value="P2">P2 普通</option><option value="P1">P1 重要</option><option value="P0">P0 紧急</option></select></div>
+      </div>
+      <div class="field"><label>${isMemo?'🏁 完成时间（倒数提醒按此计算，可留空）':'📅 截止日期'}</label><input id="maDate" type="date"></div>
+      ${isMemo?`<div class="field"><label>🕓 记录时间（自动=今天，可改）</label><input id="maStart" type="date" value="${todayStr()}"></div>`:''}
+      <div class="field"><label>备注</label><textarea id="maNote" rows="2"></textarea></div>
+    </div>
+    <div class="ma-ft"><button class="btn" onclick="closeModuleAdd()">取消</button><button class="btn primary" onclick="moduleAddSave()">保存</button></div>
+  </div>`;
+  m.addEventListener('click',()=>closeModuleAdd());
+  document.body.appendChild(m);
+  setTimeout(()=>{const el=document.getElementById('maTitle');if(el)el.focus();},50);
+}
+function closeModuleAdd(){const m=document.getElementById('maModal');if(m)m.remove();}
+function moduleAddSave(){
+  const c=CATS.find(x=>x.id===currentSubCat);if(!c)return;
+  const isMemo=String(currentSubCat)==='12';
+  const elT=document.getElementById('maTitle');
+  const title=(elT?elT.value.trim():'');
+  if(!title){toast('请填写内容');return}
+  const elSub=document.getElementById('maSub');const elPrio=document.getElementById('maPrio');
+  const elDate=document.getElementById('maDate');const elNote=document.getElementById('maNote');
+  const elStart=document.getElementById('maStart');
+  const maxId=data.tasks.reduce((m,t)=>Math.max(m,t.id),0);
+  const rec={id:maxId+1,title,cat:currentSubCat,
+    sub:(elSub?elSub.value:(c.subs[0]||'')),
+    prio:(elPrio?elPrio.value:'P2'),
+    due:(elDate?elDate.value:''),
+    note:(elNote?elNote.value:''),
+    done:false};
+  if(isMemo){
+    rec.expire=rec.due;                       // 完成时间 → expire，倒数提醒按此算
+    rec.startDate=(elStart&&elStart.value)?elStart.value:todayStr(); // 记录时间自动=今天
+  }
+  data.tasks.push(rec);
+  saveData();closeModuleAdd();renderAll();renderSubModule();
+  toast(isMemo?`已记录 · 记录时间 ${rec.startDate}${rec.expire?' · 倒数提醒已启用':''}`:'已添加');
 }
 
 /* ============== 出差报销单（cat=11「中方报销」任务）============== */
@@ -6125,6 +6211,8 @@ function taskSave(){
   if(t.doneDocs>t.totalDocs)t.doneDocs=t.totalDocs;
   t.progress=document.getElementById('tdProgress').value;
   t.note=document.getElementById('tdNote').value;
+  // cat=12 工作备忘录：抽屉保存后与表格列保持一致（完成时间=expire、记录时间=startDate）
+  if(String(t.cat)==='12'){t.expire=t.due;if(t.start)t.startDate=t.start;}
   saveData();
   renderAll();renderSubModule();
   closeTaskDrawer();
@@ -6147,7 +6235,10 @@ function addSubTask(){
   const d=document.getElementById('newTaskDate').value;
   const s=document.getElementById('newTaskSub').value;
   const maxId=data.tasks.reduce((m,t)=>Math.max(m,t.id),0);
-  data.tasks.push({id:maxId+1,title:t,cat:currentSubCat,prio:p,due:d,done:false,sub:s});
+  const rec={id:maxId+1,title:t,cat:currentSubCat,prio:p,due:d,done:false,sub:s};
+  // cat=12 工作备忘录：记录时间自动填今天；完成时间同步到 expire（倒数提醒按 expire 算）
+  if(String(currentSubCat)==='12'){rec.startDate=todayStr();if(d)rec.expire=d;}
+  data.tasks.push(rec);
   saveData();
   document.getElementById('newTaskTitle').value='';
   document.getElementById('newTaskDate').value='';
@@ -6373,6 +6464,10 @@ function normalizeData(){
     data._catVer=13;
     // 保留用户后续可能新增的旧任务？旧 cat 已无意义 → 全部以新版为准（按图1重分类）
     void oldTasks;
+  }
+  // 升级到 14：新增 cat=12 工作备忘录（不替换现有任务，仅版本号 bump）
+  if(data._catVer<14){
+    data._catVer=14;
   }
   if(!Array.isArray(data.certs))data.certs=[];
   if(!Array.isArray(data.auths))data.auths=defaultAuths();
