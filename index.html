@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APP_VERSION: 2026-09-07a (cat=12 工作备忘录列重排：序号/记录日期/工作事项/交办人/要求完成日期/完成情况/备注/完成时间；完成情况四态下拉[已完成/进行中/未开始/已搁置]，选「已完成」自动记录当前日期+时间到完成时间列并同步 done；倒数提醒保留为要求完成日期格内小标签；BUILD_TAG 26-09-1014→26-09-1015) -->
+<!-- APP_VERSION: 2026-09-07b (修复主表窄列表头字色：新增 .mt-tbl th.sm 强制白色+800字重+字间距——此前 .sm 灰色 #475569 同时命中 th/td 导致备忘录等窄列表头发灰看不清，正文灰色小字不受影响；BUILD_TAG 26-09-1015→26-09-1016) -->
 <html lang="zh-CN" data-page-node-id="yFozsu0bwy8ee7XiYUjcQv">
 <head data-page-node-id="FjW1epA4w1116VMFBMfDog">
 <meta charset="UTF-8" data-page-node-id="xuDC073VYPYDuAlUiO2vVN">
@@ -993,6 +993,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 .mt-tbl tbody tr.row-done .td-detail{text-decoration:line-through}
 .mt-tbl .num{width:38px;text-align:center;color:var(--muted);font-weight:600}
 .mt-tbl .sm{font-size:12px;color:#475569;white-space:nowrap}
+.mt-tbl th.sm{color:#fff;font-size:12.5px;font-weight:800;letter-spacing:.8px;text-shadow:0 1px 2px rgba(0,0,0,.35)}
 .mt-tbl .td-detail{font-weight:600;color:var(--text);min-width:130px}
 .mt-tbl .td-content{color:#475569;font-size:12px;min-width:180px;max-width:280px}
 .mt-tbl .td-plan{display:flex;flex-direction:column;gap:3px;min-width:200px;max-width:300px}
@@ -1606,9 +1607,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-07a';
+const APP_VER='2026-09-07b';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1015';
+const BUILD_TAG='26-09-1016';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
