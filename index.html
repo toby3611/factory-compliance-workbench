@@ -299,9 +299,9 @@ body:has(.drawer.on) .build-tag,
 body:has(.mask:not(.hidden)) .build-tag,
 body:has(.drawer.on) .fab-wrap,
 body:has(.mask:not(.hidden)) .fab-wrap{display:none}
-/* ===== 构建版本号徽章 + fab 容器（垂直堆叠、永远左下角不冲突）===== */
+/* ===== 构建版本号徽章 + fab 容器（垂直堆叠 · 右下角，避开左侧边栏底部菜单）===== */
 .fab-wrap{
-  position:fixed;bottom:20px;left:24px;z-index:80;
+  position:fixed;bottom:20px;right:20px;z-index:80;
   display:flex;flex-direction:column;align-items:center;gap:6px;
 }
 /* wrapper 内部：fab 改相对定位（取消原全局 fixed），让 flex 真正控制位置 */
@@ -315,8 +315,8 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
   box-shadow:0 1px 3px rgba(15,23,42,.06);
 }
 @media(max-width:780px){
-  /* 跟随 fab 移到手机端 tabbar 上方位置 */
-  .fab-wrap{bottom:74px;left:14px}
+  /* 手机端仍用左下角（浮在 tabbar 上方），需清除桌面端的 right */
+  .fab-wrap{bottom:74px;left:14px;right:auto}
   .build-tag{font-size:10px;padding:2px 7px}
 }
 
@@ -1614,7 +1614,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-09-09f';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1019';
+const BUILD_TAG='26-09-1020';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
