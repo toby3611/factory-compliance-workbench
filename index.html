@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APP_VERSION: 2026-09-07c (cat=12 工作备忘录「完成情况」后新增「完成进度」列：四步下拉[票据整理/单据填写/提交财务/款项到账]，各步配色[蓝/橙/紫/绿]未选灰，行内直接改即时保存；添加条目弹窗同步该字段；BUILD_TAG 26-09-1016→26-09-1017) -->
+<!-- APP_VERSION: 2026-09-09d (回滚黄总授权恢复至 v2026-09-07c 基线 + 最小化修复 cat=12 workDetail 兜底渲染：12 条历史脏数据用 title 临时回填展示，不污染原始数据；BUILD_TAG 26-09-1017→26-09-1017build1017d，实际徽章不递增) -->
 <html lang="zh-CN" data-page-node-id="yFozsu0bwy8ee7XiYUjcQv">
 <head data-page-node-id="FjW1epA4w1116VMFBMfDog">
 <meta charset="UTF-8" data-page-node-id="xuDC073VYPYDuAlUiO2vVN">
@@ -1612,7 +1612,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-07c';
+const APP_VER='2026-09-09d';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
 const BUILD_TAG='26-09-1017';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
@@ -2278,6 +2278,17 @@ function renderSubModule(){
   const c=CATS.find(x=>x.id===currentSubCat);
   document.getElementById('subName').textContent=c.name;
   const body=document.getElementById('subBody');
+
+  // === cat=12 工作备忘录 workDetail 渲染兜底（v2026-09-09d 最小修复）===
+  // 历史原因：cat=12 添加弹窗只保存 title 没保存 workDetail，导致 11 条任务的 workDetail 列空白
+  // 兜底策略：渲染前若 workDetail 为空但 title 有值，用 title 回填展示（即改即生效，下一次刷新还在）
+  if(c && c.id==='12'){
+    try{
+      data.tasks.filter(t=>String(t.cat)==='12').forEach(t=>{
+        if(t && !t.workDetail && t.title) t.workDetail=t.title;
+      });
+    }catch(e){console.warn('[cat=12 兜底]',e)}
+  }
 
   // F 聚合视图
   if(c.isAggregator){
