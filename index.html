@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APP_VERSION: 2026-09-07c (cat=12 工作备忘录「完成情况」后新增「完成进度」列：四步下拉[票据整理/单据填写/提交财务/款项到账]，各步配色[蓝/橙/紫/绿]未选灰，行内直接改即时保存；添加条目弹窗同步该字段；BUILD_TAG 26-09-1016→26-09-1017) -->
+<!-- APP_VERSION: 2026-09-09a (排版修正：仅「顶栏 + 左侧主导航栏」吸顶固定，子模块标题/Tab栏/表头 改为随内容滚动；移除已失效的 updateStickyHeights/ensureStickyObserver 死代码；BUILD_TAG 26-09-1018→26-09-1019) -->
 <html lang="zh-CN" data-page-node-id="yFozsu0bwy8ee7XiYUjcQv">
 <head data-page-node-id="FjW1epA4w1116VMFBMfDog">
 <meta charset="UTF-8" data-page-node-id="xuDC073VYPYDuAlUiO2vVN">
@@ -40,10 +40,14 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .topbar .actions .sync-badge{display:none}
 
 /* ============ 布局：左侧栏 + 主区 ============ */
-.layout{display:flex;min-height:calc(100vh - 56px)}
+.layout{display:flex;align-items:flex-start;min-height:calc(100vh - 56px)}
 .sidebar{
   width:200px;flex:none;background:#fff;
-  border-right:1px solid var(--line);padding:12px 8px;overflow-y:auto;
+  border-right:1px solid var(--line);padding:12px 8px;
+  /* === 吸顶：滚动页面时左侧主导航栏不动 === */
+  position:sticky;top:56px;align-self:flex-start;
+  max-height:calc(100vh - 56px);overflow-y:auto;
+  z-index:40;
 }
 .sidebar-section{font-size:11px;color:var(--muted);padding:10px 12px 6px;font-weight:600;letter-spacing:.5px}
 .nav-item{position:relative;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;font-size:14px;color:var(--text);margin-bottom:2px;user-select:none;transition:background .12s;font-weight:500}
@@ -214,15 +218,24 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .sub-view{background:var(--bg);animation:slideIn .25s ease}
 @keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
 .sub-hd{
-  position:sticky;top:56px;z-index:5;display:flex;align-items:center;gap:10px;
+  position:static;display:flex;align-items:center;gap:10px;
   padding:14px 16px;background:var(--card);border-bottom:1px solid var(--line);
-  backdrop-filter:saturate(180%) blur(8px);
 }
 .sub-back{background:none;border:none;color:var(--primary);font-size:22px;cursor:pointer;padding:4px 10px;line-height:1;font-weight:700}
 .sub-hd h2{font-size:19px;font-weight:800;flex:1;min-width:0;letter-spacing:.3px;color:var(--text)}
 .sub-stats{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:4px}
 .sub-stats b{color:var(--text);font-size:14px}
 .sub-body{padding:12px 14px}
+/* ==== 原吸顶容器：Tab栏 + 添加按钮（现改为随内容滚动，仅保留视觉样式） ==== */
+.sub-bar-sticky{
+  position:static;
+  background:var(--card);
+  padding:6px 14px 8px;
+  border-bottom:1px solid var(--line);
+  box-shadow:0 2px 6px rgba(0,0,0,.05);
+}
+.sub-bar-sticky .sub-filter{margin-bottom:0}
+.sub-bar-sticky .auth-foot{display:none}
 .sub-section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
 .sub-section h3{font-size:13px;margin-bottom:10px;display:flex;align-items:center;gap:6px;color:var(--muted);font-weight:600}
 .sub-section h3 .ic{width:16px;height:16px;color:var(--primary)}
@@ -989,7 +1002,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 /* ============ 11 大类通用表格视图（图 1 模板） ============ */
 .mt-wrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:6px}
 .mt-tbl{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:auto}
-.mt-tbl thead{background:linear-gradient(180deg,#0f1f3a 0%,#1e3a5f 50%,#0f1f3a 100%);position:sticky;top:0;z-index:5;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+.mt-tbl thead{background:linear-gradient(180deg,#0f1f3a 0%,#1e3a5f 50%,#0f1f3a 100%);box-shadow:0 2px 4px rgba(0,0,0,.3)}
 .mt-tbl th{padding:13px 12px;text-align:left;font-weight:800;color:#ffffff;border-bottom:3px solid #fbbf24;white-space:nowrap;font-size:14px;letter-spacing:.8px;text-shadow:0 1px 3px rgba(0,0,0,.5);background:transparent}
 .mt-tbl td{padding:9px 8px;border-bottom:1px solid #eef0f4;vertical-align:top;line-height:1.5;word-break:break-word}
 .mt-tbl tbody tr{transition:background .12s;cursor:pointer}
@@ -1612,9 +1625,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-07c';
+const APP_VER='2026-09-09a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1017';
+const BUILD_TAG='26-09-1019';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -2618,7 +2631,9 @@ function renderModuleTableHTML(){
   </div>`;
 
   if(subViewMode==='monthly' && c.cols && c.cols.some(col=>col[0]==='month')){
-    return chips + renderMonthlyViewHTML(filterItems);
+    // 仅 cat=12 工作备忘录：把 chips 包成 .sub-bar-sticky 吸顶容器（Tab栏 + 添加按钮 紧贴 sub-hd 下方不动）
+    const chipsWrap=(currentSubCat==='12')?`<div class="sub-bar-sticky">${chips}</div>`:chips;
+    return chipsWrap + renderMonthlyViewHTML(filterItems);
   }
 
   // 表格（按当前分类的 cols 配置渲染专属列）
@@ -2793,7 +2808,7 @@ function renderModuleTableHTML(){
     </tr>${isYc && tIsOpen?`<tr class="phase-row" id="pr-t-${t.id}"><td colspan="${colCount}"><div class="phase-inner">${renderPhasePanel(t)}</div></td></tr>`:''}${t.cat==='11' && recTypeOf(t)==='vac' && isVacRowOpen(t.id)?`<tr class="vac-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderVacationPanel(t.id)}</td></tr>`:''}${t.cat==='5' && openDrillTasks.has(String(t.id))?`<tr class="drill-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderDrillExpandInner(t)}</td></tr>`:''}${t.cat==='7' && openCheckTasks.has(String(t.id))?`<tr class="check-expand-row" data-task-id="${t.id}"><td colspan="${colCount}">${renderCheckExpandInner(t)}</td></tr>`:''}`;
   }).join('');
 
-  return `${chips}<div class="mt-wrap">
+  return `${currentSubCat==='12'?`<div class="sub-bar-sticky">${chips}</div>`:chips}<div class="mt-wrap">
     <table class="mt-tbl">
       <thead><tr>${thHTML}</tr></thead>
       <tbody>${rows||`<tr><td colspan="${colCount}" class="mt-empty">暂无条目，点右上「＋ 添加条目」或导入数据</td></tr>`}</tbody>
