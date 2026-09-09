@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- APP_VERSION: 2026-09-09d (回滚黄总授权恢复至 v2026-09-07c 基线 + 最小化修复 cat=12 workDetail 兜底渲染：12 条历史脏数据用 title 临时回填展示，不污染原始数据；BUILD_TAG 26-09-1017→26-09-1017build1017d，实际徽章不递增) -->
+<!-- APP_VERSION: 2026-09-09e (修复「掉回本地模式」：①同步配置双 key 备份，主 key 被清自动兜底 ②预置固定 Gist id，只补 Token 即可重连 ③新增 Gist 写权限校验 gistVerifyWrite，只读 Token 当场拦截 ④本地模式徽章改橙色告警 + 启动提醒 ⑤导出备份附带同步凭证、导入自动重连；BUILD_TAG 26-09-1017→26-09-1018) -->
 <html lang="zh-CN" data-page-node-id="yFozsu0bwy8ee7XiYUjcQv">
 <head data-page-node-id="FjW1epA4w1116VMFBMfDog">
 <meta charset="UTF-8" data-page-node-id="xuDC073VYPYDuAlUiO2vVN">
@@ -1338,7 +1338,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
     </div>
   </div>
   <div class="actions" data-page-node-id="Syna15nHO948ZZCWI0UalH">
-    <span id="syncBadge" onclick="openSync()" style="font-size:12px;padding:5px 11px;border-radius:14px;background:rgba(255,255,255,.16);cursor:pointer;font-weight:600" data-page-node-id="Uyu19RE8L4DVjsjFYW7SWX">☁ 本地模式</span>
+    <span id="syncBadge" onclick="openSync()" style="font-size:12px;padding:5px 11px;border-radius:14px;background:rgba(255,255,255,.16);cursor:pointer;font-weight:600" data-page-node-id="Uyu19RE8L4DVjsjFYW7SWX">⚠ 本地模式·未连云端</span>
     <button class="icon-btn hide-mobile" id="expBtn" title="导出备份" data-page-node-id="FzeVFudr8cURkOq4fG8MDZ"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="ZuPG9tTTFrgKFZZCCHo6eo"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" data-page-node-id="Y8sz5eFgF0WR2ByCH9BG2l"/></svg></button>
     <button class="icon-btn hide-mobile" id="impBtn" title="导入备份" data-page-node-id="DxrUBdjUoZQrh7KiDFGAmu"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="zGMscFiqFmANfl62VGZKns"><path d="M12 21V9m0 0l-4 4m4-4l4 4M5 3h14" data-page-node-id="ZMZ0k9C2oRRbAvnTcwyshA"/></svg></button>
     <input type="file" id="impFile" accept="application/json" hidden data-page-node-id="O8WuA7wrnjn2xpefHSEPyW">
@@ -1612,9 +1612,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-09d';
+const APP_VER='2026-09-09e';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1017';
+const BUILD_TAG='26-09-1018';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -1832,6 +1832,9 @@ function defaultPhases(){
 /* ============ 存储 / 云端同步 ============ */
 const KEY="wb_factory_v2";
 const SYNC_KEY="wb_factory_sync_v1";
+const SYNC_BAK_KEY="wb_factory_sync_bak_v1"; /* 同步配置备份键：主 key 被清理时自动兜底，防止掉回本地模式 */
+const DEFAULT_GIST_ID="82d676cebdc3922bf649385bb1b6ed0b"; /* 固定云端 Gist（私有），配置丢失时自动回填 */
+const DEFAULT_GIST_DESC="工厂合规工作台 云端数据";
 const GIST_FILE="workbench.json";
 let data;
 let sync={enabled:false,gistId:null,token:null};
@@ -1844,16 +1847,23 @@ function setStatus(kind){
   if(kind==='cloud'||kind==='synced'){b.textContent='☁ 已同步';b.style.background='rgba(255,255,255,.22)';}
   else if(kind==='syncing'){b.textContent='🔄 同步中…';b.style.background='rgba(255,255,255,.28)';}
   else if(kind==='error'){b.textContent='⚠️ 同步失败';b.style.background='rgba(229,72,77,.7)';}
-  else{b.textContent='☁ 本地模式';b.style.background='rgba(255,255,255,.16)';}
+  else{b.textContent='⚠ 本地模式·未连云端';b.style.background='rgba(234,88,12,.78)';}
 }
+/* 同步配置双写：主 key + 备份 key 同时落盘，任一存活即可自动恢复云端 */
+function _bakSync(){try{localStorage.setItem(SYNC_KEY,JSON.stringify(sync));localStorage.setItem(SYNC_BAK_KEY,JSON.stringify(sync));}catch(e){}}
 function loadSyncCfg(){
-  try{const s=JSON.parse(localStorage.getItem(SYNC_KEY));if(s&&s.token){sync=s;return}}catch(e){}
+  try{const s=JSON.parse(localStorage.getItem(SYNC_KEY));if(s&&s.token){sync=s;_bakSync();return}}catch(e){}
+  /* 兜底1：主 key 丢失 → 用备份 key 自动恢复云端连接 */
+  try{const b=JSON.parse(localStorage.getItem(SYNC_BAK_KEY));if(b&&b.token){sync=b;localStorage.setItem(SYNC_KEY,JSON.stringify(sync));return}}catch(e){}
   const h=location.hash.match(/gist=([^&]+)&t=([^&]+)/);
   if(h){
     sync={enabled:true,gistId:h[1],token:decodeURIComponent(h[2])};
-    localStorage.setItem(SYNC_KEY,JSON.stringify(sync));
+    _bakSync();
     history.replaceState(null,'',location.pathname+location.search);
+    return;
   }
+  /* 兜底2：彻底无配置 → 预置固定 Gist id，用户只需补填 Token 即可重连 */
+  sync={enabled:false,gistId:DEFAULT_GIST_ID,token:null};
 }
 function localLoad(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
 function localSave(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}}
@@ -1891,7 +1901,17 @@ async function gistCreate(){
   if(!res.ok)throw new Error('HTTP '+res.status);
   const j=await res.json();
   sync.gistId=j.id;sync.enabled=true;
-  localStorage.setItem(SYNC_KEY,JSON.stringify(sync));
+  _bakSync();
+}
+/* 写权限校验：只改 description、不动数据内容，用来提前拦下「只读 Token」（能读 200 但写入 404） */
+async function gistVerifyWrite(){
+  const res=await fetch('https://api.github.com/gists/'+sync.gistId,{
+    method:'PATCH',
+    headers:{'Authorization':'token '+sync.token,'Content-Type':'application/json','Accept':'application/vnd.github+json'},
+    body:JSON.stringify({description:DEFAULT_GIST_DESC})
+  });
+  if(!res.ok)throw new Error('HTTP '+res.status+'：Token 无 Gist 写入权限（需勾选 gist 权限）');
+  return true;
 }
 async function loadFromCloud(manual){
   if(!sync.enabled){if(manual)openSync();return}
@@ -2020,6 +2040,14 @@ function finish(id){const x=data.tasks.find(t=>t.id==id);if(x){x.done=true;saveD
 
 function toggle(id){const x=data.tasks.find(t=>t.id==id);if(x){x.done=!x.done;saveData();renderAll();if(currentSubCat)renderSubModule()}}
 function del(id){if(!confirm('删除该任务？'))return;data.tasks=data.tasks.filter(t=>t.id!=id);saveData();renderAll();if(currentSubCat)renderSubModule()}
+/* 表格操作列「✓/○ 标记完成」：此前只有 onclick 调用、缺函数定义（点击会报 JS 错），现补齐 */
+function toggleTaskDone(id){
+  const t=data.tasks.find(x=>String(x.id)===String(id));
+  if(!t){toast('未找到该条目');return;}
+  t.done=!t.done;
+  saveData();renderAll();if(currentSubCat)renderSubModule();
+  toast(t.done?'已标记完成':'已标记未完成');
+}
 
 /* ============ 渲染：报告中心完成率 ============ */
 function renderMetrics(){
@@ -6488,8 +6516,9 @@ async function saveSync(){
     else{
       const d=await gistRead();
       if(d){data=d;localSave();}
+      await gistVerifyWrite(); /* 只读 Token 在此拦截，避免「显示已同步但实际存不进云端」 */
     }
-    localStorage.setItem(SYNC_KEY,JSON.stringify(sync));
+    _bakSync();
     setStatus('synced');
     renderAll();
     document.getElementById('syncActions').style.display='block';
@@ -6510,6 +6539,7 @@ function disconnectSync(){
   if(!confirm('断开云端后数据只存本地浏览器，确认？'))return;
   sync={enabled:false,gistId:null,token:null};
   localStorage.removeItem(SYNC_KEY);
+  localStorage.removeItem(SYNC_BAK_KEY);
   setStatus('local');
   document.getElementById('syncActions').style.display='none';
   closeSync();
@@ -7087,13 +7117,22 @@ document.getElementById('kbFiles').addEventListener('change',e=>onKbFiles(e.targ
 document.getElementById('certForm').addEventListener('submit',saveCert);
 document.getElementById('memoInput').addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')addMemo()});
 document.getElementById('expBtn').addEventListener('click',()=>{
-  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  /* 备份附带同步凭证（只写进本机导出的文件，绝不随数据上传云端），导入时可一键重连 */
+  const out=Object.assign({},data,{_sync:sync.enabled?{enabled:true,gistId:sync.gistId,token:sync.token,uploadToken:sync.uploadToken||''}:null});
+  const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='综合工作台备份.json';a.click();
 });
 document.getElementById('impBtn').addEventListener('click',()=>document.getElementById('impFile').click());
 document.getElementById('impFile').addEventListener('change',e=>{
   const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();r.onload=()=>{try{data=JSON.parse(r.result);saveData();renderAll();toast('导入成功')}catch(err){toast('文件格式错误')}};r.readAsText(f);
+  const r=new FileReader();r.onload=()=>{try{
+    const j=JSON.parse(r.result);
+    let reconnected=false;
+    /* 备份里带同步凭证 → 自动重连云端；用完立即删除，避免 Token 随数据上传 Gist */
+    if(j&&j._sync&&j._sync.token){sync=Object.assign({},j._sync);sync.enabled=true;_bakSync();reconnected=true;delete j._sync;}
+    data=j;saveData();renderAll();
+    toast(reconnected?'导入成功 · 云端已自动重连':'导入成功');
+  }catch(err){toast('文件格式错误')}};r.readAsText(f);
 });
 document.getElementById('clearBtn').addEventListener('click',()=>{
   if(confirm('确定重置为示例数据吗？（会覆盖当前数据）')){data=seed();saveData();renderAll();toast('已重置为示例数据')}
@@ -7212,6 +7251,8 @@ async function _wbBoot(){
   }else{
     data=localLoad()||seed();
     setStatus('local');
+    /* 本地模式醒目提醒：数据只存本机浏览器，不会上传云端，清缓存即丢 */
+    setTimeout(()=>toast('本地模式：数据只存本机、未上传云端。点右上角徽章可重连云端'),800);
   }
   if(getSession()){
     hideLoginGate();
