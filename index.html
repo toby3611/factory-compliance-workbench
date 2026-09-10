@@ -232,6 +232,14 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
 .sub-filter .fchip{font-size:13px;padding:6px 14px;border-radius:14px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--text);font-weight:600;transition:all .15s;letter-spacing:.2px}
 .sub-filter .fchip:hover{background:#f1f6ff;border-color:#93b6f7;color:var(--primary)}
 .sub-filter .fchip.active{background:linear-gradient(135deg,#1e6fff,#3b82f6);color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(30,111,255,.35);font-weight:700}
+/* 2026-09-10 黄总要求①：子模块 filter+工具栏吸顶，滚动后折叠进标题成单行紧凑模式 */
+.chips-sticky{position:sticky;top:56px;z-index:6;background:#fff;padding:7px 0 5px;margin-bottom:10px;border-bottom:1px solid var(--line);box-shadow:0 4px 10px -6px rgba(15,31,58,.18)}
+.chips-sticky .sub-filter{margin-bottom:0}
+/* 折叠态：紧凑单行，隐藏次要 chips（子分类第2个起 / 月格提示 / 视图切换），仅留「全部 / 第1子分类 / +添加条目」 */
+.chips-sticky.scrl{max-height:44px;overflow:hidden}
+.chips-sticky.scrl .chip-minor,
+.chips-sticky.scrl .chip-tip,
+.chips-sticky.scrl .chip-mode{display:none}
 .add-task-bar{display:flex;gap:6px;flex-wrap:wrap}
 .add-task-bar input[type=text]{flex:1;min-width:160px}
 .add-task-bar select,.add-task-bar input[type=date]{flex:none;min-width:90px}
@@ -1619,7 +1627,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-09-09g';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1024';
+const BUILD_TAG='26-09-1025';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -2888,7 +2896,7 @@ function sortTasksForList(arr){
       }
       // 二次：开始日期升序
       const as=a.startDate||a.firstCert||'', bs=b.startDate||b.firstCert||'';
-      if(as!==bx||as!==bs){
+      if(as!==bs){
         if(as&&bs) return as.localeCompare(bs);
         if(as) return -1;
         if(bs) return 1;
