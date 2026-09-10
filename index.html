@@ -1051,6 +1051,10 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 /* 任务表内嵌 date input */
 .cell-date{border:1px solid var(--line);border-radius:6px;padding:3px 6px;font-size:11.5px;font-family:inherit;color:var(--text);background:#fff;width:100%;min-width:110px}
 .cell-date:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(30,111,255,.1)}
+/* cat=5 演习「实施要求」行内编辑格子：每行独立、互不连接 */
+.cell-plan{border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:11.5px;font-family:inherit;color:var(--text);background:#fff;width:100%;min-width:150px;max-width:230px;resize:vertical;line-height:1.4}
+.cell-plan:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(30,111,255,.1);background:#fff}
+.cell-plan::placeholder{color:#b6c2d4}
 
 .exp-bd{display:inline-block;margin-left:4px;padding:1px 6px;border-radius:4px;font-size:10.5px;font-weight:600;white-space:nowrap}
 .exp-bd.ok{background:#dcfce7;color:#15803d}
@@ -1616,7 +1620,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-09-09f';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1022';
+const BUILD_TAG='26-09-1023';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -2757,6 +2761,10 @@ function renderModuleTableHTML(){
       }
       if(k==='endDate')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.endDate||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'endDate',this.value)"></td>`;
       if(k==='plan'){
+        // cat=5 演习「实施要求」可编辑格子（2026-09-10 黄总要求）：每行一个独立 textarea、绑定各自任务 id、存各自 task.plan，行与行之间零共享零连接
+        if(t.cat==='5'){
+          return `<td class="td-plan"><textarea class="cell-plan" rows="2" placeholder="填写具体要求…" title="填写该演习的具体实施要求（点击格子编辑，点别处自动保存）" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'plan',this.value)">${esc(t.plan||'')}</textarea></td>`;
+        }
         // cat=11 三条任务各自独立、互不干涉（v2026-08-31e：workDetail+title+idx 三层容错）
         if(t.cat==='11'){
           const cfg=CAT11_ROW_CFG[(t.workDetail||t.title||'').trim()] || _cat11CfgByIdx(t) || null;
