@@ -997,7 +997,10 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 @media(max-width:860px){.auth-stats{grid-template-columns:repeat(2,1fr)}.auth-toolbar .filter{display:none}}
 
 /* ============ 11 大类通用表格视图（图 1 模板） ============ */
-.mt-wrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:6px}
+.mt-wrap{background:#fff;border:1px solid var(--line);border-radius:12px;margin-top:6px;overflow:visible}
+/* 子模块视图下，table 不在 mt-wrap 内裁剪，让 thead sticky 在 body 滚动下生效。
+   （表格过宽时会撑破 layout，由 body 横向滚动兜底；sidebar sticky 不受影响） */
+.chips-mode .mt-wrap{overflow:visible}
 .mt-tbl{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:auto}
 .mt-tbl thead{background:linear-gradient(180deg,#0f1f3a 0%,#1e3a5f 50%,#0f1f3a 100%);position:sticky;top:var(--thead-top,56px);z-index:5;box-shadow:0 2px 4px rgba(0,0,0,.3)}.mt-tbl th{padding:13px 12px;text-align:left;font-weight:800;color:#ffffff;border-bottom:3px solid #fbbf24;white-space:nowrap;font-size:14px;letter-spacing:.8px;text-shadow:0 1px 3px rgba(0,0,0,.5);background:transparent}
 .mt-tbl td{padding:9px 8px;border-bottom:1px solid #eef0f4;vertical-align:top;line-height:1.5;word-break:break-word}
@@ -1625,9 +1628,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-09h';
+const APP_VER='2026-09-09i';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1026';
+const BUILD_TAG='26-09-1027';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -2933,7 +2936,9 @@ function bindChipsSticky(){
 
   const cs=document.getElementById('chipsSticky');
   const th=document.querySelector('#subBody .mt-tbl thead');
-  if(!cs){ if(th) th.style.removeProperty('--thead-top'); return; }
+  if(!cs){ if(th) th.style.removeProperty('--thead-top'); document.body.classList.remove('chips-mode'); return; }
+  // 标记子模块视图：让 .mt-wrap 去掉 overflow:hidden（让 thead sticky 在 body 滚动下生效）
+  document.body.classList.add('chips-mode');
 
   // 真正的滚动容器：本工作台 main 没有 overflow:auto，整页是 window 滚动；保险起见仍兼容 main 滚动模式
   const sr=document.querySelector('main');
@@ -2989,6 +2994,7 @@ function bindChipsSticky(){
     if(io) io.disconnect();
     try{ srEvt.removeEventListener('scroll', onScroll); }catch(e){}
     try{ window.removeEventListener('resize', onResize); }catch(e){}
+    document.body.classList.remove('chips-mode');
   };
 }
 
