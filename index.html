@@ -991,8 +991,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 /* ============ 11 大类通用表格视图（图 1 模板） ============ */
 .mt-wrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:6px}
 .mt-tbl{width:100%;border-collapse:collapse;font-size:12.5px;table-layout:auto}
-.mt-tbl thead{background:linear-gradient(180deg,#0f1f3a 0%,#1e3a5f 50%,#0f1f3a 100%);position:sticky;top:0;z-index:5;box-shadow:0 2px 4px rgba(0,0,0,.3)}
-.mt-tbl th{padding:13px 12px;text-align:left;font-weight:800;color:#ffffff;border-bottom:3px solid #fbbf24;white-space:nowrap;font-size:14px;letter-spacing:.8px;text-shadow:0 1px 3px rgba(0,0,0,.5);background:transparent}
+.mt-tbl thead{background:linear-gradient(180deg,#0f1f3a 0%,#1e3a5f 50%,#0f1f3a 100%);position:sticky;top:var(--thead-top,56px);z-index:5;box-shadow:0 2px 4px rgba(0,0,0,.3)}.mt-tbl th{padding:13px 12px;text-align:left;font-weight:800;color:#ffffff;border-bottom:3px solid #fbbf24;white-space:nowrap;font-size:14px;letter-spacing:.8px;text-shadow:0 1px 3px rgba(0,0,0,.5);background:transparent}
 .mt-tbl td{padding:9px 8px;border-bottom:1px solid #eef0f4;vertical-align:top;line-height:1.5;word-break:break-word}
 .mt-tbl tbody tr{transition:background .12s;cursor:pointer}
 .mt-tbl tbody tr:hover{background:#f5f8ff}
@@ -1618,9 +1617,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-09f';
+const APP_VER='2026-09-09g';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1023';
+const BUILD_TAG='26-09-1024';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -2339,6 +2338,7 @@ function renderSubModule(){
   // 11 大类统一走通用表格视图（按图 1 模板）
   body.innerHTML=renderModuleTableHTML();
   bindModuleTable();
+  bindChipsSticky();  // 2026-09-10 chips-sticky 吸顶 + 滚动折叠（所有 11 大类生效）
   // 中方休假记录台账行内展开：搜索框 + 视觉/位置恢复（vacOpenSet 状态保留）
   mountVacInlineRows();
 }
@@ -2646,20 +2646,26 @@ function renderModuleTableHTML(){
     </div>`;
   })():'';
   const hasMonthCol=(c.cols&&c.cols.some(x=>x[0]==='month'));
-  const chips=drillBanner+checkBanner+`<div class="sub-filter">
-    <span class="fchip ${!currentSubFilter?'active':''}" onclick="filterSub(null)">全部 (${items.length})</span>
-    ${c.subs.map(s=>{
-      const ct=items.filter(x=>x.sub===s).length;
-      return `<span class="fchip ${currentSubFilter===s?'active':''}" onclick="filterSub('${s.replace(/'/g,"\\'")}')">${esc(s)} (${ct})</span>`;
-    }).join('')}
-    <span style="flex:1"></span>
-    ${(hasMonthCol && currentSubCat!=='11')?`<span class="fchip" style="background:#fff7e8;color:#92400e;border:1px solid #fde68a" title="操作提示：单击月份格直接输入信息">
-      ✏️ 点月格输入（客户名 / done / 日期）
-    </span>`:''}
-    <span class="fchip ${subViewMode==='list'?'active':''}" onclick="setSubView('list')" style="background:#f0f5ff">📋 任务表</span>
-    ${hasMonthCol?`<span class="fchip ${subViewMode==='monthly'?'active':''}" onclick="setSubView('monthly')" style="background:#fef9e8">📅 按月排期</span>`:''}
-    <button class="btn primary" onclick="openModuleAdd()" style="padding:5px 12px;font-size:12px">＋ 添加条目</button>
-    ${currentSubCat==='11'?`<button class="btn mig-top-btn" onclick="renderMigrationDialog()" style="padding:5px 12px;font-size:12px;background:#f1f5f9;color:#475569;border:1px solid #cbd5e1" title="批量调整 cat=11 任务的标题和模块归属（黄总 2026-08-31 强需求）">🛠️ 数据迁移</button>`:''}
+  // 2026-09-10 黄总要求：filter chips 行 + 工具栏吸顶，滚动后折叠成单行紧凑模式。
+  // 仅这一组（外层 .chips-sticky）参与吸顶逻辑；其内的 sub-filter 行为零改动，下游事件绑定零改动。
+  const chips=drillBanner+checkBanner+`<div class="chips-sticky" id="chipsSticky">
+    <div class="sub-filter">
+      <span class="fchip ${!currentSubFilter?'active':''}" onclick="filterSub(null)">全部 (${items.length})</span>
+      ${c.subs.map((s,si)=>{
+        // 第 2 个往后算「次要 chips」：滚动折叠进标题时自动隐藏，让头部更紧凑
+        const minor=si>=1?' chip-minor':'';
+        const ct=items.filter(x=>x.sub===s).length;
+        return `<span class="fchip${minor} ${currentSubFilter===s?'active':''}" onclick="filterSub('${s.replace(/'/g,"\\'")}')">${esc(s)} (${ct})</span>`;
+      }).join('')}
+      <span style="flex:1"></span>
+      ${(hasMonthCol && currentSubCat!=='11')?`<span class="fchip chip-tip" style="background:#fff7e8;color:#92400e;border:1px solid #fde68a" title="操作提示：单击月份格直接输入信息">
+        ✏️ 点月格输入（客户名 / done / 日期）
+      </span>`:''}
+      <span class="fchip chip-mode ${subViewMode==='list'?'active':''}" onclick="setSubView('list')" style="background:#f0f5ff">📋 任务表</span>
+      ${hasMonthCol?`<span class="fchip chip-mode ${subViewMode==='monthly'?'active':''}" onclick="setSubView('monthly')" style="background:#fef9e8">📅 按月排期</span>`:''}
+      <button class="btn primary" onclick="openModuleAdd()" style="padding:5px 12px;font-size:12px">＋ 添加条目</button>
+      ${currentSubCat==='11'?`<button class="btn mig-top-btn" onclick="renderMigrationDialog()" style="padding:5px 12px;font-size:12px;background:#f1f5f9;color:#475569;border:1px solid #cbd5e1" title="批量调整 cat=11 任务的标题和模块归属（黄总 2026-08-31 强需求）">🛠️ 数据迁移</button>`:''}
+    </div>
   </div>`;
 
   if(subViewMode==='monthly' && c.cols && c.cols.some(col=>col[0]==='month')){
@@ -2681,7 +2687,12 @@ function renderModuleTableHTML(){
   }).join('')+'<th style="text-align:right">操作</th>';
   const colCount=cols.reduce((n,col)=>n+(col[0]==='month'?12:1),0)+1;
 
-  const rows=filterItems.map((t,i)=>{
+  // 2026-09-10 黄总要求列表排序：
+  //   ① 未完成项放上方 → 按「要求完成日期/截止日期」升序（到期越短越靠前，空日期垫底）；
+  //   ② 已完成项自动挪到下方 → 按「完成时间」倒序（最新完成的最靠上，叠在上一个已完成之上）；
+  //   ③ 不修改任务数据本身（只影响本次渲染顺序）。
+  const sortedItems=sortTasksForList(filterItems);
+  const rows=sortedItems.map((t,i)=>{
     const detail=t.workDetail||t.title||'';
     const content=t.projectContent||'';
     const period=t.period||'';
@@ -2851,6 +2862,128 @@ function renderModuleTableHTML(){
   <div class="auth-foot">💡 单击任意一行可查看详情 / 编辑；月份格点击可切换完成状态；验厂/会员会费任务可点「▸ 计划明细」展开实施计划面板；数据自动同步至云端 Gist，电脑手机一致。</div>`;
 }
 function bindModuleTable(){ /* 预留 */ }
+
+/* ===== 子模块表格排序（2026-09-10 黄总要求）=====
+   规则：
+   ① 未完成项（!done && memoStatus≠已完成）排在已完成上方；
+   ② 未完成项内按「要求完成日期/截止日期」升序，到期越短越靠前，无日期垫底；
+   ③ 已完成项内部按「完成时间」倒序，最新完成的最靠上；
+   ④ 返回新数组，原数据不动。
+   适用范围：任务表列表 + 月排期视图。零关联其他模块。
+*/
+function sortTasksForList(arr){
+  return (arr||[]).slice().sort((a,b)=>{
+    const aDone=!!(a.done || a.memoStatus==='已完成');
+    const bDone=!!(b.done || b.memoStatus==='已完成');
+    // ① 优先级：未完成 > 已完成
+    if(aDone!==bDone) return aDone?1:-1;
+    if(!aDone){
+      // ② 未完成：按 expire/due 升序，空日期垫底
+      const ax=a.expire||a.due||'';
+      const bx=b.expire||b.due||'';
+      if(ax!==bx){
+        if(!ax)return 1;          // b 有日期、a 没 → a 排后
+        if(!bx)return -1;
+        return ax.localeCompare(bx);
+      }
+      // 二次：开始日期升序
+      const as=a.startDate||a.firstCert||'', bs=b.startDate||b.firstCert||'';
+      if(as!==bx||as!==bs){
+        if(as&&bs) return as.localeCompare(bs);
+        if(as) return -1;
+        if(bs) return 1;
+      }
+      // 三次：id 升序兜底
+      return (Number(a.id)||0)-(Number(b.id)||0);
+    }else{
+      // ③ 已完成：按 finishTime 倒序（最新完成排上）
+      const af=a.finishTime||'';
+      const bf=b.finishTime||'';
+      if(af!==bf){
+        if(!af)return 1;
+        if(!bf)return -1;
+        return bf.localeCompare(af);   // 倒序
+      }
+      // 兜底：id 升序
+      return (Number(a.id)||0)-(Number(b.id)||0);
+    }
+  });
+}
+
+/* ===== 子模块 chips-sticky 吸顶 + 滚动折叠（2026-09-10 黄总要求）=====
+   行为：
+   - 默认：filter 行 + 工具栏贴 topbar 下方（top:56px），表格表头紧随其后；
+   - 当表格第一行进入 chips-sticky 高度范围内，折叠成单行紧凑模式（仅留「全部/进行中/+添加条目」）；
+   - 反向滚动时还原完整宽度。
+   严禁：改动其他模块、CSS class 名、子模块 data-* 属性。
+*/
+let _chipsStickyTeardown=null;
+function bindChipsSticky(){
+  // 每次 renderSubModule 都会重设 chips-sticky DOM，先把上一次的监听清理掉
+  try{ if(_chipsStickyTeardown) _chipsStickyTeardown(); }catch(e){}
+  _chipsStickyTeardown=null;
+
+  const cs=document.getElementById('chipsSticky');
+  const th=document.querySelector('#subBody .mt-tbl thead');
+  if(!cs){ if(th) th.style.removeProperty('--thead-top'); return; }
+
+  // 真正的滚动容器：本工作台 main 没有 overflow:auto，整页是 window 滚动；保险起见仍兼容 main 滚动模式
+  const sr=document.querySelector('main');
+  const hasSrScroll=(sr && (getComputedStyle(sr).overflowY==='auto' || getComputedStyle(sr).overflowY==='scroll'));
+  const srEvt=hasSrScroll?sr:window;
+
+  const setTHeadTop=()=>{
+    if(!th)return;
+    // chips-sticky 贴在 topbar 下：top:56px；表格表头紧随其后，= chips 当前 bottom
+    const bottom=cs.getBoundingClientRect().bottom;
+    th.style.setProperty('--thead-top', Math.max(56, Math.round(bottom))+'px');
+  };
+
+  // 1) 让表格表头永远贴在 chips-sticky 下方
+  setTHeadTop();
+
+  // 2) 滚动折叠：表格首行接近 chips-sticky 底部时切到 scrl 模式
+  const tbl=document.querySelector('#subBody .mt-tbl tbody tr');
+  const tick=()=>{
+    if(!tbl){ cs.classList.remove('scrl'); return; }
+    const cr=cs.getBoundingClientRect();
+    const tr=tbl.getBoundingClientRect();
+    // 当首行顶部进入 chips 底部 - 8px 范围内时，视为「已进入表格内容区」→ 折叠
+    if(tr.top < cr.bottom - 8){
+      cs.classList.add('scrl');
+    }else{
+      cs.classList.remove('scrl');
+    }
+    setTHeadTop();
+  };
+  tick();
+
+  // 观察尺寸变化 + 滚动
+  let ro=null, io=null;
+  if(typeof ResizeObserver!=='undefined'){
+    ro=new ResizeObserver(()=>{ setTHeadTop(); tick(); });
+    ro.observe(cs);
+  }
+  if(tbl && typeof IntersectionObserver!=='undefined'){
+    try{
+      io=new IntersectionObserver(tick, {threshold:[0,0.01,1], rootMargin:'-56px 0px 0px 0px'});
+      io.observe(tbl);
+    }catch(e){ /* 旧浏览器降级为 scroll 监听 */ }
+  }
+
+  const onScroll=()=>{ setTHeadTop(); tick(); };
+  const onResize=()=>{ setTHeadTop(); tick(); };
+  srEvt.addEventListener('scroll', onScroll, {passive:true});
+  window.addEventListener('resize', onResize, {passive:true});
+
+  _chipsStickyTeardown=()=>{
+    if(ro) ro.disconnect();
+    if(io) io.disconnect();
+    try{ srEvt.removeEventListener('scroll', onScroll); }catch(e){}
+    try{ window.removeEventListener('resize', onResize); }catch(e){}
+  };
+}
+
 /* ============ 按月排期视图 ============ */
 const MONTH_LABELS=['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 function setSubView(m){subViewMode=m;renderSubModule()}
