@@ -678,6 +678,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 .cd-p1{background:#fef3c7;color:#b45309}
 .cd-p0{background:#fee2e2;color:#dc2626}
 .cd-today,.cd-over{background:#dc2626;color:#fff;box-shadow:0 1px 4px rgba(220,38,38,.35)}
+.cd-done{background:#f1f5f9;color:#64748b}
 .cell-txt{border:1px solid #e2e8f0;border-radius:6px;padding:3px 6px;font-size:12px;width:92px;font-family:inherit;background:#fff;color:var(--text)}
 .cell-txt:focus{outline:2px solid #c7d2fe;border-color:#6366f1}
 .ms-sel{border:none;border-radius:10px;padding:3px 8px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
@@ -1630,9 +1631,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-09n';
+const APP_VER='2026-09-09o';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1032';
+const BUILD_TAG='26-09-1033';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -2740,17 +2741,25 @@ function renderModuleTableHTML(){
         const st=exp?authStatus(t):'';
         const bdg=st==='bad'?'<span class="exp-bd bad">已过期</span>':st==='warn'?'<span class="exp-bd warn">即将到期</span>':st==='ok'?'<span class="exp-bd ok">有效</span>':'';
         if(t.cat==='12'){
-          // cat=12 工作备忘录：要求完成日期 + 下方倒数小标签（倒数提醒功能保留，与其他模块零关联）
+          // cat=12 工作备忘录：要求完成日期 + 下方倒数小标签
+          // 已完成任务不再累计逾期天数；未完成任务剩余天数按 1/2 天二档显示，统一灰色
           let cdTag='';
+          const isDone=t.done || t.memoStatus==='已完成';
           if(exp){
             const dLeft=Math.ceil((new Date(exp+'T00:00:00')-new Date(todayStr()+'T00:00:00'))/864e5);
-            if(dLeft<0)cdTag=`<span class="cd-tag cd-over">已逾期 ${-dLeft} 天</span>`;
-            else if(dLeft===0)cdTag='<span class="cd-tag cd-today">⏰ 今天到期</span>';
-            else if(dLeft<=3)cdTag=`<span class="cd-tag cd-p0">仅剩 ${dLeft} 天</span>`;
-            else if(dLeft<=7)cdTag=`<span class="cd-tag cd-p1">剩 ${dLeft} 天</span>`;
-            else cdTag=`<span class="cd-tag cd-ok">剩 ${dLeft} 天</span>`;
+            if(isDone){
+              cdTag='<span class="cd-tag cd-done">已完成</span>';
+            }else if(dLeft<0){
+              cdTag=`<span class="cd-tag cd-done">已逾期 ${-dLeft} 天</span>`;
+            }else if(dLeft===0){
+              cdTag='<span class="cd-tag cd-done">今天到期</span>';
+            }else if(dLeft===1){
+              cdTag='<span class="cd-tag cd-done">剩 1 天</span>';
+            }else{
+              cdTag='<span class="cd-tag cd-done">剩 2 天</span>';
+            }
           }else{
-            cdTag='<span class="cd-tag cd-idle">未填日期</span>';
+            cdTag='<span class="cd-tag cd-done">未填日期</span>';
           }
           return `<td class="sm"><div style="display:flex;flex-direction:column;gap:3px;align-items:flex-start"><input type="date" class="cell-date" value="${esc(exp)}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'expire',this.value)" title="点击日历修改要求完成日期">${cdTag}</div></td>`;
         }
