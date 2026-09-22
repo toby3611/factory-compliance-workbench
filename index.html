@@ -1644,9 +1644,9 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-09q';
+const APP_VER='2026-09-09r';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1035';
+const BUILD_TAG='26-09-1036';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -1700,7 +1700,7 @@ const CATS=[
   {id:'13',name:'评级跟踪',color:'c-indigo',short:'评级跟踪',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/><circle cx="12" cy="10" r="3"/></svg>',
    subs:['月度评级'],
-   cols:[['num','序号'],['detail','名称'],['rating','月份'],['note','备注']]},
+   cols:[['num','序号'],['detail','名称'],['month','月份'],['rating','评级'],['note','备注']]},
   {id:'F',name:'备忘录提醒中心',color:'c-purple',short:'备忘录提醒',isAggregator:true,
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1112 0v5l1.5 3h-15L6 13V8z"/></svg>',
    subs:['证书到期提醒','验厂排期','检测 / 演练计划','待办清单']}
@@ -1786,10 +1786,10 @@ const TS=[
   ["业务/销售/国内同事","11","P1","",false,"休假报销","","不定时","","","①汇总工厂上班计划，上班时间\n②管理室搜集记录存档","各部门","黄海涛","武氏草原","黄海涛","","3日郑雨霞下午3点来|8日郑雨霞中午12点||8日郑雨霞中午12点|8日郑雨霞中午12点||8日郑雨霞中午12点||8日郑雨霞中午12点|||","",""],
   ["中方人员休假统计/休假出差报销","11","P1","",false,"休假报销","","不定时","","","8日郑雨霞中午12点回国","各部门","陶氏云英","武氏草原","黄海涛","","回国休假/出差报销5||8日郑雨霞中午12点|8日郑雨霞中午12点|||8日郑雨霞中午12点|||8日郑雨霞中午12点||","",""],
   // 13. 评级跟踪 (4)
-  ["陶氏云英","13","P2","",false,"月度评级","","","","","","","","","","","","","C"],
-  ["武氏草原","13","P2","",false,"月度评级","","","","","","","","","","","","","B"],
-  ["陈氏春","13","P2","",false,"月度评级","","","","","","","","","","","","","A"],
-  ["黎氏庄","13","P2","",false,"月度评级","","","","","","","","","","","","","C+"],
+  ["陶氏云英","13","P2","",false,"月度评级","","","","","","","","","","","","","1","C"],
+  ["武氏草原","13","P2","",false,"月度评级","","","","","","","","","","","","","2","B"],
+  ["陈氏春","13","P2","",false,"月度评级","","","","","","","","","","","","","3","A"],
+  ["黎氏庄","13","P2","",false,"月度评级","","","","","","","","","","","","","4","C+"],
 ];
 const EXP_TYPES=["招待费","差旅费","样品费","认证费","办公费","其他"];
 const EXP_COLORS=["#2563eb","#16a34a","#f59e0b","#e5484d","#7c3aed","#0891b2"];
@@ -1803,7 +1803,7 @@ function seed(){
       supports:t[13]?t[13].split(/[、,,]/).map(s=>s.trim()).filter(Boolean):[],
       confirmer:t[14]||'',note:t[15]||'',
       monthly:t[16]?t[16].split('|'):new Array(12).fill(''),
-      startDate:t[17]||'',endDate:t[18]||'',rating:t[19]||'',
+      startDate:t[17]||'',endDate:t[18]||'',month:t[19]||'',rating:t[20]||'',
       start:'',end:t[3],totalDocs:0,doneDocs:0,progress:''
     })),
     meets:[
@@ -2581,16 +2581,33 @@ function moduleDrawerBody(t){
       </select></div>
     </div>
     ${currentSubCat==='13'?`
-    <div class="field"><label>月份评级</label><select id="md_rating">
-      <option value="" ${(t.rating||'')===''?'selected':''}>— 请选择</option>
-      <option value="A" ${t.rating==='A'?'selected':''}>A</option>
-      <option value="B" ${t.rating==='B'?'selected':''}>B</option>
-      <option value="C+" ${t.rating==='C+'?'selected':''}>C+</option>
-      <option value="C" ${t.rating==='C'?'selected':''}>C</option>
-      <option value="D" ${t.rating==='D'?'selected':''}>D</option>
-      <option value="E" ${t.rating==='E'?'selected':''}>E</option>
-      <option value="F" ${t.rating==='F'?'selected':''}>F</option>
-    </select></div>`:''}
+    <div class="field-row">
+      <div class="field"><label>月份</label><select id="md_month">
+        <option value="" ${(t.month||'')===''?'selected':''}>— 请选择</option>
+        <option value="1" ${t.month==='1'?'selected':''}>1月</option>
+        <option value="2" ${t.month==='2'?'selected':''}>2月</option>
+        <option value="3" ${t.month==='3'?'selected':''}>3月</option>
+        <option value="4" ${t.month==='4'?'selected':''}>4月</option>
+        <option value="5" ${t.month==='5'?'selected':''}>5月</option>
+        <option value="6" ${t.month==='6'?'selected':''}>6月</option>
+        <option value="7" ${t.month==='7'?'selected':''}>7月</option>
+        <option value="8" ${t.month==='8'?'selected':''}>8月</option>
+        <option value="9" ${t.month==='9'?'selected':''}>9月</option>
+        <option value="10" ${t.month==='10'?'selected':''}>10月</option>
+        <option value="11" ${t.month==='11'?'selected':''}>11月</option>
+        <option value="12" ${t.month==='12'?'selected':''}>12月</option>
+      </select></div>
+      <div class="field"><label>评级</label><select id="md_rating">
+        <option value="" ${(t.rating||'')===''?'selected':''}>— 请选择</option>
+        <option value="A" ${t.rating==='A'?'selected':''}>A</option>
+        <option value="B" ${t.rating==='B'?'selected':''}>B</option>
+        <option value="C+" ${t.rating==='C+'?'selected':''}>C+</option>
+        <option value="C" ${t.rating==='C'?'selected':''}>C</option>
+        <option value="D" ${t.rating==='D'?'selected':''}>D</option>
+        <option value="E" ${t.rating==='E'?'selected':''}>E</option>
+        <option value="F" ${t.rating==='F'?'selected':''}>F</option>
+      </select></div>
+    </div>`:''}
     <div class="field"><label>实施计划（每行一项 ①②③…）</label><textarea id="md_plan" rows="4">${esc(planStr)}</textarea></div>
     <div class="field"><label>备注</label><textarea id="md_note" rows="2">${esc(v('note'))}</textarea></div>
   `;
@@ -2615,7 +2632,9 @@ function saveModule(){
     note:document.getElementById('md_note').value.trim(),
     done:false
   };
+  const mEl=document.getElementById('md_month');
   const rEl=document.getElementById('md_rating');
+  if(mEl)obj.month=mEl.value;
   if(rEl)obj.rating=rEl.value;
   const sEl=document.getElementById('md_startDate');
   const eEl=document.getElementById('md_endDate');
@@ -2829,8 +2848,15 @@ function renderModuleTableHTML(){
         const pvOpts=['','票据整理','单据填写','提交财务','款项到账'].map(x=>`<option value="${x}" ${x===pv?'selected':''}>${x||'— 请选择'}</option>`).join('');
         return `<td class="sm"><select class="ms-sel ${pvCls}" onclick="event.stopPropagation()" onchange="memoProgressChange(${t.id},this.value)" title="完成进度：票据整理 → 单据填写 → 提交财务 → 款项到账">${pvOpts}</select></td>`;
       }
+      if(k==='month'){
+        // cat=13 评级跟踪：月份列做成 1-12 月可选
+        if(t.cat!=='13')return `<td class="sm">—</td>`;
+        const mv=t.month||'';
+        const mOpts=['','1','2','3','4','5','6','7','8','9','10','11','12'].map(x=>`<option value="${esc(x)}" ${x===mv?'selected':''}>${x?x+'月':'— 请选择'}</option>`).join('');
+        return `<td class="sm"><select class="rating-sel r-none" onclick="event.stopPropagation()" onchange="monthChange(${t.id},this.value)" title="选择月份">${mOpts}</select></td>`;
+      }
       if(k==='rating'){
-        // cat=13 评级跟踪：月份列做成 A/B/C+/C/D/E/F 可选状态
+        // cat=13 评级跟踪：评级列做成 A/B/C+/C/D/E/F 可选状态
         if(t.cat!=='13')return `<td class="sm">—</td>`;
         const rv=t.rating||'';
         const rOpts=['','A','B','C+','C','D','E','F'].map(x=>`<option value="${esc(x)}" ${x===rv?'selected':''}>${x||'— 请选择'}</option>`).join('');
@@ -3165,7 +3191,14 @@ function memoStatusChange(id,val){
   renderAll();renderSubModule();
 }
 
-/* ===== cat=13 评级跟踪：月份列 A/B/C+/C/D/E/F 变更 ===== */
+/* ===== cat=13 评级跟踪：月份 1-12 月 / 评级 A-F 变更 ===== */
+function monthChange(id,val){
+  const t=data.tasks.find(x=>x.id==id);if(!t)return;
+  t.month=val;
+  saveData();
+  toast(val?`月份已更新：${val}月`:'月份已清空');
+  renderAll();renderSubModule();
+}
 function ratingChange(id,val){
   const t=data.tasks.find(x=>x.id==id);if(!t)return;
   t.rating=val;
@@ -3194,7 +3227,11 @@ function openModuleAdd(){
       <div class="field"><label>${isMemo?'🏁 要求完成日期（倒数提醒按此计算，可留空）':'📅 截止日期'}</label><input id="maDate" type="date"></div>
       ${isMemo?`<div class="field"><label>🕓 记录日期（自动=今天，可改）</label><input id="maStart" type="date" value="${todayStr()}"></div>`:''}
       ${isMemo?`<div class="field"><label>🔄 完成进度（可后补，表内也可改）</label><select id="maProgress"><option value="">— 请选择</option><option>票据整理</option><option>单据填写</option><option>提交财务</option><option>款项到账</option></select></div>`:''}
-      ${isRating?`<div class="field"><label>月份评级</label><select id="maRating"><option value="">— 请选择</option><option value="A">A</option><option value="B">B</option><option value="C+">C+</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select></div>`:''}
+      ${isRating?`
+      <div class="field-row">
+        <div class="field"><label>月份</label><select id="maMonth"><option value="">— 请选择</option><option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option><option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option></select></div>
+        <div class="field"><label>评级</label><select id="maRating"><option value="">— 请选择</option><option value="A">A</option><option value="B">B</option><option value="C+">C+</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select></div>
+      </div>`:''}
       <div class="field"><label>备注</label><textarea id="maNote" rows="2"></textarea></div>
     </div>
     <div class="ma-ft"><button class="btn" onclick="closeModuleAdd()">取消</button><button class="btn primary" onclick="moduleAddSave()">保存</button></div>
@@ -3213,7 +3250,7 @@ function moduleAddSave(){
   const elSub=document.getElementById('maSub');const elPrio=document.getElementById('maPrio');
   const elDate=document.getElementById('maDate');const elNote=document.getElementById('maNote');
   const elStart=document.getElementById('maStart');const elAssigner=document.getElementById('maAssigner');
-  const elProgress=document.getElementById('maProgress');const elRating=document.getElementById('maRating');
+  const elProgress=document.getElementById('maProgress');const elMonth=document.getElementById('maMonth');const elRating=document.getElementById('maRating');
   const maxId=data.tasks.reduce((m,t)=>Math.max(m,t.id),0);
   const rec={id:maxId+1,title,cat:currentSubCat,
     sub:(elSub?elSub.value:(c.subs[0]||'')),
@@ -3230,6 +3267,7 @@ function moduleAddSave(){
     rec.progressStep=elProgress?elProgress.value:'';                  // 完成进度（可空）
     rec.finishTime='';                                        // 完成时间：选「已完成」时自动记录
   }
+  if(elMonth)rec.month=elMonth.value;
   if(elRating)rec.rating=elRating.value;
   data.tasks.push(rec);
   saveData();closeModuleAdd();renderAll();renderSubModule();
@@ -7391,27 +7429,39 @@ function submitAuth(){
 }
 function doLogout(){clearSession();location.reload();}
 
-/* ============ 评级跟踪（cat=13）缺失补种：老数据首次加载时自动注入 4 条示例，只执行一次 ============ */
+/* ============ 评级跟踪（cat=13）缺失补种 / 月份字段迁移 ============ */
 function ensureRatingTasks(){
-  try{ if(localStorage.getItem('wb_rating_seeded_v1')) return; }catch(e){}
-  const has=(data.tasks||[]).some(t=>String(t.cat)==='13');
-  if(has){
-    try{ localStorage.setItem('wb_rating_seeded_v1','1'); }catch(e){}
+  const list=data.tasks||[];
+  // 给已存在但缺 month 的 cat=13 数据补月份（按顺序 1-4 月循环）
+  const rated=list.filter(t=>String(t.cat)==='13');
+  let patched=false;
+  rated.forEach((t,idx)=>{
+    if(!t.month){
+      t.month=String((idx%12)+1);
+      patched=true;
+    }
+  });
+  if(patched) saveData();
+
+  // 全新数据首次补种 4 条示例（只执行一次）
+  try{ if(localStorage.getItem('wb_rating_seeded_v2')) return; }catch(e){}
+  if(rated.length>0){
+    try{ localStorage.setItem('wb_rating_seeded_v2','1'); }catch(e){}
     return;
   }
   const baseNames=['陶氏云英','武氏草原','陈氏春','黎氏庄'];
   const baseRatings=['C','B','A','C+'];
-  const maxId=(data.tasks||[]).reduce((m,t)=>Math.max(m,t.id||0),0);
+  const maxId=list.reduce((m,t)=>Math.max(m,t.id||0),0);
   baseNames.forEach((name,idx)=>{
     data.tasks.push({
       id:maxId+idx+1,title:name,cat:'13',prio:'P2',due:'',done:false,sub:'月度评级',
       workDetail:name,projectContent:'',period:'',firstCert:'',expire:'',
       plan:[],org:'',lead:'',supports:[],confirmer:'',note:'',
-      monthly:new Array(12).fill(''),startDate:'',endDate:'',rating:baseRatings[idx]
+      monthly:new Array(12).fill(''),startDate:'',endDate:'',month:String(idx+1),rating:baseRatings[idx]
     });
   });
   saveData();
-  try{ localStorage.setItem('wb_rating_seeded_v1','1'); }catch(e){}
+  try{ localStorage.setItem('wb_rating_seeded_v2','1'); }catch(e){}
 }
 
 /* ============ 启动 ============ */
