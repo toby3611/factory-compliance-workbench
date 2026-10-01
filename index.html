@@ -1331,6 +1331,31 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
   .vac-stats{font-size:11px;border-left:none;padding:0}
 }
 
+/* ===== 日报管理（cat=14）===== */
+.dr-wrap{margin:0}
+.dr-title{font-size:18px;font-weight:800;color:var(--ink);margin:4px 0 2px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.dr-note{font-size:12px;font-weight:500;color:var(--muted)}
+.dr-toolbar{display:flex;align-items:center;gap:12px;margin:8px 0 10px;flex-wrap:wrap}
+.dr-tip{font-size:12px;color:var(--muted)}
+.dr-tbl{border-collapse:collapse;min-width:max-content}
+.dr-tbl th{background:#f1f5f9;color:#334155;font-size:12px;font-weight:700;padding:6px 8px;border:1px solid #e2e8f0;white-space:nowrap}
+.dr-tbl td{border:1px solid #eef2f7;padding:4px 6px;vertical-align:top;font-size:12px}
+.dr-daily-h{background:#e0e7ff !important;text-align:center}
+.dr-date{text-align:center;min-width:64px}
+.dr-date-cell{width:64px;min-width:64px;padding:2px}
+.dr-cell{width:100%;min-width:60px;border:1px solid #cbd5e1;border-radius:6px;padding:3px 5px;font-size:11.5px;font-family:inherit;resize:vertical;line-height:1.3;background:#fff;color:#1e293b}
+.dr-cell:focus{outline:2px solid var(--primary);border-color:var(--primary)}
+.dr-num{text-align:center;width:34px;color:var(--muted);font-weight:700}
+.dr-proj{width:120px}
+.dr-points{width:200px}
+.dr-lead{width:80px}
+.dr-std{width:130px}
+.dr-inp{width:100%;border:1px solid #cbd5e1;border-radius:6px;padding:3px 5px;font-size:12px;font-family:inherit;background:#fff;color:#1e293b}
+.dr-inp:focus,.dr-ta:focus{outline:2px solid var(--primary);border-color:var(--primary)}
+.dr-ta{width:100%;min-height:54px;border:1px solid #cbd5e1;border-radius:6px;padding:3px 5px;font-size:12px;font-family:inherit;resize:vertical;line-height:1.3;background:#fff;color:#1e293b}
+.dr-ops{text-align:center;width:40px}
+.dr-group-cell{background:#334155;color:#fff;font-weight:800;font-size:13px;padding:6px 12px;letter-spacing:1px}
+.dr-item:nth-child(even){background:#fafcff}
 </style>
 </head>
 <body>
@@ -1644,15 +1669,19 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-09-09t';
+const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-09-1038';
+const BUILD_TAG='26-10-1039';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4zM4 8h16M9 4v16"/></svg>',
    subs:['进行中','今日待办','本周待办','已完成','已逾期'],
    cols:[['num','序号'],['startDate','记录日期'],['detail','工作事项'],['assigner','交办人'],['expire','要求完成日期'],['memoStatus','完成情况'],['progressStep','完成进度'],['note','备注'],['finishTime','完成时间']]},
+  {id:'14',name:'日报管理',color:'c-amber',short:'日报管理',
+   icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/><path d="M7 13h4M7 17h7M14 13h3"/></svg>',
+   subs:[],
+   cols:[['num','序号'],['detail','项目'],['points','管控要点'],['lead','担当'],['standard','管控标准'],['daily','日实绩']]},
   {id:'1',name:'认证管理',color:'c-blue',short:'认证管理',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/></svg>',
    subs:['ISO体系','可持续认证','客户平台验证'],
@@ -2371,6 +2400,12 @@ function renderSubModule(){
     return;
   }
 
+  // 14 日报管理：整模块自定义视图（月份/日期随系统日期自动更新，不参与通用表格渲染）
+  if(c.id==='14'){
+    body.innerHTML=renderDailyReportHTML();
+    return;
+  }
+
   // 11 大类统一走通用表格视图（按图 1 模板）
   body.innerHTML=renderModuleTableHTML();
   bindModuleTable();
@@ -2942,6 +2977,141 @@ function renderModuleTableHTML(){
     </table>
   </div>
   <div class="auth-foot">💡 单击任意一行可查看详情 / 编辑；月份格点击可切换完成状态；验厂/会员会费任务可点「▸ 计划明细」展开实施计划面板；数据自动同步至云端 Gist，电脑手机一致。</div>`;
+}
+/* ============ 日报管理（cat=14）自定义视图 ============
+   需求（黄总 2026-10-01）：① 表格月份随实际月份变更；② 日实绩下日期自动跟随日期变更。
+   实现：标题显示「X月越南工厂综合工作日报」；日期列按当前年月天数自动生成（2月自动 28/29 天）；
+        每格实绩按「YYYY-MM-DD」存储到 task.daily，跨月切换后历史数据保留不丢。
+*/
+function renderDailyReportHTML(){
+  const stEl=document.getElementById('subStats'); if(stEl)stEl.innerHTML='';
+  const now=new Date();
+  const y=now.getFullYear();
+  const m=now.getMonth()+1;
+  const dim=new Date(y,m,0).getDate();
+  const items=data.tasks.filter(t=>String(t.cat)==='14');
+  // 表头日期列
+  let dateTh='';
+  for(let d=1; d<=dim; d++){
+    dateTh+=`<th class="dr-date" title="${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}">${m}月${d}日</th>`;
+  }
+  // 行
+  let rowsHtml='';
+  let itemIdx=0;
+  items.forEach(t=>{
+    if(t.isGroup){
+      const colN=5+dim+1;
+      rowsHtml+=`<tr class="dr-group"><td colspan="${colN}" class="dr-group-cell">${esc(t.groupName||'')}</td></tr>`;
+      return;
+    }
+    itemIdx++;
+    const wd=t.workDetail||t.title||'';
+    const points=t.points||'';
+    const lead=t.lead||'';
+    const std=t.standard||'';
+    const daily=t.daily||{};
+    let dateCells='';
+    for(let d=1; d<=dim; d++){
+      const key=fmtDate(new Date(y,m-1,d));
+      const val=daily[key]||'';
+      dateCells+=`<td class="dr-date-cell"><textarea class="dr-cell" rows="2" data-tid="${t.id}" data-key="${key}" onclick="event.stopPropagation()" onchange="dailyCellChange(${t.id},'${key}',this.value)" title="${m}月${d}日 实绩">${esc(val)}</textarea></td>`;
+    }
+    rowsHtml+=`<tr class="dr-item">
+      <td class="dr-num">${itemIdx}</td>
+      <td class="dr-proj"><input class="dr-inp" value="${esc(wd)}" onclick="event.stopPropagation()" onchange="dailyFieldChange(${t.id},'workDetail',this.value)" title="项目"></td>
+      <td class="dr-points"><textarea class="dr-ta" rows="3" onclick="event.stopPropagation()" onchange="dailyFieldChange(${t.id},'points',this.value)" title="管控要点">${esc(points)}</textarea></td>
+      <td class="dr-lead"><input class="dr-inp" value="${esc(lead)}" onclick="event.stopPropagation()" onchange="dailyFieldChange(${t.id},'lead',this.value)" title="担当"></td>
+      <td class="dr-std"><input class="dr-inp" value="${esc(std)}" onclick="event.stopPropagation()" onchange="dailyFieldChange(${t.id},'standard',this.value)" title="管控标准"></td>
+      ${dateCells}
+      <td class="dr-ops" onclick="event.stopPropagation()"><button title="删除" onclick="dailyDelItem(${t.id})">🗑</button></td>
+    </tr>`;
+  });
+  const colN=5+dim+1;
+  const emptyRow=items.length?'' : `<tr><td colspan="${colN}" class="mt-empty">暂无条目，点上方「＋ 添加条目」</td></tr>`;
+  return `<div class="dr-wrap">
+    <div class="dr-title">${m}月越南工厂综合工作日报 <span class="dr-note">（每天 17:00 前完成并提交报告）</span></div>
+    <div class="dr-toolbar">
+      <button class="btn primary" onclick="dailyAddItem()" style="padding:5px 12px;font-size:12px">＋ 添加条目</button>
+      <span class="dr-tip">月份与日期随系统日期自动更新；日实绩按「年-月-日」存储，切换月份后历史数据保留。</span>
+    </div>
+    <div class="mt-wrap"><table class="mt-tbl dr-tbl">
+      <thead>
+        <tr><th class="num">序号</th><th>项目</th><th>管控要点</th><th>担当</th><th>管控标准</th><th class="dr-daily-h" colspan="${dim}">日实绩</th><th>操作</th></tr>
+        <tr><th colspan="5"></th>${dateTh}<th></th></tr>
+      </thead>
+      <tbody>${rowsHtml||emptyRow}</tbody>
+    </table></div>
+    <div class="auth-foot">💡 单击日期格输入当日实绩，点别处自动保存并同步云端；项目/管控要点/担当/管控标准可直接编辑；「＋ 添加条目」新增行，「🗑」删除行。</div>
+  </div>`;
+}
+function dailyCellChange(tid,key,val){
+  const t=data.tasks.find(x=>x.id==tid); if(!t)return;
+  if(!t.daily)t.daily={};
+  if(val&&val.trim())t.daily[key]=val; else delete t.daily[key];
+  saveData();
+  toast('已保存');
+}
+function dailyFieldChange(tid,field,val){
+  const t=data.tasks.find(x=>x.id==tid); if(!t)return;
+  if(field==='workDetail'){ t.workDetail=val; t.title=val; } // 双字段铁律：项目列 workDetail+title 同写
+  else t[field]=val;
+  saveData();
+  toast('已保存');
+}
+function dailyAddItem(){
+  const maxId=data.tasks.reduce((m,t)=>Math.max(m,t.id||0),0);
+  data.tasks.push({id:maxId+1,cat:'14',workDetail:'新项目',title:'新项目',points:'',lead:'',standard:'',daily:{}});
+  saveData();
+  renderSubModule();
+  toast('已添加条目');
+}
+function dailyDelItem(tid){
+  if(!confirm('确定删除该日报条目？'))return;
+  data.tasks=data.tasks.filter(t=>t.id!==tid);
+  saveData();
+  renderSubModule();
+  toast('已删除');
+}
+/* ============ 日报管理（cat=14）首次补种 / 旧格式迁移 ============ */
+function ensureDailyTasks(){
+  const list=data.tasks||[];
+  const dr=list.filter(t=>String(t.cat)==='14');
+  try{ if(localStorage.getItem('wb_daily_seeded_v1')) return; }catch(e){}
+  if(dr.length>0){ try{localStorage.setItem('wb_daily_seeded_v1','1');}catch(e){} return; }
+  const maxId=list.reduce((m,t)=>Math.max(m,t.id||0),0);
+  const seed=[
+    {isGroup:true,groupName:'通用管理项目'},
+    {wd:'事故/异常',points:'火灾及火灾隐患\n验厂/认证不通过',lead:'全员',std:'0'},
+    {wd:'安全管理',points:'消防设备/设施/巡检有无异常\n巡查厂内安保设施有无异常\n应急预案演习（庄/草：消防演习4次/年；化学品泄漏2次/年；污水厂应急1次/年）\n当日车间动火工作',lead:'全员/庄草',std:'有计划有记录实时处理'},
+    {wd:'工作时间',points:'全厂员工工作时确认（人事汇总-验厂组核实-上报）',lead:'草',std:'优衣库标准（每7天确认，连续工作≤29天）'},
+    {wd:'业务数据需求',points:'业务提出需求/报备/提交数据',lead:'全员',std:'满足需求'},
+    {wd:'客户会议/培训',points:'业务/客户邮件通知/登记/培训',lead:'全员',std:'不定时'},
+    {wd:'验厂管理',points:'客户或第三方机构验厂\n日常体系维护和准备',lead:'庄/草',std:'符合要求（完成标准条款要求）'},
+    {wd:'特种设备',points:'周期管理台账健全（新增设备时更新）\n当日特种设备巡检有无情况',lead:'庄',std:'台账完整（有计划有记录实时处理）'},
+    {wd:'数据统计',points:'能源能耗/产量/工作天数/生产回收物',lead:'庄',std:'每月15号前'},
+    {wd:'优衣库季报',points:'碳减排项目进度',lead:'庄',std:'季度10号前'},
+    {wd:'H&M客户季报',points:'PD环境能耗/产量数据上传',lead:'庄',std:'季度20号前'},
+    {wd:'李维斯月报',points:'工厂工作时间、工人数量',lead:'草',std:'每月15号前'},
+    {wd:'认证进度月报',points:'记录认证项目进度/验厂记录/客户参观记录',lead:'英',std:'每月10号前'},
+    {wd:'验厂台账月报',points:'汇总认证项目/验厂/客户参观',lead:'英',std:'每月10号前'},
+    {wd:'生产异常事故日报',points:'每日工厂异常情况',lead:'全员',std:'每日'},
+    {wd:'现场5S及安全月报',points:'汇总总结上月检查情况',lead:'全员',std:'每月5号前'},
+    {wd:'每月发票搜集',points:'蒸汽/LPG/水/电/汽油/柴油/工业废水/生活废水/自来水',lead:'庄',std:'每月15号前'},
+    {wd:'生产废物回收',points:'过磅跟踪（空车过磅-装车确认-装车后过磅）\n三方确认（仓库/财务/管理室）',lead:'英',std:'收到通知时当日完成'},
+    {wd:'行程计划报销',points:'客人行程全程跟进陪同\n中方人员休假用车安排/过关报备/休假出差报销',lead:'英',std:'用餐/用车/会议室/工厂参观安排（按规定安排和报销）'},
+    {wd:'当日部门事务',points:'现场5S及安全检查\n工厂内部事务处理\n基础设施修复、标识牌制作张贴',lead:'全员',std:'有标准有检查有记录（有记录）'},
+    {wd:'整改项目',points:'优衣库验厂整改-复审\n优衣库参观工厂整改事项\nESG项目',lead:'全员/庄',std:'不符合项整改（ESG项目收资）'},
+    {isGroup:true,groupName:'陶氏云英-负责项目'},
+    {wd:'有机棉TC证书申请(GOTS&OCS)',points:'原料统计TC证书申请\n范围证书添加新品种\n面料TC证书申请\n原纱TC采购数据汇总',lead:'英',std:'每月5号前完成采购量统计（符合业务/客户需求；收到业务订单后及时申请）'}
+  ];
+  let id=maxId;
+  seed.forEach(s=>{
+    id++;
+    if(s.isGroup) data.tasks.push({id,cat:'14',isGroup:true,groupName:s.groupName});
+    else data.tasks.push({id,cat:'14',workDetail:s.wd,title:s.wd,points:s.points,lead:s.lead,standard:s.std,daily:{}});
+  });
+  saveData();
+  try{localStorage.setItem('wb_daily_seeded_v1','1');}catch(e){}
 }
 function bindModuleTable(){ /* 预留 */ }
 
@@ -7414,6 +7584,7 @@ function submitAuth(){
   failCount=0;lockUntil=0;
   setSession(remember);
   ensureRatingTasks();
+  ensureDailyTasks();
   hideLoginGate();
   renderAll();
   setStatus(sync.enabled?'synced':'local');
