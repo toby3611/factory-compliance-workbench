@@ -1671,7 +1671,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-10-1039';
+const BUILD_TAG='26-10-1040';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -3072,12 +3072,12 @@ function dailyDelItem(tid){
   renderSubModule();
   toast('已删除');
 }
-/* ============ 日报管理（cat=14）首次补种 / 旧格式迁移 ============ */
+/* ============ 日报管理（cat=14）自动补种 / 缺失项目补齐 ============ */
 function ensureDailyTasks(){
   const list=data.tasks||[];
   const dr=list.filter(t=>String(t.cat)==='14');
-  try{ if(localStorage.getItem('wb_daily_seeded_v1')) return; }catch(e){}
-  if(dr.length>0){ try{localStorage.setItem('wb_daily_seeded_v1','1');}catch(e){} return; }
+  const existingWd=new Set(dr.filter(t=>!t.isGroup).map(t=>t.workDetail||t.title||''));
+  const existingGroup=new Set(dr.filter(t=>t.isGroup).map(t=>t.groupName||''));
   const maxId=list.reduce((m,t)=>Math.max(m,t.id||0),0);
   const seed=[
     {isGroup:true,groupName:'通用管理项目'},
@@ -3104,14 +3104,21 @@ function ensureDailyTasks(){
     {isGroup:true,groupName:'陶氏云英-负责项目'},
     {wd:'有机棉TC证书申请(GOTS&OCS)',points:'原料统计TC证书申请\n范围证书添加新品种\n面料TC证书申请\n原纱TC采购数据汇总',lead:'英',std:'每月5号前完成采购量统计（符合业务/客户需求；收到业务订单后及时申请）'}
   ];
-  let id=maxId;
+  let id=maxId, added=0;
   seed.forEach(s=>{
-    id++;
-    if(s.isGroup) data.tasks.push({id,cat:'14',isGroup:true,groupName:s.groupName});
-    else data.tasks.push({id,cat:'14',workDetail:s.wd,title:s.wd,points:s.points,lead:s.lead,standard:s.std,daily:{}});
+    if(s.isGroup){
+      if(!existingGroup.has(s.groupName)){
+        id++; data.tasks.push({id,cat:'14',isGroup:true,groupName:s.groupName}); added++;
+      }
+      return;
+    }
+    if(!existingWd.has(s.wd)){
+      id++; data.tasks.push({id,cat:'14',workDetail:s.wd,title:s.wd,points:s.points,lead:s.lead,standard:s.std,daily:{}});
+      existingWd.add(s.wd); added++;
+    }
   });
-  saveData();
-  try{localStorage.setItem('wb_daily_seeded_v1','1');}catch(e){}
+  if(added>0){ saveData(); toast('已自动补全日报管理固定项目：'+added+' 条'); }
+  try{localStorage.setItem('wb_daily_seeded_v1',String(added));}catch(e){}
 }
 function bindModuleTable(){ /* 预留 */ }
 
