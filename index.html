@@ -1671,7 +1671,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-10-1040';
+const BUILD_TAG='26-10-1041';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -7677,6 +7677,7 @@ async function _wbBoot(){
   }
   if(getSession()){
     ensureRatingTasks();
+    ensureDailyTasks();
     hideLoginGate();
     renderAll();
   }else{
