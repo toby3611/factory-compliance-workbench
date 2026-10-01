@@ -1671,7 +1671,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-10-1041';
+const BUILD_TAG='26-10-1042';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -3072,12 +3072,26 @@ function dailyDelItem(tid){
   renderSubModule();
   toast('已删除');
 }
-/* ============ 日报管理（cat=14）自动补种 / 缺失项目补齐 ============ */
+/* ============ 日报管理（cat=14）自动补种 / 缺失项目补齐（按 Excel 全表 57 序号 / 5 分组 / 85 项） ============ */
 function ensureDailyTasks(){
   const list=data.tasks||[];
   const dr=list.filter(t=>String(t.cat)==='14');
-  const existingWd=new Set(dr.filter(t=>!t.isGroup).map(t=>t.workDetail||t.title||''));
+  // 按「分组|项目名」联合去重：同名项目（如 ISO 50001）在多人分组下各自保留
+  let curGroup='';
+  const existingKey=new Set();
+  dr.forEach(t=>{
+    if(t.isGroup){ curGroup=t.groupName||''; return; }
+    existingKey.add(curGroup+'|'+(t.workDetail||t.title||''));
+  });
   const existingGroup=new Set(dr.filter(t=>t.isGroup).map(t=>t.groupName||''));
+  // 旧数据升级：有机棉TC 补「有机棉平衡表统计」子行
+  let upgraded=false;
+  dr.forEach(t=>{
+    if(!t.isGroup && String(t.workDetail||'').indexOf('有机棉TC证书申请')>=0 && String(t.points||'').indexOf('有机棉平衡表统计')<0){
+      t.points=(t.points?t.points+'\n':'')+'有机棉平衡表统计（每月更新）'; upgraded=true;
+    }
+  });
+  if(upgraded) saveData();
   const maxId=list.reduce((m,t)=>Math.max(m,t.id||0),0);
   const seed=[
     {isGroup:true,groupName:'通用管理项目'},
@@ -3102,19 +3116,87 @@ function ensureDailyTasks(){
     {wd:'当日部门事务',points:'现场5S及安全检查\n工厂内部事务处理\n基础设施修复、标识牌制作张贴',lead:'全员',std:'有标准有检查有记录（有记录）'},
     {wd:'整改项目',points:'优衣库验厂整改-复审\n优衣库参观工厂整改事项\nESG项目',lead:'全员/庄',std:'不符合项整改（ESG项目收资）'},
     {isGroup:true,groupName:'陶氏云英-负责项目'},
-    {wd:'有机棉TC证书申请(GOTS&OCS)',points:'原料统计TC证书申请\n范围证书添加新品种\n面料TC证书申请\n原纱TC采购数据汇总',lead:'英',std:'每月5号前完成采购量统计（符合业务/客户需求；收到业务订单后及时申请）'}
+    {wd:'有机棉TC证书申请(GOTS&OCS)',points:'原料统计TC证书申请（每月5号前完成）\n范围证书添加新品种（符合业务/客户需求）\n面料TC证书申请（收到业务订单后及时申请）\n原纱TC采购数据汇总（每月5号前完成）\n有机棉平衡表统计（每月更新）',lead:'英',std:'每月5号前完成采购量统计'},
+    {wd:'再生农业TC证书申请',points:'原料统计TC证书申请（每月5号前完成）\n范围证书添加新品种（符合业务/客户需求）\n面料TC证书申请（收到业务订单后及时申请）\n原纱TC采购数据汇总（每月5号前完成）\n再生农业平衡表统计（每月更新）',lead:'英',std:'每月5号前完成采购量统计'},
+    {wd:'再生农业认证(regenagri)',points:'',lead:'英',std:'按认证机构要求'},
+    {isGroup:true,groupName:'武氏草原-负责项目'},
+    {wd:'ISO 9001质量管理体系认证',points:'',lead:'草',std:'按认证机构要求'},
+    {wd:'ISO 50001能源管理认证',points:'',lead:'庄/草',std:'按认证机构要求'},
+    {wd:'有机棉GOTS&OCS认证',points:'庄(化学品,环境)/草(社会责任/基础资料)',lead:'庄/草',std:'按认证机构要求'},
+    {wd:'再生棉GRS&RCS认证',points:'庄(化学品,环境)/草(社会责任/基础资料)',lead:'庄/草',std:'按认证机构要求'},
+    {wd:'SLCP劳工整合项目验证(HIGG FSLM社会责任模块)',points:'',lead:'草',std:'3月完成自评/4月完成认证'},
+    {wd:'Oeko-tex100国际标准认证',points:'纺织品面料有害物检测',lead:'庄/草-轮换',std:'按认证机构要求'},
+    {wd:'Target QAFA&CMA质量验厂',points:'',lead:'庄/草',std:'符合客户要求'},
+    {wd:'社会责任/环境/质量验厂',points:'',lead:'庄/草-轮换',std:'符合客户要求'},
+    {wd:'良好棉花BCI会员',points:'',lead:'草',std:'按BCI要求'},
+    {wd:'蒙赛尔测试（看色人员）',points:'',lead:'庄/草',std:'按计划执行'},
+    {wd:'实验室仪器校准',points:'',lead:'草',std:'按校准周期'},
+    {wd:'计量器具流量计校准（水/蒸汽/LPG流量表）',points:'',lead:'草',std:'按校准周期'},
+    {wd:'BVE3平台化学品上传',points:'',lead:'草',std:'每月7号前'},
+    {wd:'Clean Chain化学品上传',points:'',lead:'草',std:'每月10号前'},
+    {wd:'ZDHC废水检测（2次/年）',points:'',lead:'庄/草-轮换',std:'上半年3月取样/下半年9月取样'},
+    {wd:'消防重点安全隐患检查',points:'',lead:'草',std:'每周'},
+    {wd:'认证体系维护检查',points:'',lead:'草',std:'每周'},
+    {wd:'污水泄露应急演习（2次/年）',points:'',lead:'草',std:'按计划执行'},
+    {wd:'浆染/后整/仓库泄露演习（2次/年）',points:'',lead:'草',std:'按计划执行'},
+    {wd:'工商局化学品应急演习(浆染/化工仓/工务)',points:'',lead:'庄/草(共同参与)',std:'按工商局要求'},
+    {wd:'经期休息登记记录表',points:'',lead:'草',std:'每月'},
+    {wd:'工时统计记录',points:'',lead:'草',std:'每月'},
+    {wd:'机修维修记录',points:'',lead:'草',std:'每月'},
+    {wd:'文档归类整理整顿',points:'',lead:'草/庄',std:'持续'},
+    {wd:'资料文件更新/清理',points:'',lead:'草/庄',std:'持续'},
+    {wd:'其他工作事务',points:'',lead:'草',std:''},
+    {wd:'备忘录',points:'每天接收到的工作，交代事项，完成时间，要求',lead:'草',std:''},
+    {isGroup:true,groupName:'黎氏庄-负责项目'},
+    {wd:'ISO 14001环境管理体系认证',points:'',lead:'庄',std:'按认证机构要求'},
+    {wd:'ISO 50001能源管理认证',points:'',lead:'庄/草',std:'按认证机构要求'},
+    {wd:'有机棉GOTS&OCS认证',points:'庄(化学品,环境)/草(社会责任/基础资料)',lead:'庄/草',std:'按认证机构要求'},
+    {wd:'再生棉GRS&RCS认证',points:'庄(化学品,环境)/草(社会责任/基础资料)',lead:'庄/草',std:'按认证机构要求'},
+    {wd:'Higg FEM环境模块验证',points:'',lead:'庄',std:'1月完成自评/3月完成认证'},
+    {wd:'Oeko-tex100国际标准认证',points:'纺织品面料有害物检测',lead:'庄/草-轮换',std:'按认证机构要求'},
+    {wd:'Target QAFA&CMA质量验厂',points:'',lead:'庄/草',std:'符合客户要求'},
+    {wd:'社会责任/环境/质量验厂',points:'',lead:'庄/草-轮换',std:'符合客户要求'},
+    {wd:'H&M PD环境能源数据上传',points:'',lead:'庄',std:'季度20号前'},
+    {wd:'HIGG(FDM)环境能源统计上传',points:'',lead:'庄',std:'每月20号前'},
+    {wd:'验厂认证项目费用月度汇总',points:'',lead:'庄',std:'每月'},
+    {wd:'能源/能耗/回收数据统计',points:'',lead:'庄',std:'每月15号前'},
+    {wd:'蒙赛尔测试（看色人员）',points:'',lead:'庄/草',std:'按计划执行'},
+    {wd:'BHIVE系统化学品上传',points:'',lead:'庄',std:'每月15号前'},
+    {wd:'化学品清单月度更新',points:'',lead:'庄',std:'每月10号前'},
+    {wd:'ZDHC废水检测（2次/年）',points:'',lead:'庄/草-轮换',std:'上半年3月取样/下半年9月取样'},
+    {wd:'化学品仓库检查',points:'',lead:'草',std:'每周'},
+    {wd:'季度安全检查',points:'',lead:'庄',std:'季度'},
+    {wd:'车间消防演习（2次/夜班、2次/白班）',points:'',lead:'庄',std:'4次/年'},
+    {wd:'宿舍消防演习（2次/年）',points:'',lead:'庄',std:'2次/年'},
+    {wd:'工商局化学品应急演习(浆染/化工仓/工务)',points:'',lead:'庄/草(共同参与)',std:'按工商局要求'},
+    {wd:'特种设备点检表记录回收',points:'',lead:'庄',std:'每月'},
+    {wd:'各部门安全培训记录',points:'',lead:'庄',std:'每月'},
+    {wd:'各部门消防检查记录',points:'',lead:'庄',std:'每月'},
+    {wd:'各部门班组长安全会议记录',points:'',lead:'庄',std:'每月'},
+    {wd:'文档归类整理整顿',points:'',lead:'草/庄',std:'持续'},
+    {wd:'资料文件更新/清理',points:'',lead:'草/庄',std:'持续'},
+    {wd:'其他工作事务',points:'',lead:'庄',std:''},
+    {wd:'备忘录',points:'每天接收到的工作，交代事项，完成时间，要求',lead:'庄',std:''},
+    {isGroup:true,groupName:'陈氏春-负责项目'},
+    {wd:'再生棉TC证书申请(GRS&RCS)',points:'原料统计TC证书申请（每月5号前完成采购量统计）\n范围证书添加新品种（符合业务/客户需求）\n面料TC证书申请（收到业务订单后及时申请）\n原纱TC采购数据汇总（每月5号前完成）\n再生棉平衡表统计（每月更新）\n原料TC上传系统（收到纱证后及时上传）\n月度TC证书申请汇总（月末统计）',lead:'春',std:'每月5号前完成采购量统计'},
+    {wd:'再生农业认证(regenagri)',points:'',lead:'春',std:'按认证机构要求'},
+    {wd:'验厂认证协助',points:'',lead:'春',std:'按需协助'},
+    {wd:'其他工作事务',points:'',lead:'春',std:''},
+    {wd:'备忘录',points:'每天接收到的工作，交代事项，完成时间，要求',lead:'春',std:''}
   ];
-  let id=maxId, added=0;
+  let id=maxId, added=0, group='';
   seed.forEach(s=>{
     if(s.isGroup){
+      group=s.groupName;
       if(!existingGroup.has(s.groupName)){
-        id++; data.tasks.push({id,cat:'14',isGroup:true,groupName:s.groupName}); added++;
+        id++; data.tasks.push({id,cat:'14',isGroup:true,groupName:s.groupName}); existingGroup.add(s.groupName); added++;
       }
       return;
     }
-    if(!existingWd.has(s.wd)){
-      id++; data.tasks.push({id,cat:'14',workDetail:s.wd,title:s.wd,points:s.points,lead:s.lead,standard:s.std,daily:{}});
-      existingWd.add(s.wd); added++;
+    const key=group+'|'+s.wd;
+    if(!existingKey.has(key)){
+      id++; data.tasks.push({id,cat:'14',workDetail:s.wd,title:s.wd,points:s.points||'',lead:s.lead||'',standard:s.std||'',daily:{}});
+      existingKey.add(key); added++;
     }
   });
   if(added>0){ saveData(); toast('已自动补全日报管理固定项目：'+added+' 条'); }
