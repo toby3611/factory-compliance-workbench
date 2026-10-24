@@ -993,6 +993,10 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 #printArea .foot{margin-top:14px;color:#999;font-size:11px}
 #photoModal{display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.82);z-index:200;padding:20px}
 #photoModal img{max-width:92vw;max-height:86vh;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+#photoModal .pm-x{position:absolute;top:16px;right:20px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.45);color:#fff;font-size:14px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;z-index:1}
+#photoModal .pm-x:hover{background:#dc2626;border-color:#dc2626}
+.drill-photo-overlay .dpo-x{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.45);color:#fff;font-size:14px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer}
+.drill-photo-overlay .dpo-x:hover{background:#dc2626;border-color:#dc2626}
 /* 抽屉（复用 .mask） */
 .drawer{position:fixed;top:0;right:0;height:100vh;width:520px;max-width:92vw;background:#fff;box-shadow:-8px 0 24px rgba(0,0,0,.08);transform:translateX(100%);transition:.25s;z-index:121;display:flex;flex-direction:column}
 .drawer.on{transform:translateX(0)}
@@ -1671,7 +1675,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-10-1042';
+const BUILD_TAG='26-10-1043';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -6310,13 +6314,15 @@ function drillPreviewPhoto(src){
     ov=document.createElement('div');
     ov.id='drillPhotoOverlay';
     ov.className='drill-photo-overlay';
-    ov.innerHTML='<div class="dpo-inner"><img id="dpoImg" src="" alt="现场照片"><div class="dpo-tip">点击空白处关闭</div></div>';
+    ov.innerHTML='<button class="dpo-x" type="button" onclick="drillCloseOverlay()">✕ 关闭（ESC）</button><div class="dpo-inner"><img id="dpoImg" src="" alt="现场照片"><div class="dpo-tip">点击空白处关闭</div></div>';
     document.body.appendChild(ov);
-    ov.addEventListener('click',function(e){if(e.target===ov)ov.remove();});
+    ov.addEventListener('click',function(e){if(e.target===ov)drillCloseOverlay();});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')drillCloseOverlay();});
   }
   const im=ov.querySelector('#dpoImg');if(im)im.src=String(src);
   ov.style.display='flex';
 }
+function drillCloseOverlay(){const ov=document.getElementById('drillPhotoOverlay');if(ov)ov.remove();}
 /* ============ cat=7 检测校准「完成进度」（每行独立子项，零牵连）============ */
 /* 设计：t.checkPhases = [{name,date,tag,done}] 数组，每行 task 各自独立；视觉参照 cat=1/2 phases 与参考图（绿勾+日期+标签+删除+添加项）。
    行内展开（紧跟本行下），勾选 / 改字段 / 加项 / 删项 即时刷新顶部 banner。*/
@@ -6612,10 +6618,12 @@ function ensurePhotoModal(){
   if(document.getElementById('photoModal'))return;
   const m=document.createElement('div');
   m.className='mask hidden';m.id='photoModal';
-  m.onclick=()=>m.classList.add('hidden');
-  m.innerHTML='<img id="photoImg" onclick="event.stopPropagation()">';
+  m.onclick=()=>photoModalClose();
+  m.innerHTML='<button class="pm-x" type="button" onclick="photoModalClose()">✕ 关闭（ESC）</button><img id="photoImg" onclick="event.stopPropagation()">';
   document.body.appendChild(m);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')photoModalClose();});
 }
+function photoModalClose(){const pm=document.getElementById('photoModal');if(pm)pm.classList.add('hidden');}
 function viewPhoto(imgEl){ensurePhotoModal();document.getElementById('photoImg').src=imgEl.src;document.getElementById('photoModal').classList.remove('hidden');}
 function compressImg(dataUrl,maxW,q,cb){
   const img=new Image();
