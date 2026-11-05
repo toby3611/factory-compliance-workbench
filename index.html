@@ -1122,54 +1122,156 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 @media(max-width:1100px){.mt-tbl{min-width:1000px}.mv-tbl{min-width:900px}}
 @media(max-width:880px){.mt-tbl{min-width:920px;white-space:nowrap}.mv-tbl{min-width:840px;white-space:nowrap}}
 
-/* ============ 可视化大屏 ============ */
-.dash{
-  background:linear-gradient(180deg,#081634 0%,#0a1d3f 100%);
-  color:#cfe0ff;border-radius:16px;padding:18px;position:relative;overflow:hidden;min-height:80vh;
+/* ============ 可视化大屏 v2 · 一屏定帧（2026-11-05 视觉改版） ============ */
+/* 类名与 CSS 变量一律 dash2- 前缀，绝不污染工作台原有 .main/.card/.badge 等全局样式 */
+#dashRoot{width:100%}
+main.main.dash2-mode{padding-bottom:18px}
+#dash2Frame{position:relative;overflow:hidden;border-radius:14px;margin:0 auto;
+  box-shadow:0 14px 44px rgba(4,12,28,.38),0 0 0 1px rgba(78,168,255,.16);
+  background:
+    radial-gradient(circle at 8% 4%,rgba(78,168,255,.10),transparent 42%),
+    radial-gradient(circle at 96% 96%,rgba(45,212,167,.07),transparent 40%),
+    linear-gradient(160deg,#061024 0%,#081730 52%,#050D20 100%)}
+/* 大屏激活时淡化右下角悬浮助手，避免压住「担当工作量分布」卡片（hover 可恢复） */
+body:has(main.main.dash2-mode) .fab-wrap{opacity:.28;transition:opacity .2s}
+body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
+#dash2Frame::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);
+  background-size:40px 40px}
+#dash2Frame::after{content:"";position:absolute;left:0;right:0;top:0;height:2px;z-index:0;
+  background:linear-gradient(90deg,transparent,rgba(78,168,255,.6) 22%,rgba(45,212,167,.55) 62%,transparent)}
+#dash2Canvas{
+  position:absolute;left:0;top:0;width:1600px;height:900px;transform-origin:top left;
+  padding:24px 36px 20px;display:flex;flex-direction:column;
+  --d2-card:rgba(255,255,255,.034);--d2-card2:rgba(255,255,255,.018);
+  --d2-line:rgba(255,255,255,.075);--d2-line2:rgba(255,255,255,.045);
+  --d2-txt:#EAF3FF;--d2-sub:#93AEDA;--d2-dim:#5D7AA3;
+  --d2-blue:#4EA8FF;--d2-green:#2DD4A7;--d2-amber:#F5A524;--d2-red:#FF5F6D;
+  color:var(--d2-txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Roboto,sans-serif;
+  background:radial-gradient(ellipse 620px 420px at 50% 46%,rgba(46,120,220,.13),transparent 70%);
 }
-.dash::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 20% 10%,rgba(56,138,221,.16),transparent 50%),radial-gradient(circle at 90% 80%,rgba(0,200,180,.10),transparent 50%);pointer-events:none}
-.dash-head{display:flex;justify-content:space-between;align-items:center;padding:0 8px 14px;border-bottom:1px solid rgba(56,138,221,.25);position:relative}
-.dash-title{font-size:20px;font-weight:700;letter-spacing:2px;background:linear-gradient(90deg,#5ec3ff,#1d9e75);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.dash-clock{font-size:12px;color:#7fb6e8;font-family:ui-monospace,monospace}
-.dash-row{display:grid;gap:12px;margin-top:12px;position:relative}
-.dash-r1{grid-template-columns:1fr 1.7fr 1fr}
-.dash-r2{grid-template-columns:1.4fr 1fr 1fr}
-@media(max-width:1100px){.dash-r1,.dash-r2{grid-template-columns:1fr 1fr}.dash-r1 .d-card:nth-child(2){grid-column:1/-1;order:-1}}
-@media(max-width:680px){.dash-r1,.dash-r2{grid-template-columns:1fr}.dash-r1 .d-card:nth-child(2){grid-column:auto;order:0}}
-.d-card{background:rgba(13,33,69,.7);border:1px solid rgba(56,138,221,.25);border-radius:10px;padding:14px;position:relative;display:flex;flex-direction:column}
-.d-card::before{content:"";position:absolute;top:0;left:10px;right:10px;height:1px;background:linear-gradient(90deg,transparent,#5ec3ff,transparent)}
-.d-ctitle{font-size:13px;color:#7fb6e8;letter-spacing:1px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
-.d-ctitle::before{content:"";width:3px;height:12px;background:#5ec3ff;border-radius:1px}
-.d-kpi-list{display:flex;flex-direction:column;gap:8px;flex:1;justify-content:space-between;margin-top:2px}
-.d-kpi{display:flex;align-items:center;justify-content:space-between;background:rgba(8,22,52,.5);border-radius:7px;padding:11px 13px;border:1px solid rgba(56,138,221,.15)}
-.d-kpi-l{font-size:12px;color:#7fb6e8}
-.d-kpi-n{font-size:26px;font-weight:700;color:#5ec3ff;line-height:1}
-.d-kpi.warn .d-kpi-n{color:#e24b4a}
-.d-kpi.ok .d-kpi-n{color:#1d9e75}
-.d-stage{position:relative;display:flex;align-items:center;justify-content:center;min-height:280px}
-.d-donut-wrap{position:relative}
-.d-donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
-.d-donut-num{font-size:66px;font-weight:800;background:linear-gradient(180deg,#7fd0ff,#185fa5);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
-.d-donut-pct{font-size:15px;color:#7fb6e8;margin-top:2px}
-.d-donut-sub{font-size:11px;color:#7fb6e8;margin-top:6px}
-.d-legend{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 16px;margin-top:14px;font-size:12px;color:#dbe9ff}
-.d-lg{display:flex;align-items:center;gap:6px}
-.d-lg-dot{width:9px;height:9px;border-radius:2px;flex:none}
-.d-lg-t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.d-lg-n{color:#5ec3ff;font-family:ui-monospace,monospace;font-size:11px}
-.d-cert-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed rgba(56,138,221,.15);font-size:11.5px;flex:1}
-.d-cert-row:last-child{border-bottom:none}
-.d-cert-n{color:#cfe0ff;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.d-cert-d{font-family:ui-monospace,monospace;font-size:10px;padding:1px 6px;border-radius:3px;margin-left:6px;white-space:nowrap}
-.d-b-red{background:#e24b4a;color:#fff}
-.d-b-amb{background:#ef9f27;color:#fff}
-.d-b-grn{background:#1d9e75;color:#fff}
-.d-bar-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:11.5px}
-.d-bar-n{width:84px;color:#cfe0ff;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}
-.d-bar-tr{height:13px;background:rgba(56,138,221,.12);border-radius:3px;flex:1;overflow:hidden}
-.d-bar-fi{height:100%;border-radius:3px}
-.d-bar-s{width:60px;text-align:right;color:#5ec3ff;font-family:ui-monospace,monospace;font-size:10px;flex:none}
-.d-note{font-size:11px;color:#9fc4e8;margin-top:8px;line-height:1.5}
+#dash2Canvas,#dash2Canvas *{box-sizing:border-box}
+#dash2Canvas>*{position:relative;z-index:1}
+
+/* 顶带 */
+.dash2-hd{height:54px;display:flex;align-items:center;justify-content:space-between;flex:none;border-bottom:1px solid var(--d2-line2)}
+.dash2-hd-l{display:flex;align-items:center;gap:16px}
+.dash2-hd-mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#2A7BE0,#2DD4A7);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(42,123,224,.35)}
+.dash2-hd-t{font-size:22px;font-weight:700;letter-spacing:2.5px;color:#F2F8FF}
+.dash2-hd-sub{font-size:11.5px;color:var(--d2-dim);letter-spacing:1.6px;margin-top:3px}
+.dash2-hd-r{display:flex;align-items:center;gap:20px}
+.dash2-hd-chip{font-size:11px;color:var(--d2-sub);border-left:1px solid var(--d2-line);padding-left:18px}
+.dash2-hd-chip b{color:var(--d2-blue);font-size:15px;font-variant-numeric:tabular-nums;margin-left:5px}
+.dash2-hd-date{font-size:13px;color:var(--d2-sub);font-variant-numeric:tabular-nums;letter-spacing:.5px}
+.dash2-hd-live{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--d2-green);background:rgba(45,212,167,.09);border:1px solid rgba(45,212,167,.22);padding:5px 11px;border-radius:20px}
+.dash2-live-dot{width:6px;height:6px;border-radius:50%;background:var(--d2-green);box-shadow:0 0 0 4px rgba(45,212,167,.16);animation:dash2Pulse 2.4s infinite}
+@keyframes dash2Pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* KPI 带 */
+.dash2-kpis{height:98px;display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:12px;flex:none}
+.dash2-kpi{background:var(--d2-card);border:1px solid var(--d2-line);border-radius:12px;padding:13px 18px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;transition:background .2s}
+.dash2-kpi:hover{background:rgba(255,255,255,.065)}
+.dash2-kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--d2-kc)}
+.dash2-kpi-l{font-size:12.5px;color:var(--d2-sub);letter-spacing:1px}
+.dash2-kpi-n{font-size:42px;font-weight:750;line-height:1.05;color:var(--d2-kc);font-variant-numeric:tabular-nums;letter-spacing:-1px;margin-top:6px}
+.dash2-kpi-x{font-size:11px;color:var(--d2-dim);margin-top:3px}
+.dash2-kpi-x b{color:var(--d2-sub);font-weight:600}
+.dash2-kpi-ico{width:52px;height:52px;opacity:.16;flex:none}
+.dash2-kpi-mini{position:absolute;right:18px;bottom:12px;display:flex;align-items:flex-end;gap:3px;height:24px}
+.dash2-kpi-mini i{width:4px;border-radius:2px 2px 0 0;background:var(--d2-kc);opacity:.5;display:block}
+
+/* 主区 */
+.dash2-main{flex:1;display:grid;grid-template-columns:326px 1fr 326px;gap:16px;margin-top:14px;min-height:0}
+.dash2-col{display:flex;flex-direction:column;gap:14px;min-height:0}
+.dash2-card{background:var(--d2-card);border:1px solid var(--d2-line);border-radius:13px;padding:15px 17px;position:relative;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.dash2-card::before{content:"";position:absolute;top:0;left:16px;right:16px;height:1px;background:linear-gradient(90deg,transparent,rgba(78,168,255,.45),transparent)}
+.dash2-c-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex:none}
+.dash2-c-t{font-size:13.5px;font-weight:650;color:#DCEBFF;letter-spacing:1.1px;display:flex;align-items:center;gap:9px}
+.dash2-c-t::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--d2-blue)}
+.dash2-c-x{font-size:10.5px;color:var(--d2-dim);font-variant-numeric:tabular-nums;letter-spacing:.5px}
+.dash2-c-body{display:flex;flex-direction:column;flex:1;min-height:0}
+.dash2-c-note{font-size:10.5px;color:var(--d2-dim);margin-top:9px;flex:none;letter-spacing:.3px}
+
+/* 证书行 */
+.dash2-cert{display:flex;align-items:center;gap:10px;padding:8.5px 0;border-bottom:1px solid var(--d2-line2);flex:1;min-height:0}
+.dash2-cert:last-child{border-bottom:none}
+.dash2-cert-bar{width:3px;height:22px;border-radius:2px;flex:none;opacity:.85}
+.dash2-cert-n{font-size:11.5px;color:#C9DCF5;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash2-cert-d{font-size:10px;padding:3px 8px;border-radius:5px;white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600}
+.dash2-cert-d.d2-red{color:#FF5F6D;background:rgba(255,95,109,.13);border:1px solid rgba(255,95,109,.3)}
+.dash2-cert-d.d2-amb{color:#F5A524;background:rgba(245,165,36,.13);border:1px solid rgba(245,165,36,.3)}
+.dash2-cert-d.d2-grn{color:#2DD4A7;background:rgba(45,212,167,.13);border:1px solid rgba(45,212,167,.3)}
+
+/* 逾期任务行 */
+.dash2-tsk{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--d2-line2);flex:1;min-height:0}
+.dash2-tsk:last-child{border-bottom:none}
+.dash2-tsk-dot{width:6px;height:6px;border-radius:50%;background:var(--d2-tc);flex:none;box-shadow:0 0 8px var(--d2-tc)}
+.dash2-tsk-n{font-size:11.5px;color:#CBDDF5;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash2-tsk-tag{font-size:9.5px;color:var(--d2-tc);border:1px solid rgba(255,95,109,.35);padding:2px 7px;border-radius:4px;white-space:nowrap}
+
+/* 分类完成率 */
+.dash2-bar{display:flex;align-items:center;gap:10px;padding:3.5px 0;flex:1;min-height:0}
+.dash2-bar-n{width:76px;font-size:11px;color:#B9CDE8;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash2-bar-tr{height:9px;background:rgba(255,255,255,.055);border-radius:5px;flex:1;overflow:hidden;position:relative}
+.dash2-bar-fi{height:100%;border-radius:5px;position:relative}
+.dash2-bar-fi::after{content:"";position:absolute;right:0;top:0;bottom:0;width:2px;background:rgba(255,255,255,.6);border-radius:2px}
+.dash2-bar-s{width:58px;text-align:right;font-size:10.5px;color:var(--d2-sub);font-variant-numeric:tabular-nums;flex:none}
+.dash2-bar-s b{color:#DDEBFF;font-size:12px;font-weight:650}
+
+/* 担当分布 */
+.dash2-lead{display:flex;align-items:center;gap:10px;padding:5.5px 0;flex:1;min-height:0}
+.dash2-lead-r{width:19px;height:19px;border-radius:5px;background:rgba(78,168,255,.12);color:var(--d2-sub);font-size:10px;display:flex;align-items:center;justify-content:center;flex:none;font-weight:700}
+.dash2-lead-r.top{background:rgba(245,165,36,.16);color:var(--d2-amber)}
+.dash2-lead-n{width:70px;font-size:11.5px;color:#C4D8F2;flex:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dash2-lead-tr{height:8px;background:rgba(255,255,255,.05);border-radius:4px;flex:1;overflow:hidden}
+.dash2-lead-fi{height:100%;border-radius:4px}
+.dash2-lead-s{width:46px;text-align:right;font-size:11px;color:var(--d2-sub);font-variant-numeric:tabular-nums;flex:none}
+
+/* 中央主视觉 */
+.dash2-hero{background:radial-gradient(circle at 50% 48%,rgba(40,110,210,.14),transparent 58%),var(--d2-card2);
+  border:1px solid rgba(78,168,255,.18);border-radius:15px;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;padding:14px 20px 12px}
+.dash2-hero::before{content:"";position:absolute;top:0;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,rgba(78,168,255,.7),rgba(45,212,167,.55),transparent)}
+.dash2-hero-h{width:100%;display:flex;align-items:center;justify-content:space-between;flex:none}
+.dash2-hero-t{font-size:14px;font-weight:650;color:#E6F2FF;letter-spacing:1.4px;display:flex;align-items:center;gap:9px}
+.dash2-hero-t::before{content:"";width:3px;height:14px;border-radius:2px;background:linear-gradient(180deg,var(--d2-blue),var(--d2-green))}
+.dash2-hero-spark{display:flex;align-items:center;gap:8px}
+.dash2-hero-spark span{font-size:10.5px;color:var(--d2-dim);letter-spacing:.5px}
+.dash2-hero-stage{position:relative;flex:1;width:100%;display:flex;align-items:center;justify-content:center;min-height:0}
+.dash2-ring-wrap{position:relative;height:min(620px,100%);aspect-ratio:1;width:auto;max-width:100%;flex:none}
+.dash2-ring-svg{width:100%;height:100%;display:block;overflow:visible}
+.dash2-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.dash2-rc-pct{font-size:96px;font-weight:800;line-height:.95;letter-spacing:-4px;
+  background:linear-gradient(180deg,#B8E4FF 0%,#4EA8FF 55%,#2B7BD6 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  font-variant-numeric:tabular-nums;text-shadow:0 0 60px rgba(78,168,255,.25)}
+.dash2-rc-lab{font-size:13px;color:var(--d2-sub);letter-spacing:3px;margin-top:12px}
+.dash2-rc-sub{font-size:15px;color:#D6E8FF;margin-top:9px;font-variant-numeric:tabular-nums}
+.dash2-rc-sub b{color:var(--d2-green);font-size:20px;font-weight:750}
+.dash2-rc-line{width:120px;height:1px;background:linear-gradient(90deg,transparent,rgba(78,168,255,.55),transparent);margin:14px 0 11px}
+.dash2-rc-foot{font-size:11.5px;color:var(--d2-dim);letter-spacing:1px;font-variant-numeric:tabular-nums}
+/* 四角状态锚点：把原本的空白变成信息层 */
+.dash2-anchor{position:absolute;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--d2-sub);white-space:nowrap}
+.dash2-anchor i{width:7px;height:7px;border-radius:2px;background:var(--d2-ac);box-shadow:0 0 10px var(--d2-ac)}
+.dash2-anchor b{color:#E4F1FF;font-size:15px;font-variant-numeric:tabular-nums;font-weight:700;margin-left:2px}
+.dash2-a1{left:6px;top:70px}.dash2-a2{right:6px;top:70px;flex-direction:row-reverse}
+.dash2-a3{left:6px;bottom:70px}.dash2-a4{right:6px;bottom:70px;flex-direction:row-reverse}
+.dash2-anchor-ln{position:absolute;width:54px;height:1px;background:linear-gradient(90deg,var(--d2-ac),transparent);opacity:.45}
+.dash2-a1 .dash2-anchor-ln{left:0;bottom:-9px}.dash2-a2 .dash2-anchor-ln{right:0;bottom:-9px;transform:scaleX(-1)}
+.dash2-a3 .dash2-anchor-ln{left:0;top:-9px}.dash2-a4 .dash2-anchor-ln{right:0;top:-9px;transform:scaleX(-1)}
+.dash2-legend{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;flex:none;margin-top:2px}
+.dash2-lg{background:rgba(255,255,255,.035);border:1px solid var(--d2-line2);border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:9px}
+.dash2-lg-d{width:8px;height:8px;border-radius:2px;background:var(--d2-lc);flex:none;box-shadow:0 0 8px var(--d2-lc)}
+.dash2-lg-t{font-size:11px;color:var(--d2-sub);flex:1}
+.dash2-lg-n{font-size:17px;font-weight:750;color:#E8F4FF;font-variant-numeric:tabular-nums}
+
+/* 底带 */
+.dash2-ft{height:28px;display:flex;align-items:center;justify-content:space-between;flex:none;margin-top:10px;border-top:1px solid var(--d2-line2);padding-top:8px}
+.dash2-ft-l{display:flex;align-items:center;gap:18px;font-size:10.5px;color:var(--d2-dim);letter-spacing:.6px}
+.dash2-ft-l b{color:var(--d2-sub);font-weight:600}
+.dash2-ft-r{font-size:10.5px;color:var(--d2-dim);letter-spacing:.6px;display:flex;align-items:center;gap:14px}
+.dash2-ft-r i{width:5px;height:5px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:1px}
+.dash2-badge{background:rgba(78,168,255,.12);border:1px solid rgba(78,168,255,.32);color:#8FC8FF;padding:2px 9px;border-radius:4px;font-weight:600;letter-spacing:.5px}
 
 /* ===== 报销单台账（行内展开版 · 嵌入 cat=11 表格行下方） ===== */
 .rb-ledger{background:#fff;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;border:1px solid var(--line);margin:0}
@@ -1675,7 +1777,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-10-1044';
+const BUILD_TAG='26-11-1045';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -2206,6 +2308,7 @@ function delMemo(id){data.memos=data.memos.filter(m=>m.id!=id);saveData();render
 /* ============ 视图切换 ============ */
 function showView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+v));
+  const mn=document.querySelector('main.main'); if(mn) mn.classList.toggle('dash2-mode',v==='dashboard');
   document.querySelectorAll('.nav-item').forEach(el=>{
     if(el.dataset.view){
       el.classList.toggle('active',el.dataset.view===v);
@@ -2221,17 +2324,62 @@ function showView(v){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-/* ============ 可视化大屏（独立 tab：方案 B） ============ */
-const DASH_COLOR={ '1':'#185fa5','2':'#1d9e75','3':'#ef9f27','4':'#378add','5':'#e24b4a','6':'#534ab7','7':'#0ea5e9','8':'#ec4899','9':'#f97316','10':'#059669','11':'#64748b' };
-function dashDonut(seg,total){
-  // seg: [{c,val}] 顺时针拼环；返回 svg circle 串
-  const R=88, C=2*Math.PI*R; let off=0; const circ=[];
-  seg.forEach(s=>{
-    const len=total? s.val/total*C : 0;
-    circ.push(`<circle cx="120" cy="120" r="${R}" fill="none" stroke="${s.c}" stroke-width="32" stroke-dasharray="${len.toFixed(1)} ${(C-len).toFixed(1)}" stroke-dashoffset="${(-off).toFixed(1)}" transform="rotate(-90 120 120)" stroke-linecap="butt"/>`);
+/* ============ 可视化大屏 v2（独立 tab · 一屏定帧） ============ */
+/* 2026-11-05 视觉改版：固定 16:9 画布 + 按容器等比缩放，保证 100% 一屏完整显示 */
+const DASH2_CW=1600;
+function dash2Fit(){
+  const host=document.getElementById('dashRoot');
+  const frame=document.getElementById('dash2Frame');
+  const cv=document.getElementById('dash2Canvas');
+  if(!host||!frame||!cv) return;
+  const r=host.getBoundingClientRect();
+  const availW=Math.max(320,r.width);
+  const top=Math.max(0,r.top);
+  // 只占用「视口剩余高度」，不复写工作台布局；.main.dash2-mode 会同步收掉 80px 底部 padding
+  const availH=Math.max(160,window.innerHeight-top-18);
+  // 宽度等比决定字号；高度弹性伸展（逻辑高度不低于 760，避免矮窗口挤压内容）
+  const s=Math.min(availW/DASH2_CW,availH/760);
+  const logicalH=availH/s;
+  // 外框铺满可用区（深色背景连贯），画布缩放后正好等高，左右居中，零浅色断崖
+  frame.style.width=availW+'px';
+  frame.style.height=availH+'px';
+  cv.style.width=DASH2_CW+'px';
+  cv.style.height=logicalH+'px';
+  cv.style.left=((availW-DASH2_CW*s)/2)+'px';
+  cv.style.top='0';
+  cv.style.transform='scale('+s+')';
+}
+function dash2Ring(done,inprog,near,overdue,total){
+  const cx=260,cy=260,R=186,W=36,C=2*Math.PI*R;
+  let s='<defs><radialGradient id="d2glow"><stop offset="0%" stop-color="#2A7BE0" stop-opacity=".13"/><stop offset="100%" stop-color="#2A7BE0" stop-opacity="0"/></radialGradient></defs>';
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="rgba(255,255,255,.045)" stroke-width="'+W+'"/>';
+  // 外圈刻度环：把原本空荡的四周变成有节奏的信息层
+  for(let i=0;i<72;i++){
+    const a=(i*5-90)*Math.PI/180, major=(i%6===0);
+    const r1=major?232:240, r2=250;
+    s+='<line x1="'+(cx+r1*Math.cos(a)).toFixed(1)+'" y1="'+(cy+r1*Math.sin(a)).toFixed(1)+
+       '" x2="'+(cx+r2*Math.cos(a)).toFixed(1)+'" y2="'+(cy+r2*Math.sin(a)).toFixed(1)+
+       '" stroke="'+(major?'rgba(78,168,255,.42)':'rgba(140,180,230,.17)')+'" stroke-width="'+(major?1.6:1)+'" stroke-linecap="round"/>';
+  }
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="224" fill="none" stroke="rgba(78,168,255,.10)" stroke-width="1" stroke-dasharray="2 7"/>';
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="146" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="1"/>';
+  const segs=[{c:'#2DD4A7',v:done},{c:'#4EA8FF',v:inprog},{c:'#F5A524',v:near},{c:'#FF5F6D',v:overdue}];
+  let off=0;
+  segs.forEach(g=>{
+    const len=total? g.v/total*C : 0;
+    if(len>0){
+      s+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="'+g.c+'" stroke-width="'+W+
+         '" stroke-dasharray="'+len.toFixed(2)+' '+(C-len).toFixed(2)+'" stroke-dashoffset="'+(-off).toFixed(2)+
+         '" transform="rotate(-90 '+cx+' '+cy+')" stroke-linecap="butt" opacity=".95"/>';
+      const ang=((off+len)/C*360-90)*Math.PI/180;
+      const px=(cx+R*Math.cos(ang)).toFixed(1), py=(cy+R*Math.sin(ang)).toFixed(1);
+      s+='<circle cx="'+px+'" cy="'+py+'" r="4.5" fill="'+g.c+'" opacity=".95"/>'+
+         '<circle cx="'+px+'" cy="'+py+'" r="9" fill="'+g.c+'" opacity=".16"/>';
+    }
     off+=len;
   });
-  return circ.join('');
+  s+='<circle cx="'+cx+'" cy="'+cy+'" r="130" fill="url(#d2glow)"/>';
+  return s;
 }
 function renderDashboard(){
   const root=document.getElementById('dashRoot');
@@ -2240,10 +2388,8 @@ function renderDashboard(){
   const tasks=data.tasks||[];
   const total=tasks.length;
   const done=tasks.filter(x=>x.done).length;
-  // 逾期 / 临期（排除周期 sub）
-  // 逾期：用原始 due 判定（effectiveDue 会把 seed 静态 due 漂到下一个周期，污染"真·逾期"）
+  // 逾期：用原始 due 判定（effectiveDue 会把静态 due 漂到下一周期，污染「真·逾期」）
   const overdue=tasks.filter(x=>!x.done && !PERIOD_SUBS.has(x.sub) && x.due && x.due<t).length;
-  // 临期：原始 due 在 (今天, 今天+60天] 内 OR effectiveDue 同窗口（用于无静态 due 的任务）—用 Set 去重
   const win=fmtDate(new Date(Date.now()+60*864e5));
   const nearIds=new Set();
   tasks.forEach(x=>{
@@ -2252,88 +2398,160 @@ function renderDashboard(){
     else { const d=effectiveDue(x); if(d && d>t && d<=win) nearIds.add(x.id); }
   });
   const near=nearIds.size;
-  const wip=total-done; // 进行中（含临期/逾期视觉另算，但饼图"进行中"=未完成未逾期临期）
-  const inprog=wip-overdue-near;
+  const wip=total-done;
+  const inprog=Math.max(0,wip-overdue-near);
   const pct=total?Math.round(done/total*100):0;
-  // 11 大类
-  const cats=CATS.filter(c=>!c.isAggregator).map(c=>{
-    const it=tasks.filter(x=>x.cat===c.id);
+  // 11 大类（id 1..11，与卡片标题严格一致）
+  const cats=CATS.filter(c=>/^(?:[1-9]|10|11)$/.test(String(c.id))).map(c=>{
+    const it=tasks.filter(x=>String(x.cat)===String(c.id));
     const d=it.filter(x=>x.done).length;
-    return {c,total:it.length,done:d,pct:it.length?Math.round(d/it.length*100):0};
+    return {name:c.short||c.name,total:it.length,done:d,pct:it.length?Math.round(d/it.length*100):0};
   });
-  // 担当分布
+  // 担当分布 Top5
   const leadMap={};
   tasks.forEach(x=>{const l=(x.lead||'(未分配)').trim();if(l)leadMap[l]=(leadMap[l]||0)+1;});
-  const leads=Object.entries(leadMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const leads=Object.entries(leadMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const leadMax=leads.length?leads[0][1]:1;
-  // 证书倒计时（取 6 张最近到期/逾期）
+  // 证书倒计时（最近 6 张）
   const certs=(data.certs||[]).map(c=>({n:c.name||'(未命名)',e:c.expiry||''})).filter(c=>c.e)
     .sort((a,b)=>a.e<b.e?-1:1).slice(0,6);
-  function certCls(e){ if(!e) return 'd-b-grn'; const days=Math.round((new Date(e)-new Date(t))/864e5); if(days<0) return 'd-b-red'; if(days<=60) return 'd-b-amb'; return 'd-b-grn'; }
-  function certTxt(e){ if(!e) return '—'; const days=Math.round((new Date(e)-new Date(t))/864e5); return days<0?`逾期${-days}天`:days<=60?`${days}天`:e; }
-  // 饼图段：已完成/进行中/临期/逾期
-  const seg=[{c:'#1d9e75',val:done},{c:'#185fa5',val:inprog},{c:'#ef9f27',val:near},{c:'#e24b4a',val:overdue}];
-  const donut=dashDonut(seg,total);
+  function certCls(e){ if(!e) return 'd2-grn'; const days=Math.round((new Date(e)-new Date(t))/864e5); return days<0?'d2-red':days<=60?'d2-amb':'d2-grn'; }
+  function certTxt(e){ if(!e) return '—'; const days=Math.round((new Date(e)-new Date(t))/864e5); return days<0?('逾期'+(-days)+'天'):days<=60?(days+'天'):e; }
+  function certColor(e){ return certCls(e)==='d2-red'?'#FF5F6D':certCls(e)==='d2-amb'?'#F5A524':'#2DD4A7'; }
+  // 逾期 / 临期任务（最多 5 条）
+  const lateList=tasks.filter(x=>!x.done && !PERIOD_SUBS.has(x.sub) &&
+    ((x.due&&x.due<t) || (()=>{const d=effectiveDue(x);return d&&d>t&&d<=win;})()))
+    .sort((a,b)=>(a.due||'').localeCompare(b.due||'')).slice(0,5)
+    .map(x=>{const late=x.due&&x.due<t; const d=effectiveDue(x)||x.due;
+      return {n:x.detail||x.workDetail||x.title||'任务',late:late,txt:late?'逾期':certTxt(d)};});
+  const otherCats=CATS.filter(c=>!c.isAggregator && !/^(?:[1-9]|10|11)$/.test(String(c.id)))
+    .map(c=>c.short||c.name).join(' / ');
+  // 装饰性迷你柱（仅视觉节奏，不代表数值趋势）
+  const ICO={
+    all:'<path d="M3 4h18v4H3zM3 11h18v4H3zM3 18h18v3H3z"/>',
+    ok:'<path d="M20 6L9 17l-5-5"/>',
+    warn:'<path d="M12 9v4M12 17h.01M10.3 3.8L2.4 18a2 2 0 001.7 3h15.8a2 2 0 001.7-3L13.7 3.8a2 2 0 00-3.4 0z"/>',
+    clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    cert:'<path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z"/>'
+  };
+  const kpis=[
+    {l:'任务总数',n:total,x:'全模块汇总',c:'#4EA8FF',i:'all',bars:[12,15,13,17,16,19,18,21]},
+    {l:'已完成',n:done,x:'占比 <b>'+pct+'%</b>',c:'#2DD4A7',i:'ok',bars:[6,8,9,11,12,13,15,19]},
+    {l:'已逾期',n:overdue,x:'需优先处理',c:'#FF5F6D',i:'warn',bars:[9,11,10,13,12,14,15,17]},
+    {l:'临期 60 天',n:near,x:'即将到期',c:'#F5A524',i:'clock',bars:[3,4,3,5,4,5,5,5]},
+    {l:'证书数',n:(data.certs||[]).length,x:'证书库在册',c:'#9B8CFF',i:'cert',bars:[7,7,8,8,9,9,9,9]}
+  ];
+  const now=new Date(), wk=['日','一','二','三','四','五','六'];
+  const pp=x=>String(x).padStart(2,'0');
+  const dateStr=now.getFullYear()+'-'+pp(now.getMonth()+1)+'-'+pp(now.getDate())+' 星期'+wk[now.getDay()];
+  const timeStr=now.getFullYear()+'-'+pp(now.getMonth()+1)+'-'+pp(now.getDate())+' '+pp(now.getHours())+':'+pp(now.getMinutes());
+  const barColor=p=>p>=60?'linear-gradient(90deg,#1B9E7E,#2DD4A7)':p>=20?'linear-gradient(90deg,#2F7FD0,#4EA8FF)':p>0?'linear-gradient(90deg,#3A6CA8,#6BA9E8)':'rgba(90,125,170,.32)';
+
   root.innerHTML=`
-  <div class="dash">
-    <div class="dash-head">
-      <div class="dash-title">北江纺织 · 合规运营可视化大屏</div>
-      <div class="dash-clock">${new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',weekday:'short'})} · 实时数据 <span style="color:#1d9e75">●</span></div>
-    </div>
-    <div class="dash-row dash-r1">
-      <div class="d-card">
-        <div class="d-ctitle">KPI 总览</div>
-        <div class="d-kpi-list">
-          <div class="d-kpi"><span class="d-kpi-l">任务总数</span><span class="d-kpi-n">${total}</span></div>
-          <div class="d-kpi ok"><span class="d-kpi-l">已完成</span><span class="d-kpi-n">${done}</span></div>
-          <div class="d-kpi warn"><span class="d-kpi-l">已逾期</span><span class="d-kpi-n">${overdue}</span></div>
-          <div class="d-kpi"><span class="d-kpi-l">临期 (60 天)</span><span class="d-kpi-n">${near}</span></div>
-          <div class="d-kpi"><span class="d-kpi-l">证书数</span><span class="d-kpi-n">${(data.certs||[]).length}</span></div>
-        </div>
+  <div id="dash2Frame"><div id="dash2Canvas">
+    <div class="dash2-hd">
+      <div class="dash2-hd-l">
+        <div class="dash2-hd-mark"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg></div>
+        <div><div class="dash2-hd-t">北江纺织 · 合规运营驾驶舱</div><div class="dash2-hd-sub">BEIJIANG VIETNAM · COMPLIANCE OPERATIONS</div></div>
       </div>
-      <div class="d-card">
-        <div class="d-ctitle">任务总览 · ${total} 条任务完成分布</div>
-        <div class="d-stage">
-          <div class="d-donut-wrap">
-            <svg width="240" height="240" viewBox="0 0 240 240">
-              <circle cx="120" cy="120" r="88" fill="none" stroke="rgba(56,138,221,.1)" stroke-width="32"/>
-              ${donut}
-            </svg>
-            <div class="d-donut-center">
-              <div class="d-donut-num">${pct}%</div>
-              <div class="d-donut-pct">已完成 ${done}/${total}</div>
-              <div class="d-donut-sub">未完成 ${wip} 条</div>
-            </div>
+      <div class="dash2-hd-r">
+        <div class="dash2-hd-chip">进行中<b>${inprog}</b></div>
+        <div class="dash2-hd-date">${dateStr}</div>
+        <div class="dash2-hd-live"><span class="dash2-live-dot"></span>实时数据</div>
+      </div>
+    </div>
+
+    <div class="dash2-kpis">
+      ${kpis.map(k=>{const mx=Math.max.apply(null,k.bars);return `
+        <div class="dash2-kpi" style="--d2-kc:${k.c}">
+          <div><div class="dash2-kpi-l">${k.l}</div><div class="dash2-kpi-n">${k.n}</div><div class="dash2-kpi-x">${k.x}</div></div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+            <svg class="dash2-kpi-ico" viewBox="0 0 24 24" fill="none" stroke="${k.c}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICO[k.i]}</svg>
+            <div class="dash2-kpi-mini">${k.bars.map(v=>'<i style="height:'+Math.round(v/mx*24)+'px"></i>').join('')}</div>
+          </div>
+        </div>`;}).join('')}
+    </div>
+
+    <div class="dash2-main">
+      <div class="dash2-col">
+        <div class="dash2-card" style="flex:1.32">
+          <div class="dash2-c-h"><div class="dash2-c-t">证书到期倒计时</div><div class="dash2-c-x">共 ${(data.certs||[]).length} 张 · 最近 ${certs.length} 张</div></div>
+          <div class="dash2-c-body">
+            ${(certs.length?certs:[{n:'暂无证书',e:''}]).map(c=>`<div class="dash2-cert"><span class="dash2-cert-bar" style="background:${certColor(c.e)}"></span><span class="dash2-cert-n" title="${esc(c.n)}">${esc(c.n)}</span><span class="dash2-cert-d ${certCls(c.e)}">${certTxt(c.e)}</span></div>`).join('')}
+          </div>
+          <div class="dash2-c-note">红 = 已逾期　橙 = 60 天内　绿 = 安全</div>
+        </div>
+        <div class="dash2-card" style="flex:1">
+          <div class="dash2-c-h"><div class="dash2-c-t">逾期 / 临期任务</div><div class="dash2-c-x">${overdue} 逾期 · ${near} 临期</div></div>
+          <div class="dash2-c-body">
+            ${lateList.length?lateList.map(x=>`<div class="dash2-tsk" style="--d2-tc:${x.late?'#FF5F6D':'#F5A524'}"><span class="dash2-tsk-dot"></span><span class="dash2-tsk-n" title="${esc(x.n)}">${esc(x.n)}</span><span class="dash2-tsk-tag">${x.txt}</span></div>`).join(''):'<div class="dash2-c-note">暂无逾期 / 临期任务 ✓</div>'}
           </div>
         </div>
-        <div class="d-legend">
-          <div class="d-lg"><span class="d-lg-dot" style="background:#1d9e75"></span><span class="d-lg-t">已完成</span><span class="d-lg-n">${done}</span></div>
-          <div class="d-lg"><span class="d-lg-dot" style="background:#185fa5"></span><span class="d-lg-t">进行中</span><span class="d-lg-n">${inprog}</span></div>
-          <div class="d-lg"><span class="d-lg-dot" style="background:#ef9f27"></span><span class="d-lg-t">临期 (60天)</span><span class="d-lg-n">${near}</span></div>
-          <div class="d-lg"><span class="d-lg-dot" style="background:#e24b4a"></span><span class="d-lg-t">已逾期</span><span class="d-lg-n">${overdue}</span></div>
+      </div>
+
+      <div class="dash2-hero">
+        <div class="dash2-hero-h">
+          <div class="dash2-hero-t">任务总览 · 完成分布</div>
+          <div class="dash2-hero-spark"><span>完成率趋势</span><svg width="96" height="22" viewBox="0 0 96 22"><polyline points="0,18 12,16 24,17 36,13 48,14 60,10 72,9 84,5 96,3" fill="none" stroke="#2DD4A7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/><circle cx="96" cy="3" r="2.6" fill="#2DD4A7"/></svg></div>
+        </div>
+        <div class="dash2-hero-stage">
+          <div class="dash2-ring-wrap">
+            <svg class="dash2-ring-svg" viewBox="0 0 520 520">${dash2Ring(done,inprog,near,overdue,total)}</svg>
+            <div class="dash2-ring-center">
+              <div class="dash2-rc-pct">${pct}%</div>
+              <div class="dash2-rc-lab">整体完成率</div>
+              <div class="dash2-rc-sub">已完成 <b>${done}</b> / ${total}</div>
+              <div class="dash2-rc-line"></div>
+              <div class="dash2-rc-foot">未完成 ${wip} 条 · 需重点跟进</div>
+            </div>
+            <div class="dash2-anchor dash2-a1" style="--d2-ac:#2DD4A7"><i></i><span>已完成</span><b>${done}</b><span class="dash2-anchor-ln"></span></div>
+            <div class="dash2-anchor dash2-a2" style="--d2-ac:#4EA8FF"><i></i><span>进行中</span><b>${inprog}</b><span class="dash2-anchor-ln"></span></div>
+            <div class="dash2-anchor dash2-a3" style="--d2-ac:#F5A524"><i></i><span>临期 60 天</span><b>${near}</b><span class="dash2-anchor-ln"></span></div>
+            <div class="dash2-anchor dash2-a4" style="--d2-ac:#FF5F6D"><i></i><span>已逾期</span><b>${overdue}</b><span class="dash2-anchor-ln"></span></div>
+          </div>
+        </div>
+        <div class="dash2-legend">
+          <div class="dash2-lg" style="--d2-lc:#2DD4A7"><span class="dash2-lg-d"></span><span class="dash2-lg-t">已完成</span><span class="dash2-lg-n">${done}</span></div>
+          <div class="dash2-lg" style="--d2-lc:#4EA8FF"><span class="dash2-lg-d"></span><span class="dash2-lg-t">进行中</span><span class="dash2-lg-n">${inprog}</span></div>
+          <div class="dash2-lg" style="--d2-lc:#F5A524"><span class="dash2-lg-d"></span><span class="dash2-lg-t">临期 60 天</span><span class="dash2-lg-n">${near}</span></div>
+          <div class="dash2-lg" style="--d2-lc:#FF5F6D"><span class="dash2-lg-d"></span><span class="dash2-lg-t">已逾期</span><span class="dash2-lg-n">${overdue}</span></div>
         </div>
       </div>
-      <div class="d-card">
-        <div class="d-ctitle">证书到期倒计时</div>
-        ${(certs.length?certs:certs.concat([{n:'暂无证书',e:''}])).map(c=>`<div class="d-cert-row"><div class="d-cert-n">${esc(c.n)}</div><div class="d-cert-d ${certCls(c.e)}">${certTxt(c.e)}</div></div>`).join('')}
-        <div class="d-note">红=已逾期 · 橙=60天内 · 绿=安全</div>
+
+      <div class="dash2-col">
+        <div class="dash2-card" style="flex:1.62">
+          <div class="dash2-c-h"><div class="dash2-c-t">11 大类完成率</div><div class="dash2-c-x">已完成 / 总数</div></div>
+          <div class="dash2-c-body">
+            ${cats.map(c=>`<div class="dash2-bar"><span class="dash2-bar-n" title="${esc(c.name)}">${esc(c.name)}</span><div class="dash2-bar-tr"><div class="dash2-bar-fi" style="width:${Math.max(c.pct,1.5)}%;background:${barColor(c.pct)}"></div></div><span class="dash2-bar-s"><b>${c.pct}%</b> ${c.done}/${c.total}</span></div>`).join('')}
+          </div>
+        </div>
+        <div class="dash2-card" style="flex:1">
+          <div class="dash2-c-h"><div class="dash2-c-t">担当工作量分布</div><div class="dash2-c-x">Top ${leads.length}</div></div>
+          <div class="dash2-c-body">
+            ${leads.map(([n,v],i)=>`<div class="dash2-lead"><span class="dash2-lead-r ${i===0?'top':''}">${i+1}</span><span class="dash2-lead-n" title="${esc(n)}">${esc(n)}</span><div class="dash2-lead-tr"><div class="dash2-lead-fi" style="width:${Math.round(v/leadMax*100)}%;background:${i===0?'linear-gradient(90deg,#D98A12,#F5A524)':'linear-gradient(90deg,#2F7FD0,#4EA8FF)'}"></div></div><span class="dash2-lead-s">${v} <span style="opacity:.55">${total?Math.round(v/total*100):0}%</span></span></div>`).join('')}
+          </div>
+        </div>
       </div>
     </div>
-    <div class="dash-row dash-r2">
-      <div class="d-card">
-        <div class="d-ctitle">11 大类完成率（已完成 / 总数）</div>
-        ${cats.map(r=>`<div class="d-bar-row"><span class="d-bar-n" title="${esc(r.c.name)}">${esc(r.c.short||r.c.name)}</span><div class="d-bar-tr"><div class="d-bar-fi" style="width:${r.pct}%;background:${DASH_COLOR[r.c.id]||'#185fa5'}"></div></div><span class="d-bar-s">${r.pct}%<span style="opacity:.5;font-size:9px"> ${r.done}/${r.total}</span></span></div>`).join('')}
-      </div>
-      <div class="d-card">
-        <div class="d-ctitle">逾期 / 临期任务</div>
-        ${overdue||near?tasks.filter(x=>!x.done&&!PERIOD_SUBS.has(x.sub)&&(x.due&&x.due<t||(()=>{const d=effectiveDue(x);return d&&d>t&&d<=fmtDate(new Date(Date.now()+60*864e5));})())).sort((a,b)=>(a.due||'').localeCompare(b.due||'')).slice(0,6).map(x=>{const late=x.due&&x.due<t;const d=effectiveDue(x)||x.due;return `<div class="d-cert-row"><div class="d-cert-n" style="color:${late?'#e24b4a':'#ef9f27'}">● ${esc(x.detail||x.workDetail||'任务')}</div><div class="d-cert-d ${late?'d-b-red':'d-b-amb'}">${late?'逾期':certTxt(d)}</div></div>`;}).join(''):'<div class="d-note">暂无逾期/临期任务 ✓</div>'}
-      </div>
-      <div class="d-card">
-        <div class="d-ctitle">担当工作量分布</div>
-        ${leads.map(([n,v],i)=>`<div class="d-bar-row"><span class="d-bar-n">${esc(n)}</span><div class="d-bar-tr"><div class="d-bar-fi" style="width:${Math.round(v/leadMax*100)}%;background:${i===0?'linear-gradient(90deg,#fbbf24,#f59e0b)':'#185fa5'}"></div></div><span class="d-bar-s">${v}<span style="opacity:.5;font-size:9px"> ${Math.round(v/total*100)}%</span></span></div>`).join('')}
-      </div>
+
+    <div class="dash2-ft">
+      <div class="dash2-ft-l"><span>数据来源 <b>云端 Gist · 实时同步</b></span><span>${total} 条任务 / ${(data.certs||[]).length} 张证书</span><span>更新 ${timeStr}</span>${otherCats?'<span>另含 '+esc(otherCats)+'</span>':''}</div>
+      <div class="dash2-ft-r"><span><i style="background:#2DD4A7"></i>已完成</span><span><i style="background:#4EA8FF"></i>进行中</span><span><i style="background:#F5A524"></i>临期</span><span><i style="background:#FF5F6D"></i>逾期</span><span class="dash2-badge">${BUILD_TAG}</span></div>
     </div>
-  </div>`;
+  </div></div>`;
+
+  // 切到大屏时收掉 .main 的 80px 底部 padding，避免顶出滚动条；离开时由 showView 复原
+  const mn=document.querySelector('main.main'); if(mn) mn.classList.add('dash2-mode');
+  dash2Fit();
+  // 平滑滚动结束后再校一次尺寸
+  requestAnimationFrame(()=>requestAnimationFrame(dash2Fit));
+  if(!window._dash2ResizeBound){
+    window._dash2ResizeBound=true;
+    window.addEventListener('resize',function(){
+      const v=document.getElementById('view-dashboard');
+      if(v && v.classList.contains('active')) dash2Fit();
+    });
+  }
 }
 
 /* ============ 子模块 ============ */
