@@ -679,6 +679,7 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 .trn-row.confirmed .trn-m{background:#dcfce7!important;color:#166534}
 @media(max-width:768px){.trn-wrap{padding:8px}.trn-cell input[type=date]{width:88px;font-size:10px}.trn-tbl th{font-size:10.5px;padding:6px 3px}}
 /* 台账展开时隐藏右下角 AI 助手，避免压住「保存培训记录」按钮（沿用抽屉/弹层既有规则），折叠自动恢复 */
+.trn-photos{padding:10px 14px 14px}
 body:has(.trn-wrap) .fab-wrap{display:none}
 /* ===== cat=5 演习记录「现场照片」上传 ===== */
 .drill-photos{margin-top:8px;padding:10px;border:1px dashed #fca5a5;border-radius:8px;background:#fff8f8}
@@ -1801,7 +1802,7 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-11-1047';
+const BUILD_TAG='26-11-1048';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -3185,15 +3186,14 @@ function renderModuleTableHTML(){
         return `<td class="mc mc-mini empty" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} ✏️ 点击输入（客户名 / done / 日期）">✏️</td>`;
       }).join('');
       if(k==='drill'){
-        // 培训进度（仅 cat=5）：仓库安全培训走 12 个月台账，其余 6 条走原 4 阶段；行内独立展开
+        // 培训进度（仅 cat=5）：7 条全部走按次数台账（仓库 12 个月，演习 4/2/1 次），行内独立展开
         if(t.cat!=='5')return `<td>—</td>`;
-        const trnMode=isTrainingLedger(t);
-        const dDone=trnMode?trainingCount(t):drillCount(t);
-        const dTot=trnMode?12:4;
+        const dDone=trainingCount(t);
+        const dTot=drillRowCount(t);
         const tier=dDone===dTot?'full':dDone>=1?'mid':'zero';
         const isDrillOn=openDrillTasks.has(String(t.id));
         const safeClick=`try{event.stopPropagation();toggleDrillRow('${t.id}')}catch(e){console.error('[drill]',e);alert('页面 JS 未更新，请 Ctrl+F5 强刷到最新版');}`;
-        const dTip=trnMode?'点击展开 / 折叠「12 个月培训记录台账」：培训通知→现场培训→培训记录→完成确认':'点击在该行下方展开 / 折叠「演习 4 阶段」：演习计划→演习通知→演习实操→演习记录（按顺序打勾）';
+        const dTip=isTrainingLedger(t)?'点击展开 / 折叠「12 个月培训记录台账」：培训通知→现场培训→培训记录→完成确认':`点击展开 / 折叠「${dTot} 次演习台账」：演习通知→现场演习→演习记录→完成确认`;
         return `<td class="td-drill"><button class="drill-btn drill-tier-${tier} ${isDrillOn?'on':''}" data-task-id="${t.id}" onclick="${safeClick}" title="${dTip}"><span class="arr">▸</span> 培训进度 <span class="drill-ct">${dDone}/${dTot}</span></button></td>`;
       }
       if(k==='check'){
@@ -6299,9 +6299,10 @@ function renderPhasePanel(a){
     }).join('')}
   </div>`;
 }
-/* ============ 12 个月培训记录台账（仅「仓库安全培训」，1047）============
-   数据挂 t.trainingRows（12 行 × 4 环节），与 drillPhases 完全隔离；
-   惰性初始化 + 幂等补齐，绝不覆盖已有数据；其余 6 条演习不受影响。*/
+/* ============ cat=5 按次数台账（1048：7 条全部启用）============
+   数据挂 t.trainingRows（N 行 × 4 环节），与 drillPhases 完全隔离；
+   仓库安全培训固定 12 个月；其余演习按 plan「1年N次」解析为 4/2/1 行；
+   惰性初始化 + 幂等补齐 + 老进度一次性迁移，绝不覆盖用户已填数据。*/
 const TRAINING_KEYS=[
   {key:'notice', name:'培训通知'},
   {key:'onsite', name:'现场培训'},
@@ -6314,10 +6315,41 @@ function isTrainingLedger(t){
   if(String(t.id)===TRAINING_LEDGER_ID)return true;
   return String(t.workDetail||t.title||'').indexOf('仓库安全培训')>=0;
 }
+function isExerciseLedger(t){return !!(t&&String(t.cat)==='5'&&!isTrainingLedger(t));}
+/* 行数解析：plan「1年4次/1年2次」→ 4/2；无次数 → 1；仓库安全培训固定 12。
+   跨源字段一律字符串比较，plan 可能是数组或字符串。*/
+function drillRowCount(t){
+  if(!t)return 1;
+  if(isTrainingLedger(t))return 12;
+  const raw=Array.isArray(t.plan)?t.plan.join(' '):String(t.plan||'');
+  const m=raw.match(/1\s*年\s*(\d+)\s*次/)||raw.match(/(\d+)\s*次/);
+  if(m){const n=parseInt(m[1],10);if(n>=1&&n<=12)return n;}
+  return 1;
+}
+/* 老 4 阶段进度一次性迁移到第 1 次行：notify→通知 / drill→现场 / record→记录；
+   四阶段全 done 时「完成确认」也置 done。若用户已填过台账则跳过，绝不覆盖。*/
+function migrateDrillToRows(t){
+  if(!isExerciseLedger(t))return;
+  const dp=t.drillPhases;
+  if(!dp||typeof dp!=='object')return;
+  const rows=t.trainingRows;
+  if(!Array.isArray(rows)||!rows[0])return;
+  const r=rows[0];
+  const touched=['notice','onsite','record','confirm'].some(function(k){return r[k]&&(r[k].done||r[k].date);});
+  if(touched)return;
+  const map={notice:'notify',onsite:'drill',record:'record'};
+  Object.keys(map).forEach(function(k){
+    const ph=dp[map[k]];
+    if(ph&&ph.done){r[k].done=true;if(ph.date)r[k].date=ph.date;}
+  });
+  const all=['plan','notify','drill','record'].every(function(k){return dp[k]&&dp[k].done;});
+  if(all){r.confirm.done=true;if(dp.record&&dp.record.date)r.confirm.date=dp.record.date;}
+}
 function ensureTrainingRows(t){
   if(!t||typeof t!=='object')return [];
   if(!Array.isArray(t.trainingRows))t.trainingRows=[];
-  for(let i=0;i<12;i++){
+  const N=drillRowCount(t);
+  for(let i=0;i<N;i++){
     if(!t.trainingRows[i]||typeof t.trainingRows[i]!=='object')t.trainingRows[i]={m:i+1};
     const row=t.trainingRows[i];
     row.m=i+1;
@@ -6327,19 +6359,33 @@ function ensureTrainingRows(t){
       if(typeof row[p.key].date!=='string')row[p.key].date='';
     });
   }
-  if(t.trainingRows.length>12)t.trainingRows.length=12;
+  if(t.trainingRows.length>N)t.trainingRows.length=N;
+  migrateDrillToRows(t);
   return t.trainingRows;
 }
 function trainingCount(t){
-  /* 仅统计、不初始化：避免只浏览列表就往 data / 云端写入新字段 */
-  if(!t||!Array.isArray(t.trainingRows))return 0;
-  return t.trainingRows.filter(r=>r&&r.confirm&&r.confirm.done).length;
+  /* 仅统计、不初始化：浏览列表绝不写数据。
+     老 4 阶段全 done 且台账尚未建立时，纯计算虚拟折算为「第 1 次已确认」=1，
+     避免上线瞬间按钮从 4/4 突变 0/4 被误判为数据丢失；展开时由 ensureTrainingRows 真实迁移。*/
+  if(!t)return 0;
+  if(Array.isArray(t.trainingRows))return t.trainingRows.filter(r=>r&&r.confirm&&r.confirm.done).length;
+  if(isExerciseLedger(t)&&t.drillPhases){
+    const all=['plan','notify','drill','record'].every(function(k){return t.drillPhases[k]&&t.drillPhases[k].done;});
+    if(all)return 1;
+  }
+  return 0;
 }
 function renderTrainingLedger(t){
   const rows=ensureTrainingRows(t);
-  const th='<th>月份</th>'+TRAINING_KEYS.map(p=>`<th class="${p.key==='confirm'?'trn-cf':''}">${p.name}</th>`).join('');
+  const trn=isTrainingLedger(t);
+  const N=rows.length;
+  const keys=trn?TRAINING_KEYS:TRAINING_KEYS.map(function(p){
+    const names={notice:'演习通知',onsite:'现场演习',record:'演习记录',confirm:'完成确认'};
+    return {key:p.key,name:names[p.key]||p.name};
+  });
+  const th='<th>'+(trn?'月份':'次数')+'</th>'+keys.map(p=>`<th class="${p.key==='confirm'?'trn-cf':''}">${p.name}</th>`).join('');
   const body=rows.map((r,i)=>{
-    const cells=TRAINING_KEYS.map(p=>{
+    const cells=keys.map(p=>{
       const c=r[p.key];
       const cls=`trn-td ${c.done?'done':''} ${p.key==='confirm'?'trn-cf-td':''}`;
       return `<td class="${cls}" id="trn-td-${t.id}-${i}-${p.key}"><div class="trn-cell">
@@ -6349,19 +6395,29 @@ function renderTrainingLedger(t){
                  onchange="trainingDate('${t.id}',${i},'${p.key}',this.value)" onclick="event.stopPropagation()">
         </div></td>`;
     }).join('');
-    return `<tr class="trn-row ${r.confirm&&r.confirm.done?'confirmed':''}" id="trn-row-${t.id}-${i}"><td class="trn-m">${i+1}月</td>${cells}</tr>`;
+    const label=trn?(i+1)+'月':('第'+(i+1)+'次');
+    return `<tr class="trn-row ${r.confirm&&r.confirm.done?'confirmed':''}" id="trn-row-${t.id}-${i}"><td class="trn-m">${label}</td>${cells}</tr>`;
   }).join('');
+  const tip=trn
+    ? '<b>全年培训记录台账</b> · 每行一个月份，四个环节逐项打勾并填完成日期；「完成确认」用于最终签核。改完请点右下「保存培训记录」。'
+    : `<b>${N} 次演习台账</b> · 每行一次演习（按实操要求生成共 ${N} 次），四个环节逐项打勾并填完成日期；原 4 阶段进度已迁移到第 1 次行。改完请点右下「保存演习记录」。`;
+  /* 演习台账保留原有「现场照片（取证）」入口，避免功能倒退；仓库培训不显示 */
+  const photos=trn?'':(()=>{ensureDrillPhases(t);return '<div class="trn-photos">'+drillPhotosHTML(t)+'</div>';})();
   return `<div class="trn-wrap">
-    <div class="trn-tip"><b>全年培训记录台账</b> · 每行一个月份，四个环节逐项打勾并填完成日期；「完成确认」用于最终签核。改完请点右下「保存培训记录」。</div>
+    <div class="trn-tip">${tip}</div>
     <table class="trn-tbl"><thead><tr>${th}</tr></thead><tbody>${body}</tbody></table>
+    ${photos}
   </div>`;
 }
 function renderTrainingSummary(t){
   const rows=ensureTrainingRows(t);
+  const trn=isTrainingLedger(t);
+  const N=rows.length||1;
   const confirmed=trainingCount(t);
   const steps=rows.reduce((n,r)=>n+TRAINING_KEYS.filter(p=>r[p.key]&&r[p.key].done).length,0);
-  const pct=Math.round(confirmed*100/12);
-  return `<span>已确认 <b style="color:#16a34a">${confirmed}</b> / 12 个月（${pct}%）· 环节勾选 ${steps}/48</span>
+  const pct=Math.round(confirmed*100/N);
+  const unit=trn?'个月':'次';
+  return `<span>已确认 <b style="color:#16a34a">${confirmed}</b> / ${N} ${unit}（${pct}%）· 环节勾选 ${steps}/${N*4}</span>
     <span class="drill-progress-bar"><i style="width:${pct}%"></i></span>`;
 }
 function trainingToggle(taskId,idx,key,val){
@@ -6464,13 +6520,13 @@ function renderDrillSummary(t){
 }
 function renderDrillExpandInner(t){
   const trnMode=isTrainingLedger(t);
-  if(trnMode)ensureTrainingRows(t); else ensureDrillPhases(t);
+  ensureTrainingRows(t);
   const headIc=trnMode?'📚':'🚨';
-  const headSub=trnMode?'12 个月培训记录台账 · 行内展开':'演习 4 阶段 · 行内展开';
+  const headSub=trnMode?'12 个月培训记录台账 · 行内展开':`${drillRowCount(t)} 次演习台账 · 行内展开`;
   const headName=trnMode?'培训':'应急演习';
-  const mainHTML=trnMode?renderTrainingLedger(t):`<div class="drill-cards" id="drill-cards-${t.id}">${renderDrillCards(t)}</div>`;
-  const sumHTML=trnMode?renderTrainingSummary(t):renderDrillSummary(t);
-  const saveTxt=trnMode?'💾 保存培训记录':'💾 保存进度';
+  const mainHTML=renderTrainingLedger(t);
+  const sumHTML=renderTrainingSummary(t);
+  const saveTxt=trnMode?'💾 保存培训记录':'💾 保存演习记录';
   return `<div class="drill-expand-inner" data-task-id="${t.id}">
     <div class="drill-expand-hd">
       <div class="drill-expand-title">${headIc} ${esc(t.workDetail||t.title||headName)} <span class="drill-sub">${headSub}</span></div>
@@ -6495,15 +6551,14 @@ function closeDrillDrawer(){
   if(typeof renderSubModule==='function')renderSubModule();
 }
 function refreshDrillBtn(taskId){
-  // 更新外层按钮数字 + tier 颜色：台账行 0/12，其余行 0/4（不重渲整个表）
+  // 更新外层按钮数字 + tier 颜色：按各自台账行数（仓库 12，演习 4/2/1），不重渲整个表
   const t=data.tasks.find(x=>String(x.id)===String(taskId));
   if(!t)return;
   const btn=document.querySelector(`.drill-btn[data-task-id="${taskId}"]`);
   if(!btn)return;
   const ct=btn.querySelector('.drill-ct');
-  const trnMode=isTrainingLedger(t);
-  const tot=trnMode?12:4;
-  const d=trnMode?trainingCount(t):drillCount(t);
+  const tot=drillRowCount(t);
+  const d=trainingCount(t);
   if(ct)ct.textContent=`${d}/${tot}`;
   btn.classList.remove('drill-tier-full','drill-tier-mid','drill-tier-zero');
   btn.classList.add(d===tot&&tot>0?'drill-tier-full':d>=1?'drill-tier-mid':'drill-tier-zero');
@@ -6560,7 +6615,7 @@ function saveDrillProgress(taskId){
     toast('保存失败，请重试');
     return;
   }
-  toast(isTrainingLedger(t)?'✅ 已保存培训记录':'✅ 已保存演练进度');
+  toast(isTrainingLedger(t)?'✅ 已保存培训记录':'✅ 已保存演习记录');
   closeDrillDrawer();
   if(typeof renderSubModule==='function')renderSubModule();
   if(typeof refreshDrillBanner==='function')refreshDrillBanner();
