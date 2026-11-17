@@ -1140,6 +1140,14 @@ body:has(.trn-wrap) .fab-wrap{display:none}
 .mt-tbl td.mc-mini.note{background:#fef9c3;color:#854d0e}
 .mt-tbl td.mc-mini.empty{color:#cbd5e1;font-size:11px}
 .mt-tbl td.mc-mini.empty:hover{background:#fef9e8;color:var(--primary);cursor:pointer}
+/* 检查表存档 cat=9 月份格三态：灰→绿→红（黄总 2026-11-17） */
+td.c9m{cursor:pointer;font-weight:700;text-align:center;transition:background .12s}
+td.c9m.c9-gray{color:#94a3b8;background:#f8fafc}
+td.c9m.c9-gray:hover{background:#e2e8f0;color:#64748b}
+td.c9m.c9-done{color:#15803d;background:#dcfce7}
+td.c9m.c9-done:hover{background:#bbf7d0}
+td.c9m.c9-red{color:#b91c1c;background:#fee2e2}
+td.c9m.c9-red:hover{background:#fecaca}
 .mt-tbl td.mc.empty:hover{background:#fef9e8;color:var(--primary);cursor:pointer}
 .mc.empty{color:#cbd5e1}
 .mc.empty:hover{background:#fef9e8;color:var(--primary);cursor:pointer}
@@ -1805,7 +1813,7 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-11-1050';
+const BUILD_TAG='26-11-1051';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -3123,6 +3131,16 @@ function renderModuleTableHTML(){
       }
       if(k==='month'){
         const monthly=(t.monthly && t.monthly.length===12)?t.monthly:new Array(12).fill('');
+        if(String(t.cat)==='9'){
+          // 检查表存档：月份格三态循环 灰→绿→红→灰，纯点击无需输入（黄总 2026-11-17 要求）
+          return MONTH_LABELS.map((m,mi)=>{
+            const v=monthly[mi]||'';
+            const cls=v==='done'?'c9-done':(v==='red'?'c9-red':'c9-gray');
+            const txt=v==='done'?'✓':(v==='red'?'✗':'●');
+            const tip=v==='done'?`${m} 已完成（绿）·点击变红`:`${v==='red'?`${m} 异常（红）·点击变灰`:`${m} 未处理（灰）·点击变绿`}`;
+            return `<td class="mc mc-mini c9m ${cls}" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleChecklistMonth(${t.id},${mi})" title="${tip}">${txt}</td>`;
+          }).join('');
+        }
         if(t.cat==='13'){
           // 评级跟踪：1-12 月每列都是 A/B/C+/C/D/E/F 评级下拉
           return MONTH_LABELS.map((m,mi)=>{
@@ -3595,6 +3613,12 @@ function renderMonthlyViewHTML(filterItems){
   const body=filterItems.map((t,i)=>{
     const monthly=(t.monthly && t.monthly.length===12)?t.monthly:new Array(12).fill('');
     const cells=skipMonth?'':monthly.map((v,mi)=>{
+      if(curCat==='9'){
+        const cls=v==='done'?'c9-done':(v==='red'?'c9-red':'c9-gray');
+        const txt=v==='done'?'✓':(v==='red'?'✗':'●');
+        const tip=v==='done'?`${MONTH_LABELS[mi]} 已完成（绿）·点击变红`:`${v==='red'?`${MONTH_LABELS[mi]} 异常（红）·点击变灰`:`${MONTH_LABELS[mi]} 未处理（灰）·点击变绿`}`;
+        return `<td class="mc c9m ${cls}" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleChecklistMonth(${t.id},${mi})" title="${tip}">${txt}</td>`;
+      }
       if(v==='done') return `<td class="mc done" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} 已完成。点击编辑">✓</td>`;
       if(v && /^\d{4}-\d{2}-\d{2}$/.test(v)) return `<td class="mc date" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} 计划：${v}。点击编辑">${v.slice(5)}</td>`;
       if(v) return `<td class="mc note" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]}：${esc(v)}。点击编辑">${esc(v.slice(0,4))}</td>`;
@@ -3622,6 +3646,17 @@ function renderMonthlyViewHTML(filterItems){
     </table>
   </div>
   <div class="auth-foot">💡 点击月份格切换完成/未完成；显示日期为该月计划执行日；显示文字为该月备注。</div>`;
+}
+function toggleChecklistMonth(taskId,monthIdx){
+  const t=data.tasks.find(x=>x.id==taskId);
+  if(!t)return;
+  if(!t.monthly || t.monthly.length!==12)t.monthly=new Array(12).fill('');
+  const cur=t.monthly[monthIdx]||'';
+  // 三态循环：灰(空) → 绿(done) → 红(red) → 灰(空)
+  const next=(cur==='')?'done':(cur==='done'?'red':'');
+  t.monthly[monthIdx]=next;
+  saveData();
+  renderSubModule();
 }
 function toggleMonthCell(taskId,monthIdx){
   const t=data.tasks.find(x=>x.id==taskId);
