@@ -1083,6 +1083,9 @@ body:has(.trn-wrap) .fab-wrap{display:none}
 .prog-num.prog-mid{color:var(--primary,#3b82f6)}
 .prog-num.prog-low{color:#f59e0b}
 .prog-num.prog-zero{color:var(--muted,#94a3b8)}
+.copies-badge{display:inline-block;min-width:22px;text-align:center;padding:2px 7px;border-radius:10px;background:#fff7e8;color:#b45309;font-weight:700;font-size:12px;font-variant-numeric:tabular-nums}
+.copies-none{color:var(--muted,#94a3b8)}
+.mt-tbl .td-copies{text-align:center;width:56px;max-width:56px}
 .prog-bar{display:block;width:100%;height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden;border:1px solid #e2e8f0}
 .prog-fill{display:block;height:100%;border-radius:3px;transition:width .25s ease}
 .prog-fill-full{background:linear-gradient(90deg,#10b981,#059669)}
@@ -1802,7 +1805,7 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-11-1048';
+const BUILD_TAG='26-11-1049';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -1848,7 +1851,7 @@ const CATS=[
   {id:'9',name:'检查表存档',color:'c-orange',short:'检查表存档',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6M9 13h6M9 17h6"/></svg>',
    subs:['点检记录','检查记录','统计记录'],
-   cols:[['num','序号'],['detail','工作明细'],['period','周期'],['month','1月-12月'],['progress','进度'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
+   cols:[['num','序号'],['detail','工作明细'],['copies','份数'],['period','周期'],['month','1月-12月'],['progress','进度'],['plan','实施要求'],['org','平台名称'],['lead','担当'],['sup','协力'],['conf','确认'],['note','备注']]},
   {id:'10',name:'碳减排项目',color:'c-emerald',short:'碳减排项目',
    icon:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z M19 21v-2a4 4 0 00-4-4H9a4 4 0 00-4 4v2"/></svg>',
    subs:['客户项目','ESG/碳核查'],
@@ -2841,6 +2844,7 @@ function moduleDrawerBody(t){
     <div class="field"><label>项目内容（实施细节）</label><input id="md_content" value="${esc(v('projectContent'))}" placeholder="如：①确认合作范围 ②准备审核材料 ③接受一阶段审核"></div>
     <div class="field"><label>子分类</label><select id="md_sub">${c.subs.map(s=>`<option ${(t.sub||c.subs[0])===s?'selected':''}>${esc(s)}</option>`).join('')}</select></div>
     <div class="field"><label>审核周期</label><input id="md_period" value="${esc(v('period'))}" placeholder="如 1年"></div>
+    ${(currentSubCat==='9')?`<div class="field"><label>份数（该检查表有几份）</label><input id="md_copies" type="number" min="0" value="${esc(v('copies'))}" placeholder="如 3"></div>`:''}
     ${(currentSubCat==='1'||currentSubCat==='7'||currentSubCat==='8')?`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
       ${currentSubCat==='1'?`
@@ -2895,6 +2899,7 @@ function saveModule(){
     note:document.getElementById('md_note').value.trim(),
     done:false
   };
+  {const cpEl=document.getElementById('md_copies');if(cpEl)obj.copies=cpEl.value.trim();}
   if(currentSubCat==='13'){
     const monthly=new Array(12).fill('');
     for(let mi=0;mi<12;mi++){
@@ -3016,7 +3021,7 @@ function renderModuleTableHTML(){
     if(k==='month')return MONTH_LABELS.map((m,mi)=>`<th class="mth mth-tbl" title="月份排期">${m}</th>`).join('');
     if(k==='progress')return `<th title="按月打勾完成度（X/12）">${t}</th>`;
     if(k==='drill')return `<th title="培训进度：演习按 4 阶段（计划→通知→实操→记录）；仓库安全培训按 12 个月培训台账。点击该行按钮行内展开">${t}</th>`;
-    if(k==='first'||k==='expire'||k==='startDate'||k==='assigner'||k==='finishTime'||k==='memoStatus'||k==='progressStep')return `<th class="sm">${t}</th>`;
+    if(k==='first'||k==='expire'||k==='startDate'||k==='assigner'||k==='finishTime'||k==='memoStatus'||k==='progressStep'||k==='copies')return `<th class="sm">${t}</th>`;
     if(k==='note')return `<th>${t}</th>`;
     return `<th>${t}</th>`;
   }).join('')+'<th style="text-align:right">操作</th>';
@@ -3055,6 +3060,7 @@ function renderModuleTableHTML(){
       const [k]=col;
       if(k==='num')return `<td class="num">${i+1}</td>`;
       if(k==='detail')return `<td class="td-detail" title="${esc(detail)}">${esc(detail)}</td>`;
+      if(k==='copies'){const cp=(t.copies==null||t.copies==='')?'':String(t.copies);return `<td class="sm td-copies">${cp?`<span class="copies-badge">${esc(cp)}</span>`:'<span class="copies-none">—</span>'}</td>`;}
       if(k==='content')return `<td class="td-content">${esc(content)||'—'}</td>`;
       if(k==='period')return `<td class="sm">${esc(period)||'—'}</td>`;
       if(k==='first')return `<td class="sm"><input type="date" class="cell-date" value="${esc(t.firstCert||'')}" onclick="event.stopPropagation()" onchange="updateTaskField(${t.id},'firstCert',this.value)" title="点击日历修改首次发证日期"></td>`;
@@ -3583,7 +3589,7 @@ function renderMonthlyViewHTML(filterItems){
   const curCat=String(currentSubCat);
   const skipMonth=(curCat==='11'||curCat==='5'||curCat==='7'||curCat==='2'); // cat=11 走专属台账、cat=5 走 4 阶段演练、cat=7 走完成进度子项、cat=2 客户验厂走 4 阶段计划明细，都不要月度循环
   const monthHeads=skipMonth?'':MONTH_LABELS.map((m,i)=>`<th class="mth">${m}</th>`).join('');
-  const head='<th class="num">序号</th><th>工作明细</th><th class="sm">周期</th><th>担当</th>'+
+  const head='<th class="num">序号</th><th>工作明细</th>'+(curCat==='9'?'<th class="sm">份数</th>':'')+'<th class="sm">周期</th><th>担当</th>'+
     monthHeads+
     '<th class="mth" style="text-align:right">操作</th>';
   const body=filterItems.map((t,i)=>{
@@ -3599,6 +3605,7 @@ function renderMonthlyViewHTML(filterItems){
     return `<tr>
       <td class="num">${i+1}</td>
       <td class="td-detail" title="${esc(t.workDetail||'')}">${esc(t.workDetail||'')}</td>
+      ${curCat==='9'?`<td class="sm td-copies">${(t.copies!=null&&t.copies!=='')?`<span class="copies-badge">${esc(String(t.copies))}</span>`:'<span class="copies-none">—</span>'}</td>`:''}
       <td class="sm">${esc(t.period||'')}</td>
       <td>${t.lead?`<span class="mt-person lead">${esc(t.lead)}</span>`:'—'}</td>
       ${cells}
@@ -3723,6 +3730,7 @@ function openModuleAdd(){
       <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:10px">
         ${MONTH_LABELS.map((m,mi)=>`<div class="field" style="margin:0"><label style="font-size:11px">${m}</label><select id="ma_rating_m${mi}" class="rating-sel r-none" style="width:100%;margin-top:2px"><option value="">—</option><option value="A">A</option><option value="B">B</option><option value="C+">C+</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select></div>`).join('')}
       </div>`:''}
+      ${String(currentSubCat)==='9'?`<div class="field"><label>🔢 份数（该检查表有几份，可留空后补）</label><input id="maCopies" type="number" min="0" placeholder="如 3"></div>`:''}
       <div class="field"><label>备注</label><textarea id="maNote" rows="2"></textarea></div>
     </div>
     <div class="ma-ft"><button class="btn" onclick="closeModuleAdd()">取消</button><button class="btn primary" onclick="moduleAddSave()">保存</button></div>
@@ -3751,6 +3759,7 @@ function moduleAddSave(){
     note:(elNote?elNote.value:''),
     done:false,
     workDetail:title};
+  {const el=document.getElementById('maCopies');if(el && el.value.trim()!=='')rec.copies=el.value.trim();}
   if(isMemo){
     rec.expire=rec.due;                       // 要求完成日期 → expire，倒数提醒按此算
     rec.startDate=(elStart&&elStart.value)?elStart.value:todayStr(); // 记录日期自动=今天
