@@ -95,6 +95,19 @@ input,select,textarea{font-family:inherit;font-size:14px;padding:8px 10px;border
   gap:14px;margin-bottom:22px;
 }
 @media(max-width:1280px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
+/* 模块进度速览（今日行动台 1056） */
+.mp-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:background .15s}
+.mp-row:hover{background:#f1f5f9}
+.mp-dot{width:10px;height:10px;border-radius:3px;flex:none}
+.mp-name{width:130px;flex:none;font-size:13px;font-weight:600;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mp-bar{flex:1;height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+.mp-fill{height:100%;border-radius:99px}
+.mp-num{flex:none;font-size:12px;font-weight:700;color:#334155;min-width:46px;text-align:right}
+.mp-num .mp-sep{opacity:.5;font-weight:400;padding:0 1px}
+.mp-over{flex:none;font-size:11px;font-weight:700;color:#b91c1c;background:#fee2e2;padding:2px 8px;border-radius:99px}
+.mp-arrow{flex:none;color:#94a3b8;font-size:12px}
+.pc-note{margin-left:10px;font-size:12px;font-weight:400;color:#94a3b8}
+@media(max-width:640px){.mp-name{width:92px}.mp-arrow,.mp-over{display:none}}
 @media(max-width:880px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
 
 /* ============ 可视化大屏入口按钮（首页 CTA） ============ */
@@ -1592,7 +1605,7 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
       <div class="greeting-bar">
         <div>
           <h2>欢迎回来，<span class="name">牛马</span> 👋</h2>
-          <div class="greet-meta" id="greetMeta">今天 <span id="todayDate"></span> · 6 个业务模块待您处理</div>
+          <div class="greet-meta" id="greetMeta">今天 <span id="todayDate"></span> · 12 大业务模块进度实时汇总</div>
         </div>
         <button class="today-btn" onclick="scrollToToday()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 7v5l3 2"/><circle cx="12" cy="12" r="9"/></svg>
@@ -1600,7 +1613,6 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
         </button>
       </div>
 
-      <div class="cards-grid" id="cardsGrid"></div>
 
       <div class="card" id="todayCard">
         <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今日要处理</h2>
@@ -1613,6 +1625,11 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
         </div>
         <div class="today-upd" id="todayUpd"></div>
         <div id="todayList"></div>
+      </div>
+
+      <div class="card" id="progressCard">
+        <h2><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg>模块进度速览<span class="pc-note">点击任意一行直达该模块</span></h2>
+        <div id="moduleProgress"></div>
       </div>
 
       <div class="center" style="margin-top:18px;text-align:center">
@@ -1813,7 +1830,7 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-11-1055';
+const BUILD_TAG='26-11-1056';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -2137,50 +2154,23 @@ async function loadFromCloud(manual){
 
 /* ============ 渲染：6 模块卡片网格 ============ */
 function renderCards(){
-  document.getElementById('cardsGrid').innerHTML=CATS.map(c=>{
-    let total=0,done=0,overdue=0;
-    if(!c.isAggregator){
-      const it=data.tasks.filter(x=>x.cat===c.id);
-      total=it.length;done=it.filter(x=>x.done).length;
-      const t=todayStr();
-      overdue=it.filter(x=>!x.done && x.due && x.due<t).length;
-    }
-    // 右上角徽章：F=聚合提示；其他=完成数+逾期红点
-    const statHtml=c.isAggregator
-      ? `<div class="mod-card-stat" style="background:rgba(255,255,255,.28)">💡 聚合视图</div>`
-      : (total?`<div class="mod-card-stat">${done}<span style="opacity:.6">/${total}</span>${overdue?`<span class="bad"> · ${overdue}逾期</span>`:''}</div>`:'');
-    // 副标题（描述）
-    const descMap={
-      '1':'ISO体系 · 认证台账',
-      '2':'社会责任 · 环境 · 质量验厂',
-      '3':'清洁链 · BHIVE · Higg 数据',
-      '4':'化学品 · 水电气 · 碳排放',
-      '5':'消防 / 应急 / 污水演练',
-      '6':'每周检查 · 季度安全',
-      '7':'废水 / 仪器校准 / 人员',
-      '8':'BCI · 各系统账户续费',
-      '9':'点检 · 检查 · 统计存档',
-      '10':'迅销 / POLO / OTTO 减排',
-      '11':'客人行程 · 休假报销',
-      'F':'证书到期 · 验厂排期 · 待办'
-    };
-    const desc=descMap[c.id]||'';
-    // chips 重新设计：前 3 个 sub 名称 + "+N" 折叠
-    const subs=c.subs||[];
-    const subChips=subs.slice(0,3).map(s=>`<span class="chip" onclick="event.stopPropagation();openSubModule('${c.id}','${s.replace(/'/g,"\\'")}')">${esc(s)}</span>`).join('');
-    const moreChip=subs.length>3?`<span class="chip more" onclick="event.stopPropagation();openSubModule('${c.id}')" title="还有 ${subs.length-3} 个子分类">+${subs.length-3}</span>`:'';
-    return `<div class="mod-card ${c.color}" onclick="openSubModule('${c.id}')">
-      ${statHtml}
-      <div class="mod-card-head">
-        <div class="ic">${c.icon}</div>
-        <div style="flex:1;min-width:0">
-          <div class="mod-card-title">${esc(c.name)}</div>
-          <div class="mod-card-desc">${esc(desc)}</div>
-        </div>
-      </div>
-      <div class="mod-card-chips">
-        ${subChips}${moreChip}
-      </div>
+  // 今日行动台（1056）：15 张大卡改为「模块进度速览」细条，点击直达模块
+  const box=document.getElementById('moduleProgress'); if(!box) return;
+  const t=todayStr();
+  const MP_COLOR={'1':'#6366f1','2':'#0ea5e9','3':'#10b981','4':'#f59e0b','5':'#ef4444','6':'#8b5cf6','7':'#14b8a6','8':'#ec4899','9':'#f97316','10':'#22c55e','11':'#64748b','12':'#a855f7'};
+  box.innerHTML=CATS.filter(c=>!c.isAggregator).map(c=>{
+    const it=data.tasks.filter(x=>String(x.cat)===String(c.id));
+    const total=it.length, done=it.filter(x=>x.done).length;
+    const overdue=it.filter(x=>!x.done && x.due && x.due<t).length;
+    const pct=total?Math.round(done/total*100):0;
+    const col=MP_COLOR[c.id]||'#94a3b8';
+    return `<div class="mp-row" onclick="openSubModule('${c.id}')" title="${esc(c.name)} · 点击进入模块">
+      <span class="mp-dot" style="background:${col}"></span>
+      <span class="mp-name">${esc(c.name)}</span>
+      <div class="mp-bar"><div class="mp-fill" style="width:${pct}%;background:${col}"></div></div>
+      <span class="mp-num">${done}<span class="mp-sep">/</span>${total}</span>
+      ${overdue?`<span class="mp-over">${overdue} 逾期</span>`:''}
+      <span class="mp-arrow">→</span>
     </div>`;
   }).join('');
 }
