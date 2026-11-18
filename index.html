@@ -1813,7 +1813,7 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-11-1052';
+const BUILD_TAG='26-11-1053';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -3155,6 +3155,20 @@ function renderModuleTableHTML(){
             return `<td class="mc mc-mini c9m ${cls}" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleChecklistMonth(${t.id},${mi})" title="${tip}">${txt}</td>`;
           }).join('');
         }
+        if(String(t.cat)==='10'){
+          // 碳减排项目：日期/文字格保留原样可编辑；空/done/red 走三态循环（黄总 2026-11-18 要求）
+          return MONTH_LABELS.map((m,mi)=>{
+            const v=monthly[mi]||'';
+            if(v && v!=='done' && v!=='red'){
+              if(/^\d{4}-\d{2}-\d{2}$/.test(v)) return `<td class="mc mc-mini date" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${m} 计划：${v}">${v.slice(5)}</td>`;
+              return `<td class="mc mc-mini note" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${m}：${esc(v)}">${esc(v.slice(0,2))}</td>`;
+            }
+            const cls=v==='done'?'c9-done':(v==='red'?'c9-red':'c9-gray');
+            const txt=v==='done'?'✓':(v==='red'?'✗':'●');
+            const tip=v==='done'?`${m} 已完成（绿）·点击变红`:`${v==='red'?`${m} 异常（红）·点击变灰`:`${m} 未处理（灰）·点击变绿`}`;
+            return `<td class="mc mc-mini c9m ${cls}" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleChecklistMonth(${t.id},${mi})" title="${tip}">${txt}</td>`;
+          }).join('');
+        }
         if(t.cat==='13'){
           // 评级跟踪：1-12 月每列都是 A/B/C+/C/D/E/F 评级下拉
           return MONTH_LABELS.map((m,mi)=>{
@@ -3635,6 +3649,17 @@ function renderMonthlyViewHTML(filterItems){
       }
       if(curCat==='6'){
         // 日常检查：日期/文字格保留原样可编辑；空/done/red 走三态循环
+        if(v && v!=='done' && v!=='red'){
+          if(/^\d{4}-\d{2}-\d{2}$/.test(v)) return `<td class="mc date" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} 计划：${v}">${v.slice(5)}</td>`;
+          return `<td class="mc note" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]}：${esc(v)}">${esc(v.slice(0,4))}</td>`;
+        }
+        const cls=v==='done'?'c9-done':(v==='red'?'c9-red':'c9-gray');
+        const txt=v==='done'?'✓':(v==='red'?'✗':'●');
+        const tip=v==='done'?`${MONTH_LABELS[mi]} 已完成（绿）·点击变红`:`${v==='red'?`${MONTH_LABELS[mi]} 异常（红）·点击变灰`:`${MONTH_LABELS[mi]} 未处理（灰）·点击变绿`}`;
+        return `<td class="mc c9m ${cls}" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleChecklistMonth(${t.id},${mi})" title="${tip}">${txt}</td>`;
+      }
+      if(curCat==='10'){
+        // 碳减排项目：日期/文字格保留原样可编辑；空/done/red 走三态循环
         if(v && v!=='done' && v!=='red'){
           if(/^\d{4}-\d{2}-\d{2}$/.test(v)) return `<td class="mc date" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]} 计划：${v}">${v.slice(5)}</td>`;
           return `<td class="mc note" data-tid="${t.id}" data-mid="${mi}" onclick="event.stopPropagation();toggleMonthCell(${t.id},${mi})" title="${MONTH_LABELS[mi]}：${esc(v)}">${esc(v.slice(0,4))}</td>`;
