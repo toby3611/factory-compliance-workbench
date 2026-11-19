@@ -1830,7 +1830,7 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-11-1056';
+const BUILD_TAG='26-11-1057';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -7733,6 +7733,84 @@ function ensureCertTypeOption(v){
   if(![...sel.options].some(o=>o.value===v)){const op=document.createElement('option');op.value=v;op.textContent=v;sel.appendChild(op);}
 }
 
+/* ===== 证书标准识别：证据分层 编号 > 文件名 > 正文词频（修复 OCS 被 RCS 抢先误判） ===== */
+const CERT_STD_DEF=[
+  {code:'GOTS',short:/\bGOTS\b/i,full:/Global Organic Textile Standard|全球有机纺织标准/i},
+  {code:'GRS', short:/\bGRS\b/i, full:/Global Recycled Standard|全球回收标准/i},
+  {code:'RCS', short:/\bRCS\b/i, full:/Recycled Claim Standard|回收声明标准/i},
+  {code:'OCS', short:/\bOCS\b/i, full:/Organic Content Standard|有机含量标准/i},
+  {code:'OEKO-TEX',short:/OEKO[\-\s]?TEX/i,full:/国际环保纺织标准/i},
+  {code:'Regenagri',short:/\bRegenagri\b/i,full:/Regenerative Agriculture|再生农业/i},
+  {code:'BCI',short:/\bBCI\b|Better Cotton/i,full:/良好棉花/i},
+  {code:'RWS',short:/\bRWS\b|Responsible Wool Standard/i,full:/责任羊毛标准/i},
+  {code:'RDS',short:/\bRDS\b|Responsible Down Standard/i,full:/责任羽绒标准/i},
+  {code:'Bluesign',short:/bluesign/i,full:null},
+  {code:'FSC',short:/\bFSC\b|Forest Stewardship Council/i,full:/森林认证|森林管理委员会/i},
+  {code:'PEFC',short:/\bPEFC\b/i,full:null},
+  {code:'Fairtrade',short:/Fairtrade|Fair Trade/i,full:/公平贸易/i},
+  {code:'Higg',short:/\bHigg\b/i,full:null},
+  {code:'ZDHC',short:/\bZDHC\b/i,full:null},
+  {code:'EU Ecolabel',short:/EU Eco-?label/i,full:/欧盟生态标签/i},
+  {code:'WRAP',short:/\bWRAP\b/i,full:null},
+  {code:'SA8000',short:/SA8000|Social Accountability 8000/i,full:null}
+];
+// 抽取证书编号（原 noPatterns 原样复用，供类型识别与编号填写共用）
+function grabCertNo(txt){
+  const noPatterns=[
+    /(?:证书号|证书编号|编号|证号|注册号|登记号|注册证书号)\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/]{4,55})/i,
+    /(?:Scope\s*Cert(?:ificate)?\.?\s*(?:No|Number|#)\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55}))/i,
+    /(?:Cert(?:ificate)?\.?\s*(?:No|Number|ID|#)\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55}))/i,
+    /(?:License|Registration|Reference|Ref|Certificate\s*ID)\.?\s*(?:No|Number)?\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55})/i,
+    /\bCert(?:ificate)?\s*No\.?\s*([A-Za-z0-9][A-Za-z0-9\-]{4,55})/i,
+    /\bNo\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{5,55})/i,
+    /\bID\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55})/i
+  ];
+  for(const re of noPatterns){const m=(txt||'').match(re);if(m&&m[1]){const c=m[1].replace(/\s+/g,'').trim();if(c)return c;}}
+  return '';
+}
+// 编号中的标准代号（ECOCERT 形如 EGL/215771/OCS/xxx，代号前后为 / - _ 空格 或串首尾）
+function stdCodesFromNo(no){
+  if(!no)return [];
+  const hits=[];
+  for(const d of CERT_STD_DEF){
+    const key=d.code.replace(/[- ]/g,'[\\- ]?');
+    if(new RegExp('(^|[/\\-_\\s])'+key+'($|[/\\-_\\s])','i').test(no))hits.push(d.code);
+  }
+  return hits;
+}
+// 从任意文本找标准代号（全称 + 缩写）
+function stdCodesFromText(txt){
+  if(!txt)return [];
+  const hits=[];
+  for(const d of CERT_STD_DEF){if(d.short.test(txt)||(d.full&&d.full.test(txt)))hits.push(d.code);}
+  return hits;
+}
+// 主识别：编号 > 文件名 > 正文词频 > 兜底
+function detectCertStandard(txt,no,fileName){
+  const body=txt||'';
+  const isoM=body.match(/ISO\s?(\d{4,5})/i);
+  if(isoM)return 'ISO '+isoM[1];
+  const a=stdCodesFromNo(no);
+  if(a.length===1)return a[0];
+  const f=stdCodesFromText(fileName);
+  if(a.length>1&&f.length===1&&a.indexOf(f[0])>=0)return f[0];
+  if(f.length===1)return f[0];
+  const counts={};
+  for(const d of CERT_STD_DEF){
+    let c=(body.match(new RegExp(d.short.source,'gi'))||[]).length;
+    if(d.full)c+=(body.match(new RegExp(d.full.source,'gi'))||[]).length*2;
+    if(c)counts[d.code]=c;
+  }
+  const ranked=Object.keys(counts).sort((x,y)=>counts[y]-counts[x]);
+  if(ranked.length){
+    if(ranked.length===1||counts[ranked[0]]>counts[ranked[1]])return ranked[0];
+    for(const p of a.concat(f)){if(ranked.indexOf(p)>=0)return p;}
+    return ranked[0];
+  }
+  const all=stdCodesFromText(body);
+  return all.length?all[0]:'';
+}
+
 async function autoExtractPdf(src){
   try{
     if(!window.pdfjsLib){
@@ -7782,30 +7860,11 @@ async function autoExtractPdf(src){
     ];
     for(const [re,name] of issuerList){if(re.test(txt)){setIfEmpty('certIssuer',name);break;}}
 
-    // 2. 证书类型（关键词 → 类型；ISO 特判具体编号；命中不在下拉框则动态补选项）
-    const typeKeywords=[
-      [/\bGOTS\b/i,'GOTS'],[/Global Organic Textile Standard/i,'GOTS'],[/全球有机纺织标准/i,'GOTS'],
-      [/\bGRS\b/i,'GRS'],[/Global Recycled Standard/i,'GRS'],[/全球回收标准/i,'GRS'],
-      [/\bRCS\b/i,'RCS'],[/Recycled Claim Standard/i,'RCS'],[/回收声明标准/i,'RCS'],
-      [/\bOCS\b/i,'OCS'],[/Organic Content Standard/i,'OCS'],[/有机含量标准/i,'OCS'],
-      [/OEKO[\-\s]?TEX/i,'OEKO-TEX'],[/国际环保纺织标准/i,'OEKO-TEX'],
-      [/\bRegenagri\b/i,'Regenagri'],[/Regenerative Agriculture/i,'Regenagri'],[/再生农业/i,'Regenagri'],
-      [/\bBCI\b|Better Cotton/i,'BCI'],[/良好棉花/i,'BCI'],
-      [/\bRWS\b|Responsible Wool Standard/i,'RWS'],[/责任羊毛标准/i,'RWS'],
-      [/\bRDS\b|Responsible Down Standard/i,'RDS'],[/责任羽绒标准/i,'RDS'],
-      [/bluesign/i,'Bluesign'],
-      [/\bFSC\b|Forest Stewardship Council/i,'FSC'],[/森林认证|森林管理委员会/i,'FSC'],
-      [/\bPEFC\b/i,'PEFC'],
-      [/Fairtrade|Fair Trade/i,'Fairtrade'],[/公平贸易/i,'Fairtrade'],
-      [/\bHigg\b/i,'Higg'],
-      [/\bZDHC\b/i,'ZDHC'],
-      [/EU Ecolabel|EU Eco-?label/i,'EU Ecolabel'],[/欧盟生态标签/i,'EU Ecolabel'],
-      [/\bWRAP\b/i,'WRAP'],
-      [/SA8000|Social Accountability 8000/i,'SA8000']
-    ];
-    const isoM=txt.match(/ISO\s?(\d{4,5})/i);
-    if(isoM){const v='ISO '+isoM[1];ensureCertTypeOption(v);setIfEmpty('certType',v);}
-    for(const [re,name] of typeKeywords){if(re.test(txt)){ensureCertTypeOption(name);setIfEmpty('certType',name);break;}}
+    // 2. 证书类型（证据分层：编号 > 文件名 > 正文词频；修复 OCS 被 RCS 抢先误判）
+    const noForType=grabCertNo(txt);
+    const fnForType=(typeof src!=='string'&&src&&src.name)?src.name:'';
+    const detected=detectCertStandard(txt,noForType,fnForType);
+    if(detected){ensureCertTypeOption(detected);setIfEmpty('certType',detected);}
 
     // 3+4. 有效期 / 发证日期 (v3: 关键词 + 日期对启发式 + UI 提示)
     //     支持「YYYY-MM-DD / YYYY/MM/DD / YYYY.MM.DD / YYYY年MM月DD日 / DD-MM-YYYY」五种日期写法
@@ -7866,24 +7925,8 @@ async function autoExtractPdf(src){
     });
 
     // 5. 证书编号（覆盖 Cert No / Scope Cert / License / Registration / Ref / No. / 编号 / 注册号 等写法）
-    const noPatterns=[
-      /(?:证书号|证书编号|编号|证号|注册号|登记号|注册证书号)\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/]{4,55})/i,
-      /(?:Scope\s*Cert(?:ificate)?\.?\s*(?:No|Number|#)\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55}))/i,
-      /(?:Cert(?:ificate)?\.?\s*(?:No|Number|ID|#)\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55}))/i,
-      /(?:License|Registration|Reference|Ref|Certificate\s*ID)\.?\s*(?:No|Number)?\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55})/i,
-      /\bCert(?:ificate)?\s*No\.?\s*([A-Za-z0-9][A-Za-z0-9\-]{4,55})/i,
-      /\bNo\.?\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{5,55})/i,
-      /\bID\s*[:：#]?\s*([A-Za-z0-9][A-Za-z0-9\-_/.]{4,55})/i
-    ];
-    for(const re of noPatterns){
-    const m=txt.match(re);
-    if(m&&m[1]){
-      // 证书号去内部空白：PDF.js 经常把字符间距拆开 ("TNV21 4230251" -> "TNV214230251")
-      const cleaned=m[1].replace(/\s+/g,'').trim();
-      if(cleaned)setIfEmpty('certNo',cleaned);
-      break;
-    }
-  }
+    const noFromPdf=grabCertNo(txt);
+    if(noFromPdf)setIfEmpty('certNo',noFromPdf);
 
     // 6. 范围（取关键词后第一段有效文本）
     const scopeM=txt.match(/(?:Scope\s*of\s*(?:Registration|Certification)|Product\s*Scope|Scope\s*:|范围\s*[:：]|认证范围)\s*([^\n.;。]{6,140}?)(?=\s*(?:Certificate|No\.|Issued|Valid|Expiry|Registration|License|ID|$))/i);
