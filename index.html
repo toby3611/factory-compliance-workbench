@@ -1793,6 +1793,7 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
   <div class="modal">
     <h3>云端同步设置</h3>
     <p>数据保存在你的私有云端（GitHub Gist），换电脑 / 手机打开同一链接即可同步，无需拷贝文件。<br>① 在 github.com → Settings → Developer settings → Personal access tokens 生成一个带 <b>gist</b> 权限的 Token；<br>② 粘贴到下方。留空 Gist ID 会自动新建私有 Gist。</p>
+    <p style="color:#c0392b;font-weight:600;margin:6px 0">⚠️ 推送代码用的 public_repo Token 不能用于云端同步（能读不能写，会导致「同步失败」）。同步必须用勾选 gist 权限的 Token。</p>
     <div class="field">
       <label>GitHub Token（必填，仅存你本地/链接里）</label>
       <input id="syncToken" type="password" placeholder="ghp_..." style="width:100%">
@@ -1818,6 +1819,7 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
         <button class="btn sm" onclick="copySyncLink()">复制</button>
       </div>
       <div class="row" style="margin-top:8px">
+        <button class="btn sm" onclick="selfTestSync()">🔍 自检连接</button>
         <button class="btn sm" onclick="disconnectSync()" style="color:var(--red);border-color:#ffd0d2">断开云端（转本地）</button>
       </div>
     </div>
@@ -1830,7 +1832,7 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-11-1057';
+const BUILD_TAG='26-11-1059';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -2078,6 +2080,15 @@ function setStatus(kind){
   else if(kind==='error'){b.textContent='⚠️ 同步失败';b.style.background='rgba(229,72,77,.7)';}
   else{b.textContent='⚠ 本地模式·未连云端';b.style.background='rgba(234,88,12,.78)';}
 }
+/* 把同步底层错误翻译成中文根因，避免只显示笼统「同步失败」 */
+function explainSyncError(e){
+  const m=String((e&&e.message)||e||'');
+  if(/401|Bad credentials/i.test(m))return 'Token 已过期或无效（401），请重新生成 gist 权限 Token';
+  if(/404/.test(m))return '无 Gist 写权限（404）：当前 Token 只能读不能写（常见：误用了 public_repo Token），须用勾选 gist 权限的 Token';
+  if(/403/.test(m))return '权限不足（403），Token 需勾选 gist';
+  if(/Failed to fetch|NetworkError|network|Load failed/i.test(m))return '网络不通，暂时连不上 GitHub';
+  return m||'未知错误';
+}
 /* 同步配置双写：主 key + 备份 key 同时落盘，任一存活即可自动恢复云端 */
 function _bakSync(){try{localStorage.setItem(SYNC_KEY,JSON.stringify(sync));localStorage.setItem(SYNC_BAK_KEY,JSON.stringify(sync));}catch(e){}}
 function loadSyncCfg(){
@@ -2102,16 +2113,24 @@ function saveData(){
   localSave();
   if(sync.enabled){setStatus('syncing');clearTimeout(pushTimer);pushTimer=setTimeout(pushGist,700);}
 }
+const GIST_SAFE_LIMIT=900*1024; /* Gist 单文件约 1MB 上限，留 124KB 余量防截断 */
 async function pushGist(){
   try{
+    const payload=JSON.stringify(data,null,1);
+    if(payload.length>GIST_SAFE_LIMIT){
+      setStatus('error');
+      console.warn('云端数据体积超限',payload.length);
+      toast('⛔ 数据体积 '+Math.round(payload.length/1024)+'KB 超过云端上限（900KB），已拒绝写入以防云端损坏。请到证书库删除大附件原件（原件本地留档即可）后再同步');
+      return;
+    }
     const res=await fetch('https://api.github.com/gists/'+sync.gistId,{
       method:'PATCH',
       headers:{'Authorization':'token '+sync.token,'Content-Type':'application/json'},
-      body:JSON.stringify({files:{[GIST_FILE]:{content:JSON.stringify(data,null,1)}}})
+      body:JSON.stringify({files:{[GIST_FILE]:{content:payload}}})
     });
     if(!res.ok)throw new Error('HTTP '+res.status);
     setStatus('synced');
-  }catch(e){setStatus('error');console.warn('push failed',e)}
+  }catch(e){setStatus('error');console.warn('push failed',e);toast('云端保存失败：'+explainSyncError(e)+'（数据已存本机，可点徽章重连）')}
 }
 async function gistRead(){
   const res=await fetch('https://api.github.com/gists/'+sync.gistId,{headers:{'Authorization':'token '+sync.token}});
@@ -2139,7 +2158,7 @@ async function gistVerifyWrite(){
     headers:{'Authorization':'token '+sync.token,'Content-Type':'application/json','Accept':'application/vnd.github+json'},
     body:JSON.stringify({description:DEFAULT_GIST_DESC})
   });
-  if(!res.ok)throw new Error('HTTP '+res.status+'：Token 无 Gist 写入权限（需勾选 gist 权限）');
+  if(!res.ok)throw new Error('HTTP '+res.status+'（写权限校验失败，需 gist 权限）');
   return true;
 }
 async function loadFromCloud(manual){
@@ -2149,7 +2168,7 @@ async function loadFromCloud(manual){
     const d=await gistRead();
     if(d){data=d;localSave();renderAll();setStatus('synced');if(manual)toast('已从云端刷新')}
     else{setStatus('local')}
-  }catch(e){setStatus('error');if(manual)toast('刷新失败：'+e.message)}
+  }catch(e){setStatus('error');if(manual)toast('刷新失败：'+explainSyncError(e))}
 }
 
 /* ============ 渲染：6 模块卡片网格 ============ */
@@ -7445,6 +7464,17 @@ function openSync(){
   document.getElementById('syncMask').classList.remove('hidden');
 }
 function closeSync(){document.getElementById('syncMask').classList.add('hidden')}
+/* 弹窗自检：分别验证「读」与「写」，黄总一点即知问题在哪 */
+async function selfTestSync(){
+  const err=document.getElementById('syncErr');err.style.color='';err.textContent='自检中…';
+  try{
+    await gistRead();
+    try{ await gistVerifyWrite(); err.style.color='#0a7d3c'; err.textContent='✅ 自检通过：云端可正常读取和写入，同步没问题。'; }
+    catch(w){ err.style.color='#c0392b'; err.textContent='⚠️ 读取正常，但写入失败：'+explainSyncError(w)+'。请更换带 gist 权限的 Token。'; }
+  }catch(e){
+    err.style.color='#c0392b'; err.textContent='❌ 云端读取失败：'+explainSyncError(e)+'。请检查 Token 或重新生成 gist 权限 Token。';
+  }
+}
 async function saveSync(){
   const token=document.getElementById('syncToken').value.trim();
   const gist=document.getElementById('syncGist').value.trim();
@@ -7958,12 +7988,18 @@ function saveCert(e){
     return;
   }
   const maxId=data.certs.reduce((m,c)=>Math.max(m,c.id||0),0);
+  /* 原件不进云端：base64 附件体积大，塞进 Gist 会撑爆导致整个云端数据截断损坏。
+     仅保留元数据；PDF 原件请在本机留档。小图(<200KB)仍内嵌以便本机预览。 */
+  const rawData=pendingCertFile.data||'';
+  const isBig=rawData.length>200*1024;
   data.certs.push({id:maxId+1,...fields,
-    name:pendingCertFile.name,mime:pendingCertFile.mime,size:pendingCertFile.size,data:pendingCertFile.data,url:pendingCertFile.url,ts:Date.now()});
+    name:pendingCertFile.name,mime:pendingCertFile.mime,size:pendingCertFile.size,
+    data:isBig?'':rawData,url:pendingCertFile.url,ts:Date.now()});
   pendingCertFile=null;
   document.getElementById('certFormWrap').style.display='none';
   document.getElementById('certFileMeta').textContent='';
-  saveData();renderCerts();toast('证书已保存');
+  saveData();renderCerts();
+  toast(isBig?'证书已保存（原件未上传云端，请在本机留档）':'证书已保存');
 }
 function cancelCert(){pendingCertFile=null;document.getElementById('certFormWrap').style.display='none';document.getElementById('certFileMeta').textContent=''}
 function viewCert(id){const c=data.certs.find(x=>x.id==id);if(c)window.open(c.url||c.data,'_blank')}
@@ -8264,7 +8300,15 @@ async function _wbBoot(){
     setStatus('syncing');
     try{
       const d=await gistRead();
-      if(d){data=d;localSave();setStatus('synced');}
+      if(d){
+        data=d;localSave();
+        /* 根治：读成功≠能写。启动即校验写权限，杜绝 public_repo Token「假装已同步」 */
+        try{ await gistVerifyWrite(); setStatus('synced'); }
+        catch(w){
+          setStatus('error');console.warn('写权限自检失败：',w);
+          toast('⚠️ 云端自检未通过：'+explainSyncError(w)+'。数据可查看，但修改存不回。请点右上角徽章更换 Token');
+        }
+      }
       else{data=localLoad()||seed();setStatus('local');}
     }catch(e){
       console.warn('云端同步失败：',e);
@@ -8276,7 +8320,7 @@ async function _wbBoot(){
         }else{ data=seed(); }
       }catch(_){ data=seed(); }
       setStatus('error');
-      toast('云端同步失败（同步链接可能已过期），已按云端最新状态清空本月度列；如要恢复实时同步，请向小妹获取最新同步链接');
+      toast('云端读取失败（'+explainSyncError(e)+'），已用本机缓存继续；请点右上角徽章检查同步设置');
     }
   }else{
     data=localLoad()||seed();
