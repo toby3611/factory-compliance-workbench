@@ -1830,7 +1830,7 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
 const APP_VER='2026-10-01a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-11-1057';
+const BUILD_TAG='26-11-1058';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -2102,8 +2102,30 @@ function saveData(){
   localSave();
   if(sync.enabled){setStatus('syncing');clearTimeout(pushTimer);pushTimer=setTimeout(pushGist,700);}
 }
+/* 防覆盖锁（1058）：本地待写入数据若明显少于云端快照，判定为「旧标签页残留脏数据」，
+   拦截并让用户确认，防止再次发生备忘录被清空的事故。读云端失败时放行，避免锁死同步。 */
+async function guardAgainstOverwrite(){
+  if(!sync.enabled) return true;
+  let cloud=null;
+  try{ cloud=await gistRead(); }catch(e){ return true; }
+  if(!cloud||!Array.isArray(cloud.tasks)||!Array.isArray(data.tasks)) return true;
+  const ln=data.tasks.length, cn=cloud.tasks.length;
+  /* 仅当云端≥50条、本地不足云端70%、差距≥20条才拦截——正常增删改/小批量删除零打扰 */
+  if(cn>=50 && ln<cn*0.7 && (cn-ln)>=20){
+    let ok=false;
+    try{ ok=window.confirm('数据保护：本地仅 '+ln+' 条事项，云端有 '+cn+' 条（明显更多）。\n继续上传会用本地较少数据覆盖云端，可能丢失备忘录等数据。\n\n【确定】= 仍要覆盖云端\n【取消】= 阻止上传、保留云端（推荐）'); }
+    catch(e){ ok=false; }
+    if(!ok){
+      setStatus('synced');
+      try{ toast('已阻止本次上传，云端数据保持原样（可点右上角徽章手动刷新）'); }catch(_){}
+      return false;
+    }
+  }
+  return true;
+}
 async function pushGist(){
   try{
+    if(!await guardAgainstOverwrite()) return;
     const res=await fetch('https://api.github.com/gists/'+sync.gistId,{
       method:'PATCH',
       headers:{'Authorization':'token '+sync.token,'Content-Type':'application/json'},
