@@ -1828,9 +1828,9 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-10-01a';
+const APP_VER='2026-11-21a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-11-1058';
+const BUILD_TAG='26-11-1059';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -2123,13 +2123,31 @@ async function guardAgainstOverwrite(){
   }
   return true;
 }
+/* 体积闸门(1059)：Gist 单文件约 1MB 上限，实测序列化超 ~90 万字符会被截断致 JSON 断裂。
+   上传前：①剥离存量证书内嵌 base64（历史脏数据兜底）；②校验总体积，超限则拦截写入、保留云端。 */
+const GIST_MAX_CHARS=800000;
+function stripCertBase64(){
+  if(!Array.isArray(data.certs))return 0;
+  let n=0;
+  data.certs.forEach(c=>{if(c&&c.data){delete c.data;n++;}});
+  return n;
+}
 async function pushGist(){
   try{
     if(!await guardAgainstOverwrite()) return;
+    const cleaned=stripCertBase64();              // 存量证书 base64 就地剥离，不再写云端
+    if(cleaned){localSave();console.info('stripped',cleaned,'cert base64 before push');}
+    const content=JSON.stringify(data,null,1);
+    if(content.length>GIST_MAX_CHARS){
+      setStatus('synced');                       // 保留云端现状，不误报同步失败
+      try{toast('数据过大('+content.length+'字符)，已阻止上传保护云端。请检查演习照片/大附件是否过多。');}catch(_){}
+      console.warn('push blocked: payload too large',content.length);
+      return;
+    }
     const res=await fetch('https://api.github.com/gists/'+sync.gistId,{
       method:'PATCH',
       headers:{'Authorization':'token '+sync.token,'Content-Type':'application/json'},
-      body:JSON.stringify({files:{[GIST_FILE]:{content:JSON.stringify(data,null,1)}}})
+      body:JSON.stringify({files:{[GIST_FILE]:{content:content}}})
     });
     if(!res.ok)throw new Error('HTTP '+res.status);
     setStatus('synced');
@@ -7980,15 +7998,23 @@ function saveCert(e){
     return;
   }
   const maxId=data.certs.reduce((m,c)=>Math.max(m,c.id||0),0);
+  /* 体积闸门(1059)：证书只存元数据，绝不把 PDF base64(data)写入数据集合，避免撑爆 Gist；
+     url=仓库原件链接（有则保留，可在线打开），data 一律不落盘。原件请用户本地留档。 */
   data.certs.push({id:maxId+1,...fields,
-    name:pendingCertFile.name,mime:pendingCertFile.mime,size:pendingCertFile.size,data:pendingCertFile.data,url:pendingCertFile.url,ts:Date.now()});
+    name:pendingCertFile.name,mime:pendingCertFile.mime,size:pendingCertFile.size,url:pendingCertFile.url||null,ts:Date.now()});
   pendingCertFile=null;
   document.getElementById('certFormWrap').style.display='none';
   document.getElementById('certFileMeta').textContent='';
   saveData();renderCerts();toast('证书已保存');
 }
 function cancelCert(){pendingCertFile=null;document.getElementById('certFormWrap').style.display='none';document.getElementById('certFileMeta').textContent=''}
-function viewCert(id){const c=data.certs.find(x=>x.id==id);if(c)window.open(c.url||c.data,'_blank')}
+function viewCert(id){
+  const c=data.certs.find(x=>x.id==id);if(!c)return;
+  if(c.url){window.open(c.url,'_blank');return;}  /* 仓库原件：在线打开 */
+  /* 只存元数据：无仓库链接时不内嵌原件，提示本地留档（兼容旧数据残留 data） */
+  if(c.data){window.open(c.data,'_blank');return;}
+  toast('该证书仅存元数据，PDF 原件请到电脑本地留档查看');
+}
 function delCert(id){if(!confirm('删除该证书？'))return;data.certs=data.certs.filter(c=>c.id!=id);saveData();renderCerts();toast('已删除')}
 // 快速修改到期日 - 只弹一个日期选择器，改一项即保存
 function quickEditCertExpiry(id){
@@ -8060,8 +8086,9 @@ function renderCerts(){
   box.innerHTML=data.certs.slice().sort((a,b)=>(b.ts||0)-(a.ts||0)).map(c=>{
     const over=c.expiry&&c.expiry<t;
     const soon=c.expiry&&!over&&(new Date(c.expiry)-new Date(t))<=60*DAY;
+    const certSrc=c.url||c.data;
     const thumb=c.mime&&c.mime.indexOf('image/')===0?
-      `<img class="cert-thumb" src="${c.url||c.data}" onclick="viewCert(${c.id})" alt="">`:
+      (certSrc?`<img class="cert-thumb" src="${certSrc}" onclick="viewCert(${c.id})" alt="">`:`<div class="cert-thumb" onclick="viewCert(${c.id})">图</div>`):
       `<div class="cert-thumb" onclick="viewCert(${c.id})">PDF</div>`;
     return `<div class="cert-card" data-cert-id="${c.id}">
       ${thumb}
