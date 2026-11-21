@@ -1828,9 +1828,9 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-11-21a';
+const APP_VER='2026-11-21b';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-11-1059';
+const BUILD_TAG='26-11-1060';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -2081,16 +2081,23 @@ function setStatus(kind){
 /* 同步配置双写：主 key + 备份 key 同时落盘，任一存活即可自动恢复云端 */
 function _bakSync(){try{localStorage.setItem(SYNC_KEY,JSON.stringify(sync));localStorage.setItem(SYNC_BAK_KEY,JSON.stringify(sync));}catch(e){}}
 function loadSyncCfg(){
-  try{const s=JSON.parse(localStorage.getItem(SYNC_KEY));if(s&&s.token){sync=s;_bakSync();return}}catch(e){}
-  /* 兜底1：主 key 丢失 → 用备份 key 自动恢复云端连接 */
-  try{const b=JSON.parse(localStorage.getItem(SYNC_BAK_KEY));if(b&&b.token){sync=b;localStorage.setItem(SYNC_KEY,JSON.stringify(sync));return}}catch(e){}
+  /* 根治(1060)：URL 同步链接里的 token 优先于本地配置——换 token 后打开一次链接，
+     两台设备都自动以链接为准更新，无需手动进面板粘贴。history 清 hash 后新 token 已落地 localStorage，
+     以后刷新走主 key 即为新 token；日常打开不带 hash 的固定网址仍走本地配置，互不影响。 */
   const h=location.hash.match(/gist=([^&]+)&t=([^&]+)/);
   if(h){
-    sync={enabled:true,gistId:h[1],token:decodeURIComponent(h[2])};
+    /* 链接只带 gist + token，保留本地已有的 uploadToken 避免被覆盖丢失 */
+    let up='';
+    try{const s=JSON.parse(localStorage.getItem(SYNC_KEY));if(s&&s.uploadToken)up=s.uploadToken;}catch(e){}
+    if(!up){try{const b=JSON.parse(localStorage.getItem(SYNC_BAK_KEY));if(b&&b.uploadToken)up=b.uploadToken;}catch(e){}}
+    sync={enabled:true,gistId:h[1],token:decodeURIComponent(h[2]),uploadToken:up};
     _bakSync();
     history.replaceState(null,'',location.pathname+location.search);
     return;
   }
+  try{const s=JSON.parse(localStorage.getItem(SYNC_KEY));if(s&&s.token){sync=s;_bakSync();return}}catch(e){}
+  /* 兜底1：主 key 丢失 → 用备份 key 自动恢复云端连接 */
+  try{const b=JSON.parse(localStorage.getItem(SYNC_BAK_KEY));if(b&&b.token){sync=b;localStorage.setItem(SYNC_KEY,JSON.stringify(sync));return}}catch(e){}
   /* 兜底2：彻底无配置 → 预置固定 Gist id，用户只需补填 Token 即可重连 */
   sync={enabled:false,gistId:DEFAULT_GIST_ID,token:null};
 }
