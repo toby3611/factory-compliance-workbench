@@ -448,6 +448,34 @@ body:has(.mask:not(.hidden)) .fab-wrap{display:none}
 .mobile-tabbar .tab:active{background:var(--primary-soft);opacity:.8}
 .mobile-tabbar .tab svg{width:22px;height:22px;flex:none;stroke-width:2}
 
+/* ===== 手机端模块九宫格（1061）===== */
+.mod-grid-wrap{padding:4px 0 10px}
+.mod-grid-group{margin-bottom:18px}
+.mod-grid-group h3{font-size:13px;color:var(--muted);margin:0 0 10px;padding-left:2px;font-weight:600}
+.mod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mod-tile{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  min-height:88px;padding:10px 5px;border-radius:14px;border:none;cursor:pointer;
+  color:#fff;font-size:12px;font-weight:600;text-align:center;line-height:1.25;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s,opacity .12s;
+}
+.mod-tile:active{transform:scale(.95);opacity:.85}
+.mod-tile .mt-ic{width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.22);border-radius:9px}
+.mod-tile .mt-ic svg{width:20px;height:20px}
+.mod-tile .mt-cnt{font-size:10px;font-weight:500;opacity:.9;background:rgba(255,255,255,.22);padding:1px 6px;border-radius:8px}
+.mod-tile.c-blue{background:linear-gradient(135deg,#1d4ed8 0%,#3b82f6 100%)}
+.mod-tile.c-green{background:linear-gradient(135deg,#047857 0%,#10b981 100%)}
+.mod-tile.c-teal{background:linear-gradient(135deg,#0e7490 0%,#06b6d4 100%)}
+.mod-tile.c-amber{background:linear-gradient(135deg,#b45309 0%,#f59e0b 100%)}
+.mod-tile.c-red{background:linear-gradient(135deg,#991b1b 0%,#dc2626 100%)}
+.mod-tile.c-purple{background:linear-gradient(135deg,#6b21a8 0%,#9333ea 100%)}
+.mod-tile.c-cyan{background:linear-gradient(135deg,#155e75 0%,#0ea5e9 100%)}
+.mod-tile.c-pink{background:linear-gradient(135deg,#9d174d 0%,#ec4899 100%)}
+.mod-tile.c-orange{background:linear-gradient(135deg,#9a3412 0%,#f97316 100%)}
+.mod-tile.c-emerald{background:linear-gradient(135deg,#064e3b 0%,#059669 100%)}
+.mod-tile.c-slate{background:linear-gradient(135deg,#334155 0%,#64748b 100%)}
+.mod-tile.c-indigo{background:linear-gradient(135deg,#3730a3 0%,#6366f1 100%)}
+
 /* 响应式 */
 @media(max-width:1280px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:880px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
@@ -1645,6 +1673,26 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
       </div>
     </div>
 
+    <!-- 模块中心（1061）：手机端 12 大类业务模块 + 工具九宫格入口 -->
+    <div class="view" id="view-modules">
+      <div class="greeting-bar">
+        <div>
+          <h2>全部模块</h2>
+          <div class="greet-meta">业务模块 + 工具，一点即达</div>
+        </div>
+      </div>
+      <div class="mod-grid-wrap">
+        <div class="mod-grid-group">
+          <h3>业务模块</h3>
+          <div class="mod-grid" id="modGridCats"></div>
+        </div>
+        <div class="mod-grid-group">
+          <h3>工具</h3>
+          <div class="mod-grid" id="modGridTools"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- 报告中心 -->
     <div class="view" id="view-report">
       <div class="greeting-bar">
@@ -1828,9 +1876,9 @@ body:has(main.main.dash2-mode) .fab-wrap:hover{opacity:1}
 
 <script>
 /* 工作台构建版本号（显示在顶栏，用于核对是否加载到最新版，避免 CDN 缓存误判） */
-const APP_VER='2026-11-21b';
+const APP_VER='2026-11-27a';
 // 用户可见构建版本号（YY-MM-XXXX 自增），每次优化推送 +1
-const BUILD_TAG='26-11-1060';
+const BUILD_TAG='26-11-1061';
 /* ============ 11 大类（按图 1 重分类）+ 子功能 ============ */
 const CATS=[
   {id:'12',name:'工作备忘录',color:'c-purple',short:'工作备忘录',
@@ -7540,7 +7588,7 @@ function disconnectSync(){
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 function scrollToToday(){const el=document.getElementById('todayCard');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
 function aiHelp(){toast('AI 助手已就绪 · 在 WorkBuddy 对话中让我帮你')}
-function renderAll(){const vt=document.getElementById('verTag');if(vt)vt.textContent='v'+APP_VER;normalizeData();renderSideCats();renderCards();renderToday();renderMetrics();renderKB();renderMemos();if(document.getElementById('view-cert').classList.contains('active'))renderCerts()}
+function renderAll(){const vt=document.getElementById('verTag');if(vt)vt.textContent='v'+APP_VER;normalizeData();renderSideCats();renderModuleGrid();renderCards();renderToday();renderMetrics();renderKB();renderMemos();if(document.getElementById('view-cert').classList.contains('active'))renderCerts()}
 
 /* ============ 侧栏业务模块（从 CATS 动态生成 11 大类） ============ */
 function renderSideCats(){
@@ -7555,6 +7603,28 @@ function renderSideCats(){
       ${cnt?`<span class="nav-cnt">${cnt}</span>`:''}
     </div>`;
   }).join('');
+}
+/* 模块九宫格（1061）：手机端模块中心，业务模块 + 工具入口，复用 CATS 图标与配色 */
+function renderModuleGrid(){
+  const gc=document.getElementById('modGridCats'), gt=document.getElementById('modGridTools');
+  if(!gc||!gt)return;
+  gc.innerHTML=CATS.filter(c=>!c.isAggregator).map(c=>{
+    const cnt=data.tasks.filter(x=>String(x.cat)===String(c.id)).length;
+    const ic=c.icon.replace('<svg width="22" height="22"','<svg');
+    return `<button class="mod-tile ${c.color}" onclick="openSubModule('${c.id}')">
+      <span class="mt-ic">${ic}</span><span>${esc(c.short)}</span>${cnt?`<span class="mt-cnt">${cnt}</span>`:''}
+    </button>`;
+  }).join('');
+  const TOOLS=[
+    {v:'report',name:'报告中心',color:'c-blue',ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V10zM14 3v6h6M8 13h8M8 17h5"/></svg>'},
+    {v:'kb',name:'知识库',color:'c-teal',ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h12a4 4 0 014 4v10H8a4 4 0 01-4-4V5zM4 5v10a4 4 0 004 4"/></svg>'},
+    {v:'memo',name:'备忘录',color:'c-purple',ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>'},
+    {v:'cert',name:'证书库',color:'c-amber',ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2h9l5 5v15H6zM15 2v5h5M9 13h6M9 17h6"/></svg>'},
+    {v:'dashboard',name:'可视化大屏',color:'c-indigo',ic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg>'}
+  ];
+  gt.innerHTML=TOOLS.map(o=>`<button class="mod-tile ${o.color}" onclick="showView('${o.v}')">
+    <span class="mt-ic">${o.ic}</span><span>${o.name}</span>
+  </button>`).join('');
 }
 function refreshSideActive(){
   document.querySelectorAll('.nav-item[data-cat]').forEach(el=>{
@@ -8367,6 +8437,10 @@ async function _wbBoot(){
   <button class="tab active" data-view="home" onclick="showView('home')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
     <span>首页</span>
+  </button>
+  <button class="tab" data-view="modules" onclick="showView('modules')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span>模块</span>
   </button>
   <button class="tab" data-view="report" onclick="showView('report')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V10zM14 3v6h6M8 13h8M8 17h5"/></svg>
